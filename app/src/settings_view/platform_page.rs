@@ -229,7 +229,7 @@ impl PlatformPageView {
         });
 
         PlatformPageView {
-            page: PageType::new_monolith(PlatformPageWidget::default(), None, true),
+            page: PageType::new_monolith(PlatformPageWidget::default(), None::<&'static str>, true),
             create_api_key_modal_state: CreateApiKeyModalViewState::new(ModalViewState::new(
                 create_api_key_modal_view,
             )),

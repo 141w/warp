@@ -930,7 +930,7 @@ impl AgentProfilesPageView {
         // section titles inside each widget, so it gets no page-level title,
         // in either arm below.
         if FeatureFlag::UsageBasedPricing.is_enabled() {
-            PageType::new_monolith(AgentsWidget::default(), None, true)
+            PageType::new_monolith(AgentsWidget::default(), None::<&'static str>, true)
         } else {
             let widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = vec![
                 Box::new(UsageWidget::new(ctx)),

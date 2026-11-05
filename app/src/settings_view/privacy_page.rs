@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use warp_i18n::t;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::sync::LazyLock;
@@ -230,7 +231,7 @@ impl PrivacyPageView {
         }
         widgets.push(Box::new(DataManagementWidget::default()));
         widgets.push(Box::new(PrivacyPolicyWidget::default()));
-        PageType::new_uncategorized(widgets, Some(PageTitle::new("Privacy")))
+        PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.privacy"))))
     }
 
     fn update_button_states(

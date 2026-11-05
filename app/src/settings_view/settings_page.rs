@@ -1377,15 +1377,15 @@ where
 }
 
 pub(super) struct PageTitle<V: warpui::View> {
-    text: &'static str,
+    text: std::borrow::Cow<'static, str>,
     /// An optional accessory that renders alongside it whenever the title itself renders.
     pub(super) trailing_element: Option<TrailingElementRenderer<V>>,
 }
 
 impl<V: warpui::View> PageTitle<V> {
-    pub(super) fn new(text: &'static str) -> Self {
+    pub(super) fn new(text: impl Into<std::borrow::Cow<'static, str>>) -> Self {
         Self {
-            text,
+            text: text.into(),
             trailing_element: None,
         }
     }
@@ -1411,7 +1411,7 @@ pub(super) enum PageType<V: warpui::View> {
     /// handle and render their own scrollable elements.
     Monolith {
         widget: Box<dyn SettingsWidget<View = V>>,
-        title: Option<&'static str>,
+        title: Option<std::borrow::Cow<'static, str>>,
         filter: bool,
         vertical_scroll_state: Option<ClippedScrollStateHandle>,
         horizontal_scroll_state: Option<ClippedScrollStateHandle>,
@@ -1525,7 +1525,7 @@ fn render_page_title_with_trailing<V: warpui::View>(
     app: &AppContext,
 ) -> Box<dyn Element> {
     let title_row = render_header_with_trailing_element(
-        render_title_text(title.text, size, appearance),
+        render_title_text(&title.text, size, appearance),
         title.trailing_element.as_ref(),
         view,
         appearance,
@@ -1542,7 +1542,7 @@ impl<V: warpui::View> PageType<V> {
     /// [`SettingsWidget`].
     pub(super) fn new_monolith(
         widget: impl SettingsWidget<View = V> + 'static,
-        title: Option<&'static str>,
+        title: Option<impl Into<std::borrow::Cow<'static, str>>>,
         is_dual_scrollable: bool,
     ) -> Self {
         let (vertical_scroll_state, horizontal_scroll_state) = if is_dual_scrollable {
@@ -1557,7 +1557,7 @@ impl<V: warpui::View> PageType<V> {
         Self::Monolith {
             filter: true,
             widget: Box::new(widget),
-            title,
+            title: title.map(Into::into),
             vertical_scroll_state,
             horizontal_scroll_state,
             min_page_width: MIN_PAGE_WIDTH,
@@ -1727,7 +1727,7 @@ impl<V: warpui::View> PageType<V> {
                 ..
             } => FilteredPageType::Monolith {
                 widget: filter.then_some(widget.as_ref()),
-                title: *title,
+                title: title.clone(),
                 vertical_scroll_state: vertical_scroll_state.clone(),
                 horizontal_scroll_state: horizontal_scroll_state.clone(),
             },
@@ -1763,7 +1763,7 @@ impl<V: warpui::View> PageType<V> {
                         let category = &categories[i];
                         let header = category.header.as_ref();
                         FilteredCategory {
-                            title: header.map_or("", |h| h.title),
+                            title: header.map_or(std::borrow::Cow::Borrowed(""), |h| h.title.clone()),
                             subtitle: header.and_then(|h| h.subtitle),
                             trailing_element: header.and_then(|h| h.trailing_element.as_ref()),
                             widgets: indices
@@ -1835,7 +1835,7 @@ impl<V: warpui::View> PageType<V> {
                 {
                     if let Some(title) = title {
                         let col = Flex::column()
-                            .with_child(render_page_title(title, HEADER_FONT_SIZE, appearance))
+                            .with_child(render_page_title(&title, HEADER_FONT_SIZE, appearance))
                             .with_child(widget.render_widget(view, false, appearance, app));
                         page = col.finish();
                     } else {
@@ -2024,7 +2024,7 @@ impl<V: warpui::View> PageType<V> {
 pub(super) enum FilteredPageType<'a, V: warpui::View> {
     Monolith {
         widget: Option<&'a dyn SettingsWidget<View = V>>,
-        title: Option<&'static str>,
+        title: Option<std::borrow::Cow<'static, str>>,
         vertical_scroll_state: Option<ClippedScrollStateHandle>,
         horizontal_scroll_state: Option<ClippedScrollStateHandle>,
     },
@@ -2048,7 +2048,7 @@ pub(super) enum FilteredPageType<'a, V: warpui::View> {
 /// the category draws no header row at all (e.g. Warpify's single-widget category, whose widget
 /// draws its own heading).
 pub(super) struct CategoryHeader<V: warpui::View> {
-    title: &'static str,
+    title: std::borrow::Cow<'static, str>,
     subtitle: Option<&'static str>,
     trailing_element: Option<TrailingElementRenderer<V>>,
 }
@@ -2060,9 +2060,9 @@ pub(super) struct Category<V: warpui::View> {
 }
 
 impl<V: warpui::View> CategoryHeader<V> {
-    pub(super) fn new(title: &'static str) -> Self {
+    pub(super) fn new(title: impl Into<std::borrow::Cow<'static, str>>) -> Self {
         Self {
-            title,
+            title: title.into(),
             subtitle: None,
             trailing_element: None,
         }
@@ -2085,9 +2085,10 @@ impl<V: warpui::View> CategoryHeader<V> {
 
 impl<V: warpui::View> Category<V> {
     pub(super) fn new(
-        title: &'static str,
+        title: impl Into<std::borrow::Cow<'static, str>>,
         widgets: Vec<Box<dyn SettingsWidget<View = V>>>,
     ) -> Self {
+        let title = title.into();
         Self {
             header: (!title.is_empty()).then(|| CategoryHeader::new(title)),
             widgets,
@@ -2110,7 +2111,7 @@ impl<V: warpui::View> Category<V> {
 
 /// A [`Category`] with only the results which match a search query.
 pub(super) struct FilteredCategory<'a, V: warpui::View> {
-    pub(super) title: &'static str,
+    pub(super) title: std::borrow::Cow<'static, str>,
     pub(super) subtitle: Option<&'static str>,
     pub(super) trailing_element: Option<&'a TrailingElementRenderer<V>>,
     pub(super) widgets: Vec<&'a dyn SettingsWidget<View = V>>,

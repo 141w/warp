@@ -1,6 +1,7 @@
 //! The "Knowledge" settings page, shown under the Agents umbrella.
 
 use std::cell::RefCell;
+use warp_i18n::t;
 use std::collections::HashMap;
 
 use markdown_parser::{FormattedText, FormattedTextFragment, FormattedTextLine};
@@ -26,7 +27,6 @@ use crate::appearance::Appearance;
 use crate::settings::{AISettings, MemoryEnabled, RuleSuggestionsEnabled, WarpDriveContextEnabled};
 use crate::util::bindings;
 
-const PAGE_TITLE: &str = "Knowledge";
 
 const RULES_DOCS_URL: &str = "https://docs.warp.dev/agents/capabilities/rules";
 
@@ -55,7 +55,7 @@ impl KnowledgePageView {
                 Box::new(WarpDriveContextWidget::default()),
             ]);
         }
-        PageType::new_uncategorized(widgets, Some(PageTitle::new(PAGE_TITLE)))
+        PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.knowledge"))))
     }
 }
 

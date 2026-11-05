@@ -320,7 +320,7 @@ impl MainSettingsPageView {
 
         widgets.push(Box::new(LogoutWidget::default()));
 
-        let page = PageType::new_uncategorized(widgets, Some(PageTitle::new("Account")));
+        let page = PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.account"))));
 
         MainSettingsPageView {
             self_handle: ctx.handle(),

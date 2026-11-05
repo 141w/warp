@@ -436,7 +436,7 @@ impl ShowBlocksView {
             me.handle_overflow_menu_event(event, ctx);
         });
 
-        let page = PageType::new_monolith(ShowBlocksWidget::default(), None, false);
+        let page = PageType::new_monolith(ShowBlocksWidget::default(), None::<&'static str>, false);
         Self {
             page,
             list_state: Default::default(),

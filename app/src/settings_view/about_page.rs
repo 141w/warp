@@ -23,7 +23,7 @@ pub struct AboutPageView {
 impl AboutPageView {
     pub fn new(_ctx: &mut ViewContext<AboutPageView>) -> Self {
         AboutPageView {
-            page: PageType::new_monolith(AboutPageWidget::default(), None, false),
+            page: PageType::new_monolith(AboutPageWidget::default(), None::<&'static str>, false),
         }
     }
 }

@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use warp_i18n::t;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -87,7 +88,6 @@ const CODEBASE_INDEX_LIMIT_REACHED: &str = "You have reached the maximum number 
 const REMOTE_CODEBASE_INDEX_LIMIT_REACHED_FAILURE: &str =
     "maximum number of codebase indexes has been reached";
 
-const PAGE_TITLE: &str = "Codebase Indexing";
 
 #[cfg(not(target_family = "wasm"))]
 fn remote_codebase_index_limit_reached(status: &RemoteCodebaseIndexStatus) -> bool {
@@ -377,7 +377,7 @@ impl CodeIndexingPageView {
                 manual_add_directory_button,
             },
         };
-        PageType::new_monolith(widget, Some(PAGE_TITLE), true)
+        PageType::new_monolith(widget, Some(t!("settings.page.code_indexing")), true)
     }
 
     /// Resize `open_project_rules_mouse_states` to match the current workspace count.

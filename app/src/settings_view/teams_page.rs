@@ -1118,7 +1118,7 @@ impl TeamsPageView {
             }
         });
 
-        let page = PageType::new_monolith(TeamsWidget::default(), None, true);
+        let page = PageType::new_monolith(TeamsWidget::default(), None::<&'static str>, true);
         TeamsPageView {
             self_handle: ctx.handle(),
             page,

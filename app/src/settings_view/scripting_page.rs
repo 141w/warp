@@ -1,5 +1,6 @@
 //! Settings UI for local scripting and Warp control permissions.
 use std::cell::RefCell;
+use warp_i18n::t;
 use std::collections::HashMap;
 
 use settings::Setting as _;
@@ -71,7 +72,7 @@ impl ScriptingSettingsPageView {
             vec![Box::new(LocalControlModeWidget)];
 
         Self {
-            page: PageType::new_uncategorized(widgets, Some(PageTitle::new("Scripting"))),
+            page: PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.scripting")))),
             local_only_icon_tooltip_states: RefCell::new(HashMap::new()),
             local_control_mode_dropdown,
             #[cfg(target_os = "macos")]

@@ -513,7 +513,7 @@ impl EnvironmentsPageView {
             self_handle: ctx.handle(),
             page: PageType::new_monolith(
                 EnvironmentsPageWidget,
-                None, // Title rendered conditionally in widget
+                None::<&'static str>, // Title rendered conditionally in widget
                 true, /* is_dual_scrollable */
             ),
             current_page: EnvironmentsPage::default(),

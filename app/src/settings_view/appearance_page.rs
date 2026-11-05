@@ -1362,8 +1362,7 @@ impl AppearanceSettingsPageView {
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
         let mut categories = vec![
             Category::new("", vec![Box::new(LanguageWidget)]),
-            Category::new(
-            "Themes",
+            Category::new(t!("settings.section.themes"),
             vec![
                 Box::new(CreateCustomThemeWidget::default()),
                 Box::new(ThemeSelectWidget::default()),
@@ -1371,8 +1370,7 @@ impl AppearanceSettingsPageView {
         )];
 
         if AppIconSettings::as_ref(ctx).is_supported_on_current_platform() {
-            categories.push(Category::new(
-                "Icon",
+            categories.push(Category::new(t!("settings.section.icon"),
                 vec![Box::new(CustomAppIconWidget::default())],
             ));
         }
@@ -1416,7 +1414,7 @@ impl AppearanceSettingsPageView {
         }
 
         if !window_settings_widgets.is_empty() {
-            categories.push(Category::new("Window", window_settings_widgets));
+            categories.push(Category::new(t!("settings.section.window"), window_settings_widgets));
         }
 
         // Tools panel tab visibility toggles. These control which of the four
@@ -1440,7 +1438,7 @@ impl AppearanceSettingsPageView {
         }
         tools_panel_widgets.push(Box::new(ToolsPanelWarpDriveWidget::default()));
         if !tools_panel_widgets.is_empty() {
-            categories.push(Category::new("Tools panel", tools_panel_widgets));
+            categories.push(Category::new(t!("settings.section.tools_panel"), tools_panel_widgets));
         }
 
         // Create the Input category with all widgets
@@ -1452,10 +1450,9 @@ impl AppearanceSettingsPageView {
             Box::new(InputModeWidget::default()),
         ];
 
-        categories.push(Category::new("Input", category_widgets));
+        categories.push(Category::new(t!("settings.section.input"), category_widgets));
 
-        categories.push(Category::new(
-            "Panes",
+        categories.push(Category::new(t!("settings.section.panes"),
             vec![
                 Box::new(DimInactivePanesWidget::default()),
                 Box::new(FocusFollowsMouseWidget::default()),
@@ -1469,7 +1466,7 @@ impl AppearanceSettingsPageView {
         if FeatureFlag::MinimalistUI.is_enabled() {
             block_settings_widgets.push(Box::new(ShowBlockDividersWidget::default()));
         }
-        categories.push(Category::new("Blocks", block_settings_widgets));
+        categories.push(Category::new(t!("settings.section.blocks"), block_settings_widgets));
 
         let font_settings = FontSettings::as_ref(ctx);
         let mut text_settings_widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = vec![
@@ -1498,10 +1495,9 @@ impl AppearanceSettingsPageView {
             text_settings_widgets.push(Box::new(LigaturesWidget::default()));
         }
 
-        categories.push(Category::new("Text", text_settings_widgets));
+        categories.push(Category::new(t!("settings.section.text"), text_settings_widgets));
 
-        categories.push(Category::new(
-            "Cursor",
+        categories.push(Category::new(t!("settings.section.cursor"),
             vec![
                 Box::new(CursorTypeWidget::default()),
                 Box::new(BlinkingCursorWidget::default()),
@@ -1547,10 +1543,9 @@ impl AppearanceSettingsPageView {
             tab_settings_widgets.push(Box::new(DirectoryTabColorsWidget { add_picker }));
         }
 
-        categories.push(Category::new("Tabs", tab_settings_widgets));
+        categories.push(Category::new(t!("settings.section.tabs"), tab_settings_widgets));
 
-        categories.push(Category::new(
-            "Full-screen Apps",
+        categories.push(Category::new(t!("settings.section.full_screen_apps"),
             vec![Box::new(AltScreenPaddingWidget::default())],
         ));
 

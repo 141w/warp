@@ -2327,8 +2327,7 @@ impl WarpAgentPageView {
             ));
         }
 
-        categories.push(Category::new(
-            "Input",
+        categories.push(Category::new(t!("settings.section.input"),
             vec![
                 Box::new(NaturalLanguageDetectionWidget::default()),
                 Box::new(ShowInputHintTextWidget::default()),
@@ -2345,14 +2344,12 @@ impl WarpAgentPageView {
                 .voice_input_enabled_internal
                 .is_supported_on_current_platform();
         if voice_supported {
-            categories.push(Category::new(
-                "Voice",
+            categories.push(Category::new(t!("settings.section.voice"),
                 vec![Box::new(VoiceWidget::default())],
             ));
         }
 
-        categories.push(Category::new(
-            "Cloud Handoff",
+        categories.push(Category::new(t!("settings.section.cloud_handoff"),
             vec![
                 Box::new(CloudHandoffWidget::default()),
                 Box::new(AutoHandoffOnSleepWidget::default()),
@@ -2378,13 +2375,11 @@ impl WarpAgentPageView {
             vec![Box::new(ApiKeysWidget::new(ctx))],
         ));
 
-        categories.push(Category::new(
-            "AWS Bedrock",
+        categories.push(Category::new(t!("settings.section.aws_bedrock"),
             vec![Box::new(AwsBedrockWidget::new(ctx))],
         ));
 
-        categories.push(Category::new(
-            "Gemini Enterprise",
+        categories.push(Category::new(t!("settings.section.gemini_enterprise"),
             vec![Box::new(GeminiEnterpriseWidget::new(ctx))],
         ));
 
@@ -2397,11 +2392,10 @@ impl WarpAgentPageView {
                 widgets.push(Box::new(CustomModelRoutersWidget));
                 widgets
             };
-            categories.push(Category::new("Custom Routers", custom_router_widgets));
+            categories.push(Category::new(t!("settings.section.custom_routers"), custom_router_widgets));
         }
 
-        categories.push(Category::new(
-            "Agent Attribution",
+        categories.push(Category::new(t!("settings.section.agent_attribution"),
             vec![Box::new(AgentAttributionWidget::default())],
         ));
 
@@ -2416,11 +2410,10 @@ impl WarpAgentPageView {
         ];
         #[cfg(feature = "local_fs")]
         other_widgets.push(Box::new(ConversationLayoutPreferenceWidget));
-        categories.push(Category::new("Other", other_widgets));
+        categories.push(Category::new(t!("settings.section.other"), other_widgets));
 
         if FeatureFlag::AgentModeComputerUse.is_enabled() {
-            categories.push(Category::new(
-                "Experimental",
+            categories.push(Category::new(t!("settings.section.experimental"),
                 vec![Box::new(CloudAgentComputerUseWidget::default())],
             ));
         }
@@ -2429,7 +2422,7 @@ impl WarpAgentPageView {
         let global_ai_sign_up_button = MouseStateHandle::default();
         PageType::new_categorized(
             categories,
-            Some(PageTitle::new("Warp Agent").with_trailing_element(
+            Some(PageTitle::new(t!("settings.page.warp_agent")).with_trailing_element(
                 move |_view, appearance, app| {
                     render_global_ai_toggle(
                         &global_ai_switch_state,

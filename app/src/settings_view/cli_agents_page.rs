@@ -5,6 +5,7 @@
 //! interactive regardless of the global AI toggle.
 
 use std::cell::RefCell;
+use warp_i18n::t;
 use std::collections::HashMap;
 
 use enum_iterator::all;
@@ -51,7 +52,6 @@ use crate::view_components::dropdown::DropdownAction;
 use crate::view_components::{Dropdown, SubmittableTextInput, SubmittableTextInputEvent};
 use crate::{TelemetryEvent, send_telemetry_from_ctx};
 
-const PAGE_TITLE: &str = "Third party CLI agents";
 
 pub struct CLIAgentsPageView {
     page: PageType<Self>,
@@ -134,7 +134,7 @@ impl CLIAgentsPageView {
             Box::new(CLIAgentCommandsWidget),
             Box::new(CLIAgentToolbarLayoutWidget),
         ];
-        PageType::new_uncategorized(widgets, Some(PageTitle::new(PAGE_TITLE)))
+        PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.cli_agents"))))
     }
 
     fn create_cli_agent_dropdowns(
