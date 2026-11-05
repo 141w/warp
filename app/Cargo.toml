@@ -49,6 +49,7 @@ required-features = ["preview_channel"]
 test = false
 
 [dependencies]
+warp_i18n.workspace = true
 addr = "0.15.6"
 ai.workspace = true
 ai_types.workspace = true

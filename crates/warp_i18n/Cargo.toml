@@ -1,0 +1,15 @@
+[package]
+name = "warp_i18n"
+authors.workspace = true
+version = "0.1.0"
+edition = "2024"
+description = "Internationalization layer for Warp UI strings"
+publish.workspace = true
+license.workspace = true
+
+[dependencies]
+rust-i18n.workspace = true
+sys-locale.workspace = true
+
+[dev-dependencies]
+serde_yaml.workspace = true

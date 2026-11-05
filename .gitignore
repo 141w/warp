@@ -70,3 +70,15 @@ __pycache__/
 # Project notes
 .note/
 .claude/scheduled_tasks.lock
+
+# Local build environment (sandbox workarounds)
+.cargo-home/
+.tools/
+.tmp/
+.fakehome/
+.gitconfig-proxy
+.dsh-progress/
+build.log
+build-gui.log
+build-tui.log
+install-bundle.log
