@@ -26,3 +26,4 @@ fn language_converts_to_i18n_language() {
     assert_eq!(I18nLanguage::from(Language::Auto), I18nLanguage::Auto);
     assert_eq!(I18nLanguage::from(Language::English), I18nLanguage::English);
 }
+

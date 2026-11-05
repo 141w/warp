@@ -2105,8 +2105,8 @@ impl UsageWidget {
 impl SettingsWidget for UsageWidget {
     type View = AgentProfilesPageView;
 
-    fn search_terms(&self) -> &str {
-        "a.i. ai usage limit plan"
+    fn search_terms(&self) -> String {
+        "a.i. ai usage limit plan".to_string()
     }
 
     fn render(
@@ -2264,11 +2264,11 @@ struct AgentsWidget {
 impl SettingsWidget for AgentsWidget {
     type View = AgentProfilesPageView;
 
-    fn search_terms(&self) -> &str {
+    fn search_terms(&self) -> String {
         if should_show_mcp_servers() {
-            "ai a.i. agent autonomy profiles allowlist denylist autoexecute permissions models llms planning mcp server"
+            "ai a.i. agent autonomy profiles allowlist denylist autoexecute permissions models llms planning mcp server".to_string()
         } else {
-            "ai a.i. agent autonomy profiles allowlist denylist autoexecute permissions models llms planning"
+            "ai a.i. agent autonomy profiles allowlist denylist autoexecute permissions models llms planning".to_string()
         }
     }
 

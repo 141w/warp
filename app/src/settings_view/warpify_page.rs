@@ -523,8 +523,8 @@ impl TitleWidget {
 impl SettingsWidget for TitleWidget {
     type View = WarpifyPageView;
 
-    fn search_terms(&self) -> &str {
-        "ssh subshell warpify session"
+    fn search_terms(&self) -> String {
+        "ssh subshell warpify session".to_string()
     }
 
     fn render(
@@ -585,8 +585,8 @@ impl SubshellsWidget {
 impl SettingsWidget for SubshellsWidget {
     type View = WarpifyPageView;
 
-    fn search_terms(&self) -> &str {
-        "warpify subshell"
+    fn search_terms(&self) -> String {
+        "warpify subshell".to_string()
     }
 
     fn render(
@@ -611,8 +611,8 @@ struct SSHWidget {
 impl SettingsWidget for SSHWidget {
     type View = WarpifyPageView;
 
-    fn search_terms(&self) -> &str {
-        "warpify ssh"
+    fn search_terms(&self) -> String {
+        "warpify ssh".to_string()
     }
 
     fn render(

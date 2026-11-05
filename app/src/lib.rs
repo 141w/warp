@@ -1,5 +1,9 @@
 #![allow(clippy::doc_lazy_continuation)]
 
+// Embed the shared locale files for the `t!` macro used across the app crate.
+// Paths resolve against this crate's manifest directory (app/).
+warp_i18n::i18n!("../crates/warp_i18n/locales", fallback = "en");
+
 mod ai;
 mod alloc;
 mod antivirus;

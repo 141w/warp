@@ -1151,8 +1151,8 @@ impl SecretRedactionWidget {
 impl SettingsWidget for SecretRedactionWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "secret redaction safe mode hide"
+    fn search_terms(&self) -> String {
+        "secret redaction safe mode hide".to_string()
     }
 
     fn render(
@@ -1429,8 +1429,8 @@ impl AppAnalyticsWidget {
 impl SettingsWidget for AppAnalyticsWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "telemetry usage analytics data collection"
+    fn search_terms(&self) -> String {
+        "telemetry usage analytics data collection".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -1573,8 +1573,8 @@ struct CrashReportsWidget {
 impl SettingsWidget for CrashReportsWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "telemetry crash reports stability data collection"
+    fn search_terms(&self) -> String {
+        "telemetry crash reports stability data collection".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -1648,8 +1648,8 @@ struct CloudConversationStorageWidget {
 impl SettingsWidget for CloudConversationStorageWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "sync cloud conversation store storage ai agent"
+    fn search_terms(&self) -> String {
+        "sync cloud conversation store storage ai agent".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -1762,8 +1762,8 @@ struct NetworkLogWidget {
 impl SettingsWidget for NetworkLogWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "network log audit console data collection"
+    fn search_terms(&self) -> String {
+        "network log audit console data collection".to_string()
     }
 
     fn render(
@@ -1840,8 +1840,8 @@ struct DataManagementWidget {
 impl SettingsWidget for DataManagementWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "data management delete account"
+    fn search_terms(&self) -> String {
+        "data management delete account".to_string()
     }
 
     fn render(
@@ -1916,8 +1916,8 @@ struct PrivacyPolicyWidget {
 impl SettingsWidget for PrivacyPolicyWidget {
     type View = PrivacyPageView;
 
-    fn search_terms(&self) -> &str {
-        "privacy policy terms"
+    fn search_terms(&self) -> String {
+        "privacy policy terms".to_string()
     }
 
     fn render(

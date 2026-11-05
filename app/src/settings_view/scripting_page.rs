@@ -218,8 +218,8 @@ struct WarpControlCliInstallWidget {
 impl SettingsWidget for WarpControlCliInstallWidget {
     type View = ScriptingSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "warp control cli command warpctrl install scripting"
+    fn search_terms(&self) -> String {
+        "warp control cli command warpctrl install scripting".to_string()
     }
 
     fn render(
@@ -274,8 +274,8 @@ struct LocalControlModeWidget;
 impl SettingsWidget for LocalControlModeWidget {
     type View = ScriptingSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "scripting warp control automation warpctrl local cli scripts disabled enabled"
+    fn search_terms(&self) -> String {
+        "scripting warp control automation warpctrl local cli scripts disabled enabled".to_string()
     }
 
     fn render(

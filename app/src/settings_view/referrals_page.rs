@@ -1106,8 +1106,8 @@ impl ReferralsWidget {
 impl SettingsWidget for ReferralsWidget {
     type View = ReferralsPageView;
 
-    fn search_terms(&self) -> &str {
-        "referrals invites"
+    fn search_terms(&self) -> String {
+        "referrals invites".to_string()
     }
 
     fn render(

@@ -346,8 +346,8 @@ struct ExternalEditorCodeWidget;
 impl SettingsWidget for ExternalEditorCodeWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "code editor open files markdown AI conversations layout pane tab"
+    fn search_terms(&self) -> String {
+        "code editor open files markdown AI conversations layout pane tab".to_string()
     }
 
     fn render(
@@ -372,8 +372,8 @@ struct AutoOpenCodeReviewPaneCodeWidget {
 impl SettingsWidget for AutoOpenCodeReviewPaneCodeWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz auto open code review pane panel agent mode change first time accepted diff view conversation"
+    fn search_terms(&self) -> String {
+        "oz auto open code review pane panel agent mode change first time accepted diff view conversation".to_string()
     }
 
     fn render(
@@ -413,8 +413,8 @@ struct CodeReviewPanelToggleWidget {
 impl SettingsWidget for CodeReviewPanelToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "code review panel right side diff git"
+    fn search_terms(&self) -> String {
+        "code review panel right side diff git".to_string()
     }
 
     fn render(
@@ -456,8 +456,8 @@ struct CodeReviewDiffStatsToggleWidget {
 impl SettingsWidget for CodeReviewDiffStatsToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "code review diff stats lines added removed counts"
+    fn search_terms(&self) -> String {
+        "code review diff stats lines added removed counts".to_string()
     }
 
     fn render(
@@ -498,8 +498,8 @@ struct ProjectExplorerToggleWidget {
 impl SettingsWidget for ProjectExplorerToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "project explorer file tree left panel tools"
+    fn search_terms(&self) -> String {
+        "project explorer file tree left panel tools".to_string()
     }
 
     fn render(
@@ -541,8 +541,8 @@ struct GlobalSearchToggleWidget {
 impl SettingsWidget for GlobalSearchToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "global search file search left panel tools"
+    fn search_terms(&self) -> String {
+        "global search file search left panel tools".to_string()
     }
 
     fn render(
@@ -581,8 +581,8 @@ struct ShowHiddenFilesToggleWidget {
 impl SettingsWidget for ShowHiddenFilesToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "show hidden files dotfiles project explorer file tree"
+    fn search_terms(&self) -> String {
+        "show hidden files dotfiles project explorer file tree".to_string()
     }
 
     fn render(
@@ -623,8 +623,8 @@ struct FormatOnSaveToggleWidget {
 impl SettingsWidget for FormatOnSaveToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "format on save lsp language server formatting reformat editor"
+    fn search_terms(&self) -> String {
+        "format on save lsp language server formatting reformat editor".to_string()
     }
 
     fn render(
@@ -666,8 +666,8 @@ struct AutoSaveToggleWidget {
 impl SettingsWidget for AutoSaveToggleWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "auto save autosave automatically save editor files on type focus"
+    fn search_terms(&self) -> String {
+        "auto save autosave automatically save editor files on type focus".to_string()
     }
 
     fn render(
@@ -707,8 +707,8 @@ struct CodeEditorLineNumberModeWidget {}
 impl SettingsWidget for CodeEditorLineNumberModeWidget {
     type View = EditorAndCodeReviewPageView;
 
-    fn search_terms(&self) -> &str {
-        "line number numbers relative line vim gutter code editor"
+    fn search_terms(&self) -> String {
+        "line number numbers relative line vim gutter code editor".to_string()
     }
 
     fn render(

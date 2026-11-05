@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use warp_i18n::t;
 
 use anyhow::Result;
 use chrono::{DateTime, FixedOffset, Local};
@@ -690,7 +691,7 @@ impl ShowBlocksWidget {
                                                 ButtonVariant::Basic,
                                                 view.state_handles.cancel_dialog_handle.clone(),
                                             )
-                                            .with_text_label("Cancel".into())
+                                            .with_text_label(t!("common.cancel").into_owned())
                                             .build()
                                             .on_click(|ctx, _, _| {
                                                 ctx.dispatch_typed_action(
@@ -744,8 +745,8 @@ impl ShowBlocksWidget {
 impl SettingsWidget for ShowBlocksWidget {
     type View = ShowBlocksView;
 
-    fn search_terms(&self) -> &str {
-        "shared blocks"
+    fn search_terms(&self) -> String {
+        "shared blocks".to_string()
     }
 
     fn render(

@@ -53,6 +53,9 @@ use crate::editor::{
     TextOptions,
 };
 use crate::features::FeatureFlag;
+use crate::settings::Language;
+use crate::terminal::general_settings::GeneralSettings;
+use warp_i18n::t;
 use crate::gpu_state::{GPUState, GPUStateEvent};
 use crate::prompt::editor_modal::OpenSource as PromptEditorOpenSource;
 use crate::server::telemetry::{InputUXChangeOrigin, TelemetryEvent};
@@ -497,6 +500,7 @@ pub enum AppearancePageAction {
     ToggleUseLatestUserPromptAsConversationTitleInTabNames,
     ToggleLigatureRendering,
     SetWindowBackdrop(WindowBackdrop),
+    SetLanguage(Language),
     ToggleLeftPanelVisibility,
     ToggleToolsPanelProjectExplorer,
     ToggleToolsPanelGlobalSearch,
@@ -541,6 +545,7 @@ pub struct AppearanceSettingsPageView {
     enforce_min_contrast_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
     input_mode_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
     window_backdrop_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
+    language_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
     input_type_radio_state: RadioButtonStateHandle,
     app_icon_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
     workspace_decorations_dropdown: ViewHandle<Dropdown<AppearancePageAction>>,
@@ -627,6 +632,7 @@ impl TypedActionView for AppearanceSettingsPageView {
             ToggleAllAvailableFonts => self.toggle_all_available_fonts(ctx),
             ToggleDimInactivePanes => self.toggle_dim_inactive_panes(ctx),
             SetWindowBackdrop(backdrop) => self.set_window_backdrop(*backdrop, ctx),
+            SetLanguage(language) => self.set_language(*language, ctx),
             ToggleLeftPanelVisibility => self.toggle_left_panel_visibility(ctx),
             ToggleToolsPanelProjectExplorer => {
                 CodeSettings::handle(ctx).update(ctx, |settings, ctx| {
@@ -1326,6 +1332,7 @@ impl AppearanceSettingsPageView {
             thin_strokes_dropdown,
             input_mode_dropdown,
             window_backdrop_dropdown: Self::build_window_backdrop_dropdown(ctx),
+            language_dropdown: Self::build_language_dropdown(ctx),
             input_type_radio_state,
             app_icon_dropdown,
             enforce_min_contrast_dropdown,
@@ -1353,7 +1360,9 @@ impl AppearanceSettingsPageView {
     }
 
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
-        let mut categories = vec![Category::new(
+        let mut categories = vec![
+            Category::new("", vec![Box::new(LanguageWidget)]),
+            Category::new(
             "Themes",
             vec![
                 Box::new(CreateCustomThemeWidget::default()),
@@ -2598,6 +2607,49 @@ impl AppearanceSettingsPageView {
         })
     }
 
+    fn build_language_dropdown(
+        ctx: &mut ViewContext<Self>,
+    ) -> ViewHandle<Dropdown<AppearancePageAction>> {
+        ctx.add_typed_action_view(|ctx| {
+            let mut dropdown = Dropdown::new(ctx);
+            let values = [Language::Auto, Language::English, Language::Chinese];
+            let current_value = GeneralSettings::as_ref(ctx).language;
+            let selected_index = values
+                .iter()
+                .position(|value| *value == current_value)
+                .unwrap_or(0);
+            dropdown.set_items(
+                values
+                    .into_iter()
+                    .map(|value| {
+                        DropdownItem::new(
+                            Self::language_dropdown_item_label(value),
+                            AppearancePageAction::SetLanguage(value),
+                        )
+                    })
+                    .collect(),
+                ctx,
+            );
+            dropdown.set_selected_by_index(selected_index, ctx);
+            dropdown
+        })
+    }
+
+    fn language_dropdown_item_label(language: Language) -> String {
+        match language {
+            Language::Auto => t!("settings.appearance.language.option.auto").into_owned(),
+            Language::English => t!("settings.appearance.language.option.english").into_owned(),
+            Language::Chinese => t!("settings.appearance.language.option.chinese").into_owned(),
+        }
+    }
+
+    fn set_language(&mut self, language: Language, ctx: &mut ViewContext<Self>) {
+        GeneralSettings::handle(ctx).update(ctx, |settings, ctx| {
+            report_if_error!(settings.language.set_value(language, ctx));
+        });
+        ctx.notify();
+    }
+
     fn window_backdrop_dropdown_item_label(backdrop: WindowBackdrop) -> &'static str {
         match backdrop {
             WindowBackdrop::None => "No material",
@@ -2816,8 +2868,8 @@ struct CreateCustomThemeWidget {
 impl SettingsWidget for CreateCustomThemeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "create theme create custom theme"
+    fn search_terms(&self) -> String {
+        "create theme create custom theme".to_string()
     }
 
     fn render(
@@ -2943,8 +2995,8 @@ impl ThemeSelectWidget {
 impl SettingsWidget for ThemeSelectWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "sync with os theme themes background backgrounds color colors customize"
+    fn search_terms(&self) -> String {
+        "sync with os theme themes background backgrounds color colors customize".to_string()
     }
 
     fn render(
@@ -3040,8 +3092,8 @@ struct CustomAppIconWidget {
 impl SettingsWidget for CustomAppIconWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "customize custom app icon icons dock cmd tab app switcher"
+    fn search_terms(&self) -> String {
+        "customize custom app icon icons dock cmd tab app switcher".to_string()
     }
 
     fn render(
@@ -3156,8 +3208,8 @@ struct CustomWindowSizeWidget {
 impl SettingsWidget for CustomWindowSizeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "open windows with custom size"
+    fn search_terms(&self) -> String {
+        "open windows with custom size".to_string()
     }
 
     fn render(
@@ -3279,8 +3331,8 @@ struct WindowOpacityWidget {
 impl SettingsWidget for WindowOpacityWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "window opacity transparency"
+    fn search_terms(&self) -> String {
+        "window opacity transparency".to_string()
     }
 
     fn render(
@@ -3406,8 +3458,8 @@ struct WindowBlurWidget {
 impl SettingsWidget for WindowBlurWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "window blur radius"
+    fn search_terms(&self) -> String {
+        "window blur radius".to_string()
     }
 
     fn render(
@@ -3465,13 +3517,45 @@ impl SettingsWidget for WindowBlurWidget {
     }
 }
 
+struct LanguageWidget;
+
+impl SettingsWidget for LanguageWidget {
+    type View = AppearanceSettingsPageView;
+
+    fn search_terms(&self) -> String {
+        t!("settings.appearance.language.search").into_owned()
+    }
+
+    fn render(
+        &self,
+        view: &Self::View,
+        appearance: &Appearance,
+        app: &AppContext,
+    ) -> Box<dyn Element> {
+        render_dropdown_item(
+            appearance,
+            &t!("settings.appearance.language.label"),
+            None,
+            None,
+            LocalOnlyIconState::for_setting(
+                Language::storage_key(),
+                Language::sync_to_cloud(),
+                &mut view.local_only_icon_tooltip_states.borrow_mut(),
+                app,
+            ),
+            None,
+            &view.language_dropdown,
+        )
+    }
+}
+
 struct WindowBackdropWidget;
 
 impl SettingsWidget for WindowBackdropWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "window backdrop material blur acrylic mica"
+    fn search_terms(&self) -> String {
+        "window backdrop material blur acrylic mica".to_string()
     }
 
     fn render(
@@ -3525,8 +3609,8 @@ struct ToolsPanelStateScopeWidget {
 impl SettingsWidget for ToolsPanelStateScopeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "left tools panel open closed across tabs file tree project explorer global search warp drive conversation list"
+    fn search_terms(&self) -> String {
+        "left tools panel open closed across tabs file tree project explorer global search warp drive conversation list".to_string()
     }
 
     fn render(
@@ -3575,8 +3659,8 @@ struct ToolsPanelProjectExplorerWidget {
 impl SettingsWidget for ToolsPanelProjectExplorerWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tools panel tabs file explorer project explorer file tree left panel visibility"
+    fn search_terms(&self) -> String {
+        "tools panel tabs file explorer project explorer file tree left panel visibility".to_string()
     }
 
     fn render(
@@ -3615,8 +3699,8 @@ struct ToolsPanelConversationHistoryWidget {
 impl SettingsWidget for ToolsPanelConversationHistoryWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tools panel tabs conversation history agent conversations left panel visibility"
+    fn search_terms(&self) -> String {
+        "tools panel tabs conversation history agent conversations left panel visibility".to_string()
     }
 
     fn render(
@@ -3655,8 +3739,8 @@ struct ToolsPanelGlobalSearchWidget {
 impl SettingsWidget for ToolsPanelGlobalSearchWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tools panel tabs global file search left panel visibility"
+    fn search_terms(&self) -> String {
+        "tools panel tabs global file search left panel visibility".to_string()
     }
 
     fn render(
@@ -3694,8 +3778,8 @@ struct ToolsPanelWarpDriveWidget {
 impl SettingsWidget for ToolsPanelWarpDriveWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tools panel tabs warp drive left panel visibility"
+    fn search_terms(&self) -> String {
+        "tools panel tabs warp drive left panel visibility".to_string()
     }
 
     fn render(
@@ -3739,8 +3823,8 @@ impl Default for InputTypeWidget {
 impl SettingsWidget for InputTypeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "input type warp universal classic style prompt terminal ai developer mode interface shell chips ps1"
+    fn search_terms(&self) -> String {
+        "input type warp universal classic style prompt terminal ai developer mode interface shell chips ps1".to_string()
     }
 
     fn render(
@@ -3793,8 +3877,8 @@ struct InputModeWidget {}
 impl SettingsWidget for InputModeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "input mode input position pinned top bottom classic waterfall reverse"
+    fn search_terms(&self) -> String {
+        "input mode input position pinned top bottom classic waterfall reverse".to_string()
     }
 
     fn render(
@@ -3828,8 +3912,8 @@ struct PromptWidget {
 impl SettingsWidget for PromptWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "prompt ps1 terminal warp shell custom"
+    fn search_terms(&self) -> String {
+        "prompt ps1 terminal warp shell custom".to_string()
     }
 
     fn render(
@@ -3916,8 +4000,8 @@ struct DimInactivePanesWidget {
 impl SettingsWidget for DimInactivePanesWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "dim inactive panes"
+    fn search_terms(&self) -> String {
+        "dim inactive panes".to_string()
     }
 
     fn render(
@@ -3959,8 +4043,8 @@ struct FocusFollowsMouseWidget {
 impl SettingsWidget for FocusFollowsMouseWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "focus follows mouse"
+    fn search_terms(&self) -> String {
+        "focus follows mouse".to_string()
     }
 
     fn render(
@@ -4002,8 +4086,8 @@ struct CompactModeWidget {
 impl SettingsWidget for CompactModeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "compact mode spacing padding"
+    fn search_terms(&self) -> String {
+        "compact mode spacing padding".to_string()
     }
 
     fn render(
@@ -4050,8 +4134,8 @@ struct JumpToBottomOfBlockWidget {
 impl SettingsWidget for JumpToBottomOfBlockWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "jump to bottom of block button"
+    fn search_terms(&self) -> String {
+        "jump to bottom of block button".to_string()
     }
 
     fn render(
@@ -4099,8 +4183,8 @@ struct ShowBlockDividersWidget {
 impl SettingsWidget for ShowBlockDividersWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "show block dividers"
+    fn search_terms(&self) -> String {
+        "show block dividers".to_string()
     }
 
     fn render(
@@ -4144,8 +4228,8 @@ struct AIFontWidget {
 impl SettingsWidget for AIFontWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text agent ai font family font size monospace"
+    fn search_terms(&self) -> String {
+        "text agent ai font family font size monospace".to_string()
     }
 
     fn render(
@@ -4305,8 +4389,8 @@ impl TerminalFontWidget {
 impl SettingsWidget for TerminalFontWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text terminal font family font size line height monospace"
+    fn search_terms(&self) -> String {
+        "text terminal font family font size line height monospace".to_string()
     }
 
     fn render(
@@ -4471,8 +4555,8 @@ struct NotebookFontSizeWidget {
 impl SettingsWidget for NotebookFontSizeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text notebook font size"
+    fn search_terms(&self) -> String {
+        "text notebook font size".to_string()
     }
 
     fn render(
@@ -4563,8 +4647,8 @@ struct ThinStrokesWidget {}
 impl SettingsWidget for ThinStrokesWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text thin strokes high dpi"
+    fn search_terms(&self) -> String {
+        "text thin strokes high dpi".to_string()
     }
 
     fn render(
@@ -4596,8 +4680,8 @@ struct MinimumContrastWidget {}
 impl SettingsWidget for MinimumContrastWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text minimum contrast high"
+    fn search_terms(&self) -> String {
+        "text minimum contrast high".to_string()
     }
 
     fn render(
@@ -4632,8 +4716,8 @@ struct LigaturesWidget {
 impl SettingsWidget for LigaturesWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "text font ligatures"
+    fn search_terms(&self) -> String {
+        "text font ligatures".to_string()
     }
 
     fn render(
@@ -4694,8 +4778,8 @@ impl Default for CursorTypeWidget {
 impl SettingsWidget for CursorTypeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "cursor shape cursor type block bar beam underline"
+    fn search_terms(&self) -> String {
+        "cursor shape cursor type block bar beam underline".to_string()
     }
 
     fn render(
@@ -4767,8 +4851,8 @@ struct BlinkingCursorWidget {
 impl SettingsWidget for BlinkingCursorWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "blinking cursor"
+    fn search_terms(&self) -> String {
+        "blinking cursor".to_string()
     }
 
     fn render(
@@ -4810,8 +4894,8 @@ struct TabCloseButtonPositionWidget {}
 impl SettingsWidget for TabCloseButtonPositionWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tab bar close button position left right"
+    fn search_terms(&self) -> String {
+        "tab bar close button position left right".to_string()
     }
 
     fn render(
@@ -4845,8 +4929,8 @@ struct TabIndicatorWidget {
 impl SettingsWidget for TabIndicatorWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tab indicator"
+    fn search_terms(&self) -> String {
+        "tab indicator".to_string()
     }
 
     fn render(
@@ -4890,8 +4974,8 @@ struct PreserveActiveTabColorWidget {
 impl SettingsWidget for PreserveActiveTabColorWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "tab color preserve new inherit active"
+    fn search_terms(&self) -> String {
+        "tab color preserve new inherit active".to_string()
     }
 
     fn render(
@@ -4935,8 +5019,8 @@ struct VerticalTabsWidget {
 impl SettingsWidget for VerticalTabsWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "vertical tabs sidebar layout"
+    fn search_terms(&self) -> String {
+        "vertical tabs sidebar layout".to_string()
     }
 
     fn render(
@@ -4980,8 +5064,8 @@ struct ShowVerticalTabPanelInRestoredWindowsWidget {
 impl SettingsWidget for ShowVerticalTabPanelInRestoredWindowsWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "vertical tabs panel restore window session snapshot"
+    fn search_terms(&self) -> String {
+        "vertical tabs panel restore window session snapshot".to_string()
     }
 
     fn render(
@@ -5030,8 +5114,8 @@ struct HideTitleBarSearchBarInVerticalTabsWidget {
 impl SettingsWidget for HideTitleBarSearchBarInVerticalTabsWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "hide title bar search bar vertical tabs chrome minimal"
+    fn search_terms(&self) -> String {
+        "hide title bar search bar vertical tabs chrome minimal".to_string()
     }
 
     fn render(
@@ -5080,8 +5164,8 @@ struct UseLatestUserPromptAsConversationTitleInTabNamesWidget {
 impl SettingsWidget for UseLatestUserPromptAsConversationTitleInTabNamesWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "latest user prompt conversation title tab names vertical tabs oz third-party agent"
+    fn search_terms(&self) -> String {
+        "latest user prompt conversation title tab names vertical tabs oz third-party agent".to_string()
     }
 
     fn render(
@@ -5131,8 +5215,8 @@ struct EditToolbarWidget;
 impl SettingsWidget for EditToolbarWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "edit toolbar header panel buttons configure arrange layout chip chips rearrange re-arrange customize"
+    fn search_terms(&self) -> String {
+        "edit toolbar header panel buttons configure arrange layout chip chips rearrange re-arrange customize".to_string()
     }
 
     fn render(
@@ -5231,8 +5315,8 @@ struct DirectoryTabColorsWidget {
 impl SettingsWidget for DirectoryTabColorsWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "directory tab color folder codebase repo"
+    fn search_terms(&self) -> String {
+        "directory tab color folder codebase repo".to_string()
     }
 
     fn render(
@@ -5386,8 +5470,8 @@ struct ZenModeWidget {}
 impl SettingsWidget for ZenModeWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "zen mode minimal tab bar window decoration"
+    fn search_terms(&self) -> String {
+        "zen mode minimal tab bar window decoration".to_string()
     }
 
     fn render(
@@ -5422,8 +5506,8 @@ struct AltScreenPaddingWidget {
 impl SettingsWidget for AltScreenPaddingWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "alt screen padding border space vim"
+    fn search_terms(&self) -> String {
+        "alt screen padding border space vim".to_string()
     }
 
     fn render(
@@ -5528,8 +5612,8 @@ struct ZoomLevelWidget;
 impl SettingsWidget for ZoomLevelWidget {
     type View = AppearanceSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "zoom level zoom size scale"
+    fn search_terms(&self) -> String {
+        "zoom level zoom size scale".to_string()
     }
 
     fn render(

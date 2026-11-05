@@ -1,4 +1,5 @@
 use regex::Regex;
+use warp_i18n::t;
 use warp_editor::editor::NavigationKey;
 use warpui::elements::{
     ChildView, Container, CrossAxisAlignment, Empty, Expanded, Flex, MainAxisSize,
@@ -259,7 +260,7 @@ impl View for AddRegexModal {
                         ButtonVariant::Secondary,
                         self.cancel_button_mouse_state.clone(),
                     )
-                    .with_text_label("Cancel".to_string())
+                    .with_text_label(t!("common.cancel").into_owned())
                     .with_style(button_style)
                     .build()
                     .on_click(move |ctx, _, _| {

@@ -1,4 +1,6 @@
 use pathfinder_geometry::vector::vec2f;
+
+use warp_i18n::t;
 use warpui::elements::{Hoverable, MainAxisAlignment, MainAxisSize, MouseStateHandle};
 use warpui::ui_components::button::{ButtonVariant, TextAndIcon, TextAndIconAlignment};
 use warpui::ui_components::components::{Coords, UiComponent, UiComponentStyles};
@@ -23,6 +25,17 @@ pub struct SettingsUmbrella {
     pub pre_search_expanded: Option<bool>,
     pub button_state_handle: MouseStateHandle,
     pub subpage_button_states: Vec<MouseStateHandle>,
+}
+
+/// Translates the stored (stable, English) umbrella label for display.
+/// The stored label stays untranslated because it keys saved nav positions.
+fn umbrella_label(label: &str) -> String {
+    match label {
+        "Agents" => t!("settings.nav.umbrella.agents").into_owned(),
+        "Code" => t!("settings.nav.umbrella.code").into_owned(),
+        "Cloud platform" => t!("settings.nav.umbrella.cloud_platform").into_owned(),
+        other => other.to_string(),
+    }
 }
 
 impl SettingsUmbrella {
@@ -73,7 +86,7 @@ impl SettingsUmbrella {
             .button(ButtonVariant::Text, self.button_state_handle.clone())
             .with_text_and_icon_label(TextAndIcon::new(
                 TextAndIconAlignment::TextFirst,
-                self.label.to_string(),
+                umbrella_label(self.label),
                 chevron_icon.to_warpui_icon(text_color),
                 MainAxisSize::Max,
                 MainAxisAlignment::SpaceBetween,

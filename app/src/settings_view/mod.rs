@@ -66,6 +66,7 @@ use crate::server::server_api::ServerApiProvider;
 use crate::server::telemetry::MCPServerCollectionPaneEntrypoint;
 use crate::settings::{AISettings, BlockVisibilitySettings, SettingsFileError};
 use crate::terminal::general_settings::{GeneralSettings, GeneralSettingsChangedEvent};
+use warp_i18n::t;
 use crate::settings_view::mcp_servers_page::{MCPServersSettingsPage, MCPServersSettingsPageEvent};
 use crate::terminal::SizeInfo;
 use crate::terminal::model::blockgrid::BlockGrid;
@@ -346,21 +347,28 @@ use crate::util::bindings::custom_tag_to_keystroke;
 impl Display for SettingsSection {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            SettingsSection::BillingAndUsage => write!(f, "Billing and usage"),
-            SettingsSection::Keybindings => write!(f, "Keyboard shortcuts"),
-            SettingsSection::SharedBlocks => write!(f, "Shared blocks"),
-            SettingsSection::Scripting => write!(f, "Scripting"),
-            SettingsSection::WarpDrive => write!(f, "Warp Drive"),
-            SettingsSection::WarpAgent => write!(f, "Warp Agent"),
-            SettingsSection::AgentProfiles => write!(f, "Profiles"),
-            SettingsSection::AgentMCPServers => write!(f, "MCP servers"),
-            SettingsSection::Knowledge => write!(f, "Knowledge"),
-            SettingsSection::ThirdPartyCLIAgents => write!(f, "Third party CLI agents"),
-            SettingsSection::CodeIndexing => write!(f, "Indexing and projects"),
-            SettingsSection::EditorAndCodeReview => write!(f, "Editor and Code Review"),
-            SettingsSection::CloudEnvironments => write!(f, "Environments"),
-            SettingsSection::WarpCloudAgentAPIKeys => write!(f, "API keys"),
-            _ => write!(f, "{self:?}"),
+            SettingsSection::About => write!(f, "{}", t!("settings.nav.about")),
+            SettingsSection::Account => write!(f, "{}", t!("settings.nav.account")),
+            SettingsSection::BillingAndUsage => write!(f, "{}", t!("settings.nav.billing_and_usage")),
+            SettingsSection::Appearance => write!(f, "{}", t!("settings.nav.appearance")),
+            SettingsSection::Features => write!(f, "{}", t!("settings.nav.features")),
+            SettingsSection::Keybindings => write!(f, "{}", t!("settings.nav.keybindings")),
+            SettingsSection::Privacy => write!(f, "{}", t!("settings.nav.privacy")),
+            SettingsSection::Referrals => write!(f, "{}", t!("settings.nav.referrals")),
+            SettingsSection::Scripting => write!(f, "{}", t!("settings.nav.scripting")),
+            SettingsSection::SharedBlocks => write!(f, "{}", t!("settings.nav.shared_blocks")),
+            SettingsSection::Teams => write!(f, "{}", t!("settings.nav.teams")),
+            SettingsSection::WarpDrive => write!(f, "{}", t!("settings.nav.warp_drive")),
+            SettingsSection::Warpify => write!(f, "{}", t!("settings.nav.warpify")),
+            SettingsSection::WarpAgent => write!(f, "{}", t!("settings.nav.warp_agent")),
+            SettingsSection::AgentProfiles => write!(f, "{}", t!("settings.nav.agent_profiles")),
+            SettingsSection::AgentMCPServers => write!(f, "{}", t!("settings.nav.agent_mcp_servers")),
+            SettingsSection::Knowledge => write!(f, "{}", t!("settings.nav.knowledge")),
+            SettingsSection::ThirdPartyCLIAgents => write!(f, "{}", t!("settings.nav.third_party_cli_agents")),
+            SettingsSection::CodeIndexing => write!(f, "{}", t!("settings.nav.code_indexing")),
+            SettingsSection::EditorAndCodeReview => write!(f, "{}", t!("settings.nav.editor_and_code_review")),
+            SettingsSection::CloudEnvironments => write!(f, "{}", t!("settings.nav.cloud_environments")),
+            SettingsSection::WarpCloudAgentAPIKeys => write!(f, "{}", t!("settings.nav.warp_cloud_agent_api_keys")),
         }
     }
 }
@@ -1369,7 +1377,7 @@ impl SettingsView {
                 ..Default::default()
             };
             let mut editor = EditorView::single_line(options, ctx);
-            editor.set_placeholder_text("Search", ctx);
+            editor.set_placeholder_text(t!("settings.window.search_placeholder"), ctx);
             editor
         });
 

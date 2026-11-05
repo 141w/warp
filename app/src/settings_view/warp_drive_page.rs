@@ -152,8 +152,8 @@ struct WarpDriveHeaderWidget {
 impl SettingsWidget for WarpDriveHeaderWidget {
     type View = WarpDriveSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "warp drive sign up"
+    fn search_terms(&self) -> String {
+        "warp drive sign up".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -235,8 +235,8 @@ struct WarpDriveToggleWidget {
 impl SettingsWidget for WarpDriveToggleWidget {
     type View = WarpDriveSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "warp drive tools panel command palette search workflows prompts notebooks environment variables"
+    fn search_terms(&self) -> String {
+        "warp drive tools panel command palette search workflows prompts notebooks environment variables".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {

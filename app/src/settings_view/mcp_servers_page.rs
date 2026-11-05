@@ -571,8 +571,8 @@ pub struct MCPServersSettingsWidget {
 impl SettingsWidget for MCPServersSettingsWidget {
     type View = MCPServersSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "mcp servers"
+    fn search_terms(&self) -> String {
+        "mcp servers".to_string()
     }
 
     fn render(

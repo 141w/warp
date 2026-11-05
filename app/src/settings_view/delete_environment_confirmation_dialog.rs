@@ -1,4 +1,5 @@
 use warpui::elements::{ChildView, Container, Dismiss, Empty};
+use warp_i18n::t;
 use warpui::ui_components::components::UiComponent;
 use warpui::{
     AppContext, Element, Entity, SingletonEntity, TypedActionView, View, ViewContext, ViewHandle,
@@ -33,7 +34,7 @@ pub struct DeleteEnvironmentConfirmationDialog {
 impl DeleteEnvironmentConfirmationDialog {
     pub fn new(ctx: &mut ViewContext<Self>) -> Self {
         let cancel_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Cancel", NakedTheme).on_click(|ctx| {
+            ActionButton::new(t!("common.cancel"), NakedTheme).on_click(|ctx| {
                 ctx.dispatch_typed_action(DeleteEnvironmentConfirmationDialogAction::Cancel);
             })
         });

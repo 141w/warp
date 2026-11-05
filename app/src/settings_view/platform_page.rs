@@ -474,8 +474,8 @@ struct PlatformPageWidget {
 impl SettingsWidget for PlatformPageWidget {
     type View = PlatformPageView;
 
-    fn search_terms(&self) -> &str {
-        "cloud agents platform api keys authentication"
+    fn search_terms(&self) -> String {
+        "cloud agents platform api keys authentication".to_string()
     }
 
     fn render(

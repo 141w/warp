@@ -746,8 +746,8 @@ struct CodePageWidget {
 impl SettingsWidget for CodePageWidget {
     type View = CodeIndexingPageView;
 
-    fn search_terms(&self) -> &str {
-        "code coding codebase repository index indexing indices context path lsp language server"
+    fn search_terms(&self) -> String {
+        "code coding codebase repository index indexing indices context path lsp language server".to_string()
     }
 
     fn render(
@@ -2181,8 +2181,8 @@ struct CodeIndexingPageWidget {
 impl SettingsWidget for CodeIndexingPageWidget {
     type View = CodeIndexingPageView;
 
-    fn search_terms(&self) -> &str {
-        "codebase index indexing repository code context embedding auto-index lsp language server"
+    fn search_terms(&self) -> String {
+        "codebase index indexing repository code context embedding auto-index lsp language server".to_string()
     }
 
     fn render(

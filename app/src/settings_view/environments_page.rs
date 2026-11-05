@@ -1034,8 +1034,8 @@ enum EnvironmentListScope {
 impl SettingsWidget for EnvironmentsPageWidget {
     type View = EnvironmentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "environments environment ambient agents github warp assisted manual configuration"
+    fn search_terms(&self) -> String {
+        "environments environment ambient agents github warp assisted manual configuration".to_string()
     }
 
     fn render(

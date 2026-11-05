@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use warp_i18n::t;
 use std::path::Path;
 #[cfg(feature = "local_fs")]
 use std::sync::Arc;
@@ -133,7 +134,7 @@ pub struct MCPServersEditPageView {
 impl MCPServersEditPageView {
     pub fn new(ctx: &mut ViewContext<Self>) -> Self {
         let save_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Save", PrimaryTheme)
+            ActionButton::new(t!("common.save"), PrimaryTheme)
                 .with_icon(Icon::Check)
                 .on_click(|ctx| {
                     ctx.dispatch_typed_action(MCPServersEditPageViewAction::Save);

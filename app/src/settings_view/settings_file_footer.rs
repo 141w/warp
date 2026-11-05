@@ -8,6 +8,7 @@
 //!   error *and* the user has dismissed the workspace banner.
 //! * Otherwise, a plain bordered "Open settings file" button.
 use pathfinder_color::ColorU;
+use warp_i18n::t;
 use warp_core::ui::color::coloru_with_opacity;
 use warp_core::ui::theme::Fill;
 use warpui::elements::{
@@ -113,7 +114,11 @@ pub fn render_open_settings_file_button(
             .with_height(FOOTER_ICON_SIZE)
             .finish();
 
-        let label = Text::new_inline("Open settings file", ui_font_family, FOOTER_FONT_SIZE)
+        let label = Text::new_inline(
+            t!("settings.window.open_settings_file"),
+            ui_font_family,
+            FOOTER_FONT_SIZE,
+        )
             .with_color(text_color)
             .with_style(Properties {
                 weight: Weight::Semibold,

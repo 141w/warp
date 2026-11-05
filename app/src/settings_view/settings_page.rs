@@ -1613,7 +1613,7 @@ impl<V: warpui::View> PageType<V> {
         match self {
             Self::Monolith { widget, filter, .. } => {
                 *filter =
-                    widget.should_render(app) && search_terms_match(widget.search_terms(), query);
+                    widget.should_render(app) && search_terms_match(widget.search_terms().as_str(), query);
                 (*filter).into()
             }
             Self::Uncategorized {
@@ -1624,7 +1624,7 @@ impl<V: warpui::View> PageType<V> {
                     .enumerate()
                     .filter_map(|(i, widget)| {
                         (widget.should_render(app)
-                            && search_terms_match(widget.search_terms(), query))
+                            && search_terms_match(widget.search_terms().as_str(), query))
                         .then_some(i)
                     })
                     .collect();
@@ -1646,7 +1646,7 @@ impl<V: warpui::View> PageType<V> {
                             .enumerate()
                             .filter_map(|(i, widget)| {
                                 (widget.should_render(app)
-                                    && search_terms_match(widget.search_terms(), query))
+                                    && search_terms_match(widget.search_terms().as_str(), query))
                                 .then_some(i)
                             })
                             .collect_vec()
@@ -2149,7 +2149,7 @@ pub(super) trait SettingsWidget {
     }
 
     /// The terms to match search queries against.
-    fn search_terms(&self) -> &str;
+    fn search_terms(&self) -> String;
 
     fn should_render(&self, _app: &AppContext) -> bool {
         true

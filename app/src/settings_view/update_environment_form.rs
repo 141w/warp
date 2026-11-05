@@ -1,5 +1,8 @@
 #[cfg(not(target_family = "wasm"))]
 use std::collections::HashMap;
+use std::borrow::Cow;
+
+use warp_i18n::t;
 
 use instant::{Duration, Instant};
 use log::debug;
@@ -487,7 +490,7 @@ impl UpdateEnvironmentForm {
         });
 
         let cancel_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Cancel", SecondaryTheme).on_click(|ctx| {
+            ActionButton::new(t!("common.cancel"), SecondaryTheme).on_click(|ctx| {
                 ctx.dispatch_typed_action(UpdateEnvironmentFormAction::Cancel);
             })
         });
@@ -840,11 +843,15 @@ impl UpdateEnvironmentForm {
     }
 
     fn update_submit_button_label(&mut self, ctx: &mut ViewContext<Self>) {
-        let button_text = match (&self.mode, self.show_header) {
-            (EnvironmentFormMode::Create, true) => "Create",
-            (EnvironmentFormMode::Create, false) => "Create environment",
-            (EnvironmentFormMode::Edit { .. }, true) => "Save",
-            (EnvironmentFormMode::Edit { .. }, false) => "Save environment",
+        let button_text: Cow<'static, str> = match (&self.mode, self.show_header) {
+            (EnvironmentFormMode::Create, true) => t!("settings.environments.form.create"),
+            (EnvironmentFormMode::Create, false) => {
+                t!("settings.environments.form.create_environment")
+            }
+            (EnvironmentFormMode::Edit { .. }, true) => t!("settings.environments.form.save"),
+            (EnvironmentFormMode::Edit { .. }, false) => {
+                t!("settings.environments.form.save_environment")
+            }
         };
         self.submit_button.update(ctx, |button, ctx| {
             button.set_label(button_text, ctx);
@@ -918,7 +925,7 @@ impl UpdateEnvironmentForm {
                     .collect();
                 // Update button text for Edit mode
                 self.submit_button.update(ctx, |button, ctx| {
-                    button.set_label("Save", ctx);
+                    button.set_label(t!("common.save"), ctx);
                 });
             }
         }

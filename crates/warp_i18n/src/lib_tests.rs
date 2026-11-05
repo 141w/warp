@@ -36,11 +36,26 @@ fn locales_have_symmetric_keys() {
 }
 
 #[test]
-fn missing_key_falls_back_to_english() {
-    // zh-CN.yml ships `common: {}`, so the Chinese lookup misses and the
-    // configured "en" fallback answers. Locale-independent by construction.
+fn missing_translation_falls_back_to_english() {
+    // `common.probe_fallback` exists only in en.yml, so the Chinese lookup
+    // misses and the configured "en" fallback answers.
     set_language(Language::Chinese);
+    assert_eq!(t!("common.probe_fallback"), "Fallback works");
+}
+
+#[test]
+fn translated_key_follows_active_locale() {
+    set_language(Language::Chinese);
+    assert_eq!(t!("common.cancel"), "取消");
+    set_language(Language::English);
     assert_eq!(t!("common.cancel"), "Cancel");
+}
+
+#[test]
+fn unknown_key_echoes_the_key_itself() {
+    // rust-i18n returns the key verbatim when no locale has it, which is what
+    // `setting_description` relies on to detect a miss.
+    assert_eq!(t!("no.such.key.at.all"), "no.such.key.at.all");
 }
 
 #[test]

@@ -1,4 +1,5 @@
 use warp_errors::report_error;
+use warp_i18n::t;
 use warpui::elements::{
     Align, Container, CrossAxisAlignment, Flex, MouseStateHandle, ParentElement, Text,
 };
@@ -74,7 +75,7 @@ impl View for TransferOwnershipConfirmationModal {
                 appearance
                     .ui_builder()
                     .button(ButtonVariant::Secondary, self.cancel_mouse_state.clone())
-                    .with_text_label("Cancel".to_string())
+                    .with_text_label(t!("common.cancel").into_owned())
                     .with_style(button_style)
                     .build()
                     .on_click(|ctx, _, _| {

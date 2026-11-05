@@ -1,5 +1,7 @@
 use std::sync::{Arc, Mutex};
 
+use warp_i18n::t;
+
 use ::settings::{Setting, ToggleableSetting};
 use lazy_static::lazy_static;
 use pathfinder_color::ColorU;
@@ -53,10 +55,8 @@ use crate::workspaces::workspace::CustomerType;
 use crate::{TelemetryEvent, send_telemetry_from_ctx};
 
 const PHOTO_SIZE: f32 = 40.;
-const REFERRAL_CTA: &str = "Earn rewards by sharing Warp with friends & colleagues";
 const REGULAR_TEXT_FONT_SIZE: f32 = 12.;
 const VERTICAL_MARGIN: f32 = 24.;
-const LOG_OUT_TEXT: &str = "Log out";
 lazy_static! {
     static ref SETTINGS_SYNC_BINDINGS_ADDED: Arc<Mutex<bool>> = Default::default();
 }
@@ -649,8 +649,8 @@ impl AccountWidget {
 impl SettingsWidget for AccountWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "account sign up"
+    fn search_terms(&self) -> String {
+        "account sign up".to_string()
     }
 
     fn render(
@@ -685,8 +685,8 @@ struct DividerWidget {}
 impl SettingsWidget for DividerWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        ""
+    fn search_terms(&self) -> String {
+        "".to_string()
     }
 
     fn render(
@@ -714,8 +714,8 @@ struct SettingsSyncWidget {
 impl SettingsWidget for SettingsSyncWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "settings sync"
+    fn search_terms(&self) -> String {
+        "settings sync".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -803,8 +803,8 @@ impl EarnRewardsWidget {
 impl SettingsWidget for EarnRewardsWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "earn rewards referral share friends"
+    fn search_terms(&self) -> String {
+        "earn rewards referral share friends".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -822,7 +822,7 @@ impl SettingsWidget for EarnRewardsWidget {
         Container::new(
             self.render_row(
                 appearance,
-                REFERRAL_CTA,
+                &t!("settings.window.referral_cta"),
                 appearance
                     .ui_builder()
                     .link(
@@ -1056,8 +1056,8 @@ impl VersionInfoWidget {
 impl SettingsWidget for VersionInfoWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "version update"
+    fn search_terms(&self) -> String {
+        "version update".to_string()
     }
 
     fn render(
@@ -1087,7 +1087,7 @@ impl LogoutWidget {
         appearance
             .ui_builder()
             .button(ButtonVariant::Secondary, self.mouse_state.clone())
-            .with_text_label(LOG_OUT_TEXT.into())
+            .with_text_label(t!("settings.window.log_out").into_owned())
             .with_style(UiComponentStyles {
                 font_size: Some(14.),
                 padding: Some(Coords::uniform(8.).left(32.).right(32.)),
@@ -1113,8 +1113,8 @@ struct IapCredentialsWidget {
 impl SettingsWidget for IapCredentialsWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "iap staging gcloud proxy credentials"
+    fn search_terms(&self) -> String {
+        "iap staging gcloud proxy credentials".to_string()
     }
 
     fn render(
@@ -1222,8 +1222,8 @@ struct IapRoutingWidget {
 impl SettingsWidget for IapRoutingWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "iap staging routing opt in identity proxy"
+    fn search_terms(&self) -> String {
+        "iap staging routing opt in identity proxy".to_string()
     }
 
     fn render(
@@ -1257,8 +1257,8 @@ impl SettingsWidget for IapRoutingWidget {
 impl SettingsWidget for LogoutWidget {
     type View = MainSettingsPageView;
 
-    fn search_terms(&self) -> &str {
-        "sign out log out logout"
+    fn search_terms(&self) -> String {
+        "sign out log out logout".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {

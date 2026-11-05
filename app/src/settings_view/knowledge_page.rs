@@ -203,8 +203,8 @@ struct RulesWidget {
 impl SettingsWidget for RulesWidget {
     type View = KnowledgePageView;
 
-    fn search_terms(&self) -> &str {
-        "fact memory memories rules conventions"
+    fn search_terms(&self) -> String {
+        "fact memory memories rules conventions".to_string()
     }
 
     fn render(
@@ -265,8 +265,8 @@ struct SuggestedRulesWidget {
 impl SettingsWidget for SuggestedRulesWidget {
     type View = KnowledgePageView;
 
-    fn search_terms(&self) -> &str {
-        "suggested rules suggest save"
+    fn search_terms(&self) -> String {
+        "suggested rules suggest save".to_string()
     }
 
     fn render(
@@ -307,8 +307,8 @@ struct ManageRulesWidget {
 impl SettingsWidget for ManageRulesWidget {
     type View = KnowledgePageView;
 
-    fn search_terms(&self) -> &str {
-        "manage rules rule collection"
+    fn search_terms(&self) -> String {
+        "manage rules rule collection".to_string()
     }
 
     fn render(
@@ -335,8 +335,8 @@ struct WarpDriveContextWidget {
 impl SettingsWidget for WarpDriveContextWidget {
     type View = KnowledgePageView;
 
-    fn search_terms(&self) -> &str {
-        "warp drive agent context contents personal team developer workflows environments notebooks environment variables"
+    fn search_terms(&self) -> String {
+        "warp drive agent context contents personal team developer workflows environments notebooks environment variables".to_string()
     }
 
     fn render(

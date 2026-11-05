@@ -53,8 +53,8 @@ struct AboutPageWidget {
 impl SettingsWidget for AboutPageWidget {
     type View = AboutPageView;
 
-    fn search_terms(&self) -> &str {
-        "about warp version"
+    fn search_terms(&self) -> String {
+        "about warp version".to_string()
     }
 
     fn render(

@@ -3,6 +3,7 @@ use warpui::elements::{
     MouseStateHandle, Padding, ParentElement, Radius, Text,
 };
 use warpui::ui_components::button::ButtonVariant;
+use warp_i18n::t;
 use warpui::ui_components::components::{Coords, UiComponent, UiComponentStyles};
 use warpui::{
     AppContext, Element, Entity, SingletonEntity, TypedActionView, View, ViewContext, ViewHandle,
@@ -278,7 +279,7 @@ impl View for SpendingLimitModal {
                         ButtonVariant::Secondary,
                         self.cancel_button_mouse_state.clone(),
                     )
-                    .with_text_label("Cancel".to_string())
+                    .with_text_label(t!("common.cancel").into_owned())
                     .with_style(button_style)
                     .build()
                     .on_click(|ctx, _, _| {

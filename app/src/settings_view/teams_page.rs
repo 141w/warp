@@ -1,4 +1,5 @@
 use core::default::Default;
+use warp_i18n::t;
 use std::cmp::Ordering;
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -5146,7 +5147,7 @@ impl TeamsWidget {
             false,
             self.mouse_state_handles.discovery_back_button.clone(),
         )
-        .with_tooltip(move || ui_builder.tool_tip("Back".to_string()).build().finish());
+        .with_tooltip(move || ui_builder.tool_tip(t!("common.back").into_owned()).build().finish());
         if view.discovery_join_target.is_some() {
             back_button = back_button.disabled();
         }
@@ -5599,8 +5600,8 @@ impl TeamsWidget {
 impl SettingsWidget for TeamsWidget {
     type View = TeamsPageView;
 
-    fn search_terms(&self) -> &str {
-        "invites teams team members"
+    fn search_terms(&self) -> String {
+        "invites teams team members".to_string()
     }
 
     fn render(

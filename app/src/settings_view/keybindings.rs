@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::borrow::Cow;
+
+use warp_i18n::t;
 
 use itertools::Itertools;
 use warp_core::ui::theme::color::internal_colors;
@@ -49,9 +52,7 @@ pub const SEARCH_PLACEHOLDER: &str = "Search by name or by keys (ex. \"cmd d\")"
 const SHORTCUT_CONFLICT_WARNING_TEXT: &str = "This shortcut conflicts with other keybinds";
 const KEYBINDINGS_PAGE_SHORTCUT: &str = "workspace:toggle_keybindings_page";
 const RESET_BUTTON_TEXT: &str = "Default";
-const CANCEL_BUTTON_TEXT: &str = "Cancel";
 const CLEAR_BUTTON_TEXT: &str = "Clear";
-const SAVE_BUTTON_TEXT: &str = "Save";
 
 /// Notifier for custom keybinding changed. Views could subscribe to this for
 /// KeybindingChangedEvent.
@@ -443,12 +444,12 @@ impl KeybindingRow {
                     let cancel_button_color = self.get_button_text_color(appearance, state);
                     if index == 0 {
                         SavePosition::new(
-                            render_button(CANCEL_BUTTON_TEXT, appearance, cancel_button_color),
+                            render_button(t!("common.cancel"), appearance, cancel_button_color),
                             "first_keybinding_cancel",
                         )
                         .finish()
                     } else {
-                        render_button("Cancel", appearance, cancel_button_color)
+                        render_button(t!("common.cancel"), appearance, cancel_button_color)
                     }
                 },
             )
@@ -465,7 +466,7 @@ impl KeybindingRow {
         let save = Container::new(
             Hoverable::new(self.mouse_state_handles.save_mouse_state.clone(), |state| {
                 render_button(
-                    SAVE_BUTTON_TEXT,
+                    t!("common.save"),
                     appearance,
                     self.get_button_text_color(appearance, state),
                 )
@@ -895,7 +896,7 @@ fn render_columns(
 }
 
 fn render_button(
-    text: &'static str,
+    text: impl Into<Cow<'static, str>>,
     appearance: &Appearance,
     line_color: themes::theme::Fill,
 ) -> Box<dyn Element> {
@@ -1092,8 +1093,8 @@ impl KeybindingsWidget {
 impl SettingsWidget for KeybindingsWidget {
     type View = KeybindingsView;
 
-    fn search_terms(&self) -> &str {
-        "keybindings keyboard shortcuts hotkeys"
+    fn search_terms(&self) -> String {
+        "keybindings keyboard shortcuts hotkeys".to_string()
     }
 
     fn render(

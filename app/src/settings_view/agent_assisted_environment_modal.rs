@@ -6,6 +6,7 @@ use std::{
 
 #[cfg(all(feature = "local_fs", not(target_family = "wasm")))]
 use ai::index::full_source_code_embedding::manager::CodebaseIndexManager;
+use warp_i18n::t;
 #[cfg(all(
     feature = "local_fs",
     not(target_family = "wasm"),
@@ -103,7 +104,7 @@ impl AgentAssistedEnvironmentModal {
         });
 
         let cancel_button = ctx.add_typed_action_view(|_ctx| {
-            ActionButton::new("Cancel", SecondaryTheme).on_click(|ctx| {
+            ActionButton::new(t!("common.cancel"), SecondaryTheme).on_click(|ctx| {
                 ctx.dispatch_typed_action(AgentAssistedEnvironmentModalAction::Cancel);
             })
         });

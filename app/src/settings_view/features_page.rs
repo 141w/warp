@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use warp_i18n::t;
 use std::collections::HashMap;
 use std::ops::Not as _;
 use std::sync::{Arc, Mutex};
@@ -4293,7 +4294,7 @@ impl FeaturesPageView {
                 padding: Some(Coords::default().right(10.)),
                 ..Default::default()
             })
-            .with_text_label("Cancel".to_string())
+            .with_text_label(t!("common.cancel").into_owned())
             .build()
             .on_click(move |ctx, _, _| {
                 ctx.dispatch_typed_action(cancel_action.clone());
@@ -4305,7 +4306,7 @@ impl FeaturesPageView {
             appearance
                 .ui_builder()
                 .button(ButtonVariant::Text, save_button_mouse_state)
-                .with_text_label("Save".to_string())
+                .with_text_label(t!("common.save").into_owned())
                 .build()
                 .on_click(move |ctx, _, _| {
                     ctx.dispatch_typed_action(save_action.clone());
@@ -4583,8 +4584,8 @@ struct NativeRedirectWidget {
 impl SettingsWidget for NativeRedirectWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "link open desktop native redirect url intent deep link deeplink"
+    fn search_terms(&self) -> String {
+        "link open desktop native redirect url intent deep link deeplink".to_string()
     }
 
     fn render(
@@ -4643,8 +4644,8 @@ struct SessionRestorationWidget {
 impl SettingsWidget for SessionRestorationWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "restore session window tab pane startup"
+    fn search_terms(&self) -> String {
+        "restore session window tab pane startup".to_string()
     }
 
     fn render(
@@ -4738,8 +4739,8 @@ struct SnackbarHeaderWidget {
 impl SettingsWidget for SnackbarHeaderWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "sticky command block header snackbar"
+    fn search_terms(&self) -> String {
+        "sticky command block header snackbar".to_string()
     }
 
     fn render(
@@ -4791,8 +4792,8 @@ struct LinkTooltipWidget {
 impl SettingsWidget for LinkTooltipWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "link tooltip click open"
+    fn search_terms(&self) -> String {
+        "link tooltip click open".to_string()
     }
 
     fn render(
@@ -4837,8 +4838,8 @@ struct QuitWarningModalWidget {
 impl SettingsWidget for QuitWarningModalWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "warning popup modal dialog quit logout log out close"
+    fn search_terms(&self) -> String {
+        "warning popup modal dialog quit logout log out close".to_string()
     }
 
     fn render(
@@ -4884,8 +4885,8 @@ struct LoginItemWidget {
 impl SettingsWidget for LoginItemWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "login item startup start mac windows app restart automatic"
+    fn search_terms(&self) -> String {
+        "login item startup start mac windows app restart automatic".to_string()
     }
 
     fn render(
@@ -4935,8 +4936,8 @@ struct QuitWhenAllWindowsClosedWidget {
 impl SettingsWidget for QuitWhenAllWindowsClosedWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "quit all windows closed"
+    fn search_terms(&self) -> String {
+        "quit all windows closed".to_string()
     }
 
     fn render(
@@ -4982,8 +4983,8 @@ struct ShowChangelogWidget {
 impl SettingsWidget for ShowChangelogWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "changelog updates"
+    fn search_terms(&self) -> String {
+        "changelog updates".to_string()
     }
 
     fn render(
@@ -5029,8 +5030,8 @@ struct MouseScrollMultiplierWidget {
 impl SettingsWidget for MouseScrollMultiplierWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "mouse scroll wheel multiplier lines"
+    fn search_terms(&self) -> String {
+        "mouse scroll wheel multiplier lines".to_string()
     }
 
     fn render(
@@ -5115,8 +5116,8 @@ struct DefaultTerminalWidget {
 impl SettingsWidget for DefaultTerminalWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "warp default terminal application"
+    fn search_terms(&self) -> String {
+        "warp default terminal application".to_string()
     }
 
     fn render(
@@ -5160,8 +5161,8 @@ struct BlockLimitWidget {}
 impl SettingsWidget for BlockLimitWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "max block size lines maximum limit memory"
+    fn search_terms(&self) -> String {
+        "max block size lines maximum limit memory".to_string()
     }
 
     fn render(
@@ -5221,8 +5222,8 @@ struct DesktopNotificationsWidget {
 impl SettingsWidget for DesktopNotificationsWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "desktop notifications"
+    fn search_terms(&self) -> String {
+        "desktop notifications".to_string()
     }
 
     fn render(
@@ -5406,8 +5407,8 @@ struct StartupShellWidget {}
 impl SettingsWidget for StartupShellWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "startup shell session"
+    fn search_terms(&self) -> String {
+        "startup shell session".to_string()
     }
 
     fn render(
@@ -5445,8 +5446,8 @@ struct WorkingDirectoryWidget {}
 impl SettingsWidget for WorkingDirectoryWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "starting working directory pwd session"
+    fn search_terms(&self) -> String {
+        "starting working directory pwd session".to_string()
     }
 
     fn render(
@@ -5482,8 +5483,8 @@ struct UndoCloseWidget {}
 impl SettingsWidget for UndoCloseWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "reopen restore recover closed tab session"
+    fn search_terms(&self) -> String {
+        "reopen restore recover closed tab session".to_string()
     }
 
     fn render(
@@ -5504,8 +5505,8 @@ struct ConfirmCloseSharedSessionWidget {
 impl SettingsWidget for ConfirmCloseSharedSessionWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "warning popup modal dialog shared session close"
+    fn search_terms(&self) -> String {
+        "warning popup modal dialog shared session close".to_string()
     }
 
     fn render(
@@ -5552,8 +5553,8 @@ struct ExtraMetaKeysWidget {
 impl SettingsWidget for ExtraMetaKeysWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "extra meta key alt option"
+    fn search_terms(&self) -> String {
+        "extra meta key alt option".to_string()
     }
 
     fn render(
@@ -5628,8 +5629,8 @@ struct GlobalHotkeyWidget {}
 impl SettingsWidget for GlobalHotkeyWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "global hotkey quake mode keybinding quick terminal"
+    fn search_terms(&self) -> String {
+        "global hotkey quake mode keybinding quick terminal".to_string()
     }
 
     fn render(
@@ -5773,8 +5774,8 @@ struct AutocompleteSymbolsWidget {
 impl SettingsWidget for AutocompleteSymbolsWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "autocomplete autoclose symbol bracket quote parentheses braces"
+    fn search_terms(&self) -> String {
+        "autocomplete autoclose symbol bracket quote parentheses braces".to_string()
     }
 
     fn render(
@@ -5819,8 +5820,8 @@ struct ErrorUnderliningWidget {
 impl SettingsWidget for ErrorUnderliningWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "error underline editor"
+    fn search_terms(&self) -> String {
+        "error underline editor".to_string()
     }
 
     fn render(
@@ -5865,8 +5866,8 @@ struct SyntaxHighlightingWidget {
 impl SettingsWidget for SyntaxHighlightingWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "syntax highlighting editor"
+    fn search_terms(&self) -> String {
+        "syntax highlighting editor".to_string()
     }
 
     fn render(
@@ -5911,8 +5912,8 @@ struct CompletionsMenuWhileTypingWidget {
 impl SettingsWidget for CompletionsMenuWhileTypingWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "completions menu type typing"
+    fn search_terms(&self) -> String {
+        "completions menu type typing".to_string()
     }
 
     fn render(
@@ -5962,8 +5963,8 @@ struct WarpCompletionsWidget {
 impl SettingsWidget for WarpCompletionsWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "warp completions built-in shell command suggestions open completions menu as you type typing"
+    fn search_terms(&self) -> String {
+        "warp completions built-in shell command suggestions open completions menu as you type typing".to_string()
     }
 
     fn render(
@@ -6043,8 +6044,8 @@ struct NativeShellCompletionsWidget {
 impl SettingsWidget for NativeShellCompletionsWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "native shell completions your shell command suggestions"
+    fn search_terms(&self) -> String {
+        "native shell completions your shell command suggestions".to_string()
     }
 
     fn render(
@@ -6103,8 +6104,8 @@ struct CommandCorrectionsWidget {
 impl SettingsWidget for CommandCorrectionsWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "suggest command corrections"
+    fn search_terms(&self) -> String {
+        "suggest command corrections".to_string()
     }
 
     fn render(
@@ -6149,8 +6150,8 @@ struct AliasExpansionWidget {
 impl SettingsWidget for AliasExpansionWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "expand alias expansion"
+    fn search_terms(&self) -> String {
+        "expand alias expansion".to_string()
     }
 
     fn render(
@@ -6196,8 +6197,8 @@ struct MiddleClickPasteWidget {
 impl SettingsWidget for MiddleClickPasteWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "middle click paste clipboard"
+    fn search_terms(&self) -> String {
+        "middle click paste clipboard".to_string()
     }
 
     fn render(
@@ -6241,8 +6242,8 @@ struct RightClickBehaviorWidget {}
 impl SettingsWidget for RightClickBehaviorWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "right click behavior paste context menu shift"
+    fn search_terms(&self) -> String {
+        "right click behavior paste context menu shift".to_string()
     }
 
     fn render(
@@ -6292,8 +6293,8 @@ struct VimModeWidget {
 impl SettingsWidget for VimModeWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "vim mode keybindings"
+    fn search_terms(&self) -> String {
+        "vim mode keybindings".to_string()
     }
 
     fn render(
@@ -6401,8 +6402,8 @@ struct AtContextMenuInTerminalModeWidget {
 impl SettingsWidget for AtContextMenuInTerminalModeWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "@ at sign context menu terminal mode AI assistant"
+    fn search_terms(&self) -> String {
+        "@ at sign context menu terminal mode AI assistant".to_string()
     }
 
     fn render(
@@ -6453,8 +6454,8 @@ struct SlashCommandsInTerminalModeWidget {
 impl SettingsWidget for SlashCommandsInTerminalModeWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "slash commands terminal mode input menu"
+    fn search_terms(&self) -> String {
+        "slash commands terminal mode input menu".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -6509,8 +6510,8 @@ struct OutlineCodebaseSymbolsForAtContextMenuWidget {
 impl SettingsWidget for OutlineCodebaseSymbolsForAtContextMenuWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "outline codebase symbols context menu code indexing"
+    fn search_terms(&self) -> String {
+        "outline codebase symbols context menu code indexing".to_string()
     }
 
     fn render(
@@ -6561,8 +6562,8 @@ struct ShowTerminalInputMessageLineWidget {
 impl SettingsWidget for ShowTerminalInputMessageLineWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "terminal input message line bar agent"
+    fn search_terms(&self) -> String {
+        "terminal input message line bar agent".to_string()
     }
 
     fn render(
@@ -6609,8 +6610,8 @@ struct PreserveInputFocusOnBlockSelectionWidget {
 impl SettingsWidget for PreserveInputFocusOnBlockSelectionWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "preserve input focus block selection navigate arrow keys"
+    fn search_terms(&self) -> String {
+        "preserve input focus block selection navigate arrow keys".to_string()
     }
 
     fn render(
@@ -6657,8 +6658,8 @@ struct AutosuggestionKeybindingHintWidget {
 impl SettingsWidget for AutosuggestionKeybindingHintWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "autosuggestion keybinding hint"
+    fn search_terms(&self) -> String {
+        "autosuggestion keybinding hint".to_string()
     }
 
     fn render(
@@ -6712,8 +6713,8 @@ struct AutosuggestionIgnoreButtonWidget {
 impl SettingsWidget for AutosuggestionIgnoreButtonWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "autosuggestion ignore button hide"
+    fn search_terms(&self) -> String {
+        "autosuggestion ignore button hide".to_string()
     }
 
     fn render(
@@ -6842,8 +6843,8 @@ impl TabKeyBehaviorWidget {
 impl SettingsWidget for TabKeyBehaviorWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "completions autosuggestions tab keybinding arrow accept"
+    fn search_terms(&self) -> String {
+        "completions autosuggestions tab keybinding arrow accept".to_string()
     }
 
     fn render(
@@ -6900,8 +6901,8 @@ struct CtrlTabBehaviorWidget {}
 impl SettingsWidget for CtrlTabBehaviorWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "ctrl tab behavior pane switch session recent"
+    fn search_terms(&self) -> String {
+        "ctrl tab behavior pane switch session recent".to_string()
     }
 
     fn render(
@@ -6947,8 +6948,8 @@ struct MouseReportingWidget {
 impl SettingsWidget for MouseReportingWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "mouse reporting"
+    fn search_terms(&self) -> String {
+        "mouse reporting".to_string()
     }
 
     fn render(
@@ -7002,8 +7003,8 @@ struct ScrollReportingWidget {
 impl SettingsWidget for ScrollReportingWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "scroll reporting"
+    fn search_terms(&self) -> String {
+        "scroll reporting".to_string()
     }
 
     fn render(
@@ -7060,8 +7061,8 @@ struct FocusReportingWidget {
 impl SettingsWidget for FocusReportingWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "focus reporting"
+    fn search_terms(&self) -> String {
+        "focus reporting".to_string()
     }
 
     fn render(
@@ -7107,8 +7108,8 @@ struct AudibleBellWidget {
 impl SettingsWidget for AudibleBellWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "audible bell"
+    fn search_terms(&self) -> String {
+        "audible bell".to_string()
     }
 
     fn render(
@@ -7211,8 +7212,8 @@ impl SmartSelectWidget {
 impl SettingsWidget for SmartSelectWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "word smart select semantic separator"
+    fn search_terms(&self) -> String {
+        "word smart select semantic separator".to_string()
     }
 
     fn render(
@@ -7284,8 +7285,8 @@ struct ShowTerminalZeroStateBlockWidget {
 impl SettingsWidget for ShowTerminalZeroStateBlockWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "zero state new conversation terminal block welcome output first"
+    fn search_terms(&self) -> String {
+        "zero state new conversation terminal block welcome output first".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -7330,8 +7331,8 @@ impl SettingsWidget for ShowTerminalZeroStateBlockWidget {
 impl SettingsWidget for CopyOnSelectWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "copy on select"
+    fn search_terms(&self) -> String {
+        "copy on select".to_string()
     }
 
     fn render(
@@ -7375,8 +7376,8 @@ struct Osc52ClipboardAccessWidget {}
 impl SettingsWidget for Osc52ClipboardAccessWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "clipboard osc 52 osc52 paste copy access terminal program"
+    fn search_terms(&self) -> String {
+        "clipboard osc 52 osc52 paste copy access terminal program".to_string()
     }
 
     fn render(
@@ -7413,8 +7414,8 @@ struct NewTabPlacementWidget {}
 impl SettingsWidget for NewTabPlacementWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "new tab placement"
+    fn search_terms(&self) -> String {
+        "new tab placement".to_string()
     }
 
     fn render(
@@ -7449,8 +7450,8 @@ struct DefaultSessionModeWidget {}
 impl SettingsWidget for DefaultSessionModeWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "default session mode agent terminal new pane tab open config"
+    fn search_terms(&self) -> String {
+        "default session mode agent terminal new pane tab open config".to_string()
     }
 
     fn render(
@@ -7501,8 +7502,8 @@ struct WorkflowsInCommandSearch {
 impl SettingsWidget for WorkflowsInCommandSearch {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "global workflows command search"
+    fn search_terms(&self) -> String {
+        "global workflows command search".to_string()
     }
 
     fn render(
@@ -7558,8 +7559,8 @@ struct LinuxSelectionClipboardWidget {
 impl SettingsWidget for LinuxSelectionClipboardWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "linux selection clipboard middle click"
+    fn search_terms(&self) -> String {
+        "linux selection clipboard middle click".to_string()
     }
 
     fn render(
@@ -7611,8 +7612,8 @@ struct GPUWidget {
 impl SettingsWidget for GPUWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "render integrated discrete gpu graphics"
+    fn search_terms(&self) -> String {
+        "render integrated discrete gpu graphics".to_string()
     }
 
     fn render(
@@ -7680,8 +7681,8 @@ struct WindowSystemWidget {
 impl SettingsWidget for WindowSystemWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "wayland x11 window system compositor"
+    fn search_terms(&self) -> String {
+        "wayland x11 window system compositor".to_string()
     }
 
     fn render(
@@ -7756,8 +7757,8 @@ struct GraphicsBackendWidget {}
 impl SettingsWidget for GraphicsBackendWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "gpu graphics backend vulkan dx12 directx12 opengl driver"
+    fn search_terms(&self) -> String {
+        "gpu graphics backend vulkan dx12 directx12 opengl driver".to_string()
     }
 
     fn render(
@@ -7828,8 +7829,8 @@ struct AsyncFindWidget {
 impl SettingsWidget for AsyncFindWidget {
     type View = FeaturesPageView;
 
-    fn search_terms(&self) -> &str {
-        "async asynchronous fast find search"
+    fn search_terms(&self) -> String {
+        "async asynchronous fast find search".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {

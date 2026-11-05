@@ -1,4 +1,5 @@
 use warpui::elements::{ChildView, Container, Dismiss, Empty};
+use warp_i18n::t;
 use warpui::ui_components::components::UiComponent;
 use warpui::{
     AppContext, Element, Entity, SingletonEntity, TypedActionView, View, ViewContext, ViewHandle,
@@ -60,19 +61,19 @@ impl From<&DestructiveMCPConfirmationDialogVariant>
                 "Delete MCP server?".to_string(),
                 "This will uninstall and remove this MCP server from all your devices.".to_string(),
                 "Delete MCP".to_string(),
-                "Cancel".to_string(),
+                t!("common.cancel").into_owned(),
             ),
             DestructiveMCPConfirmationDialogVariant::DeleteShared => DestructiveMCPConfirmationDialogDisplayOptions::new(
                 "Delete shared MCP server?".to_string(),
                 "This will not only delete this MCP server for yourself, but also uninstall and remove this MCP server from Warp and across all of your teammates' devices.".to_string(),
                 "Delete MCP".to_string(),
-                "Cancel".to_string(),
+                t!("common.cancel").into_owned(),
             ),
             DestructiveMCPConfirmationDialogVariant::Unshare => DestructiveMCPConfirmationDialogDisplayOptions::new(
                 "Remove shared MCP server from team?".to_string(),
                 "This will uninstall and remove this MCP server from Warp and across all of your teammates' devices.".to_string(),
                 "Remove from team".to_string(),
-                "Cancel".to_string(),
+                t!("common.cancel").into_owned(),
             ),
         }
     }

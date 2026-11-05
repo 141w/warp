@@ -6,6 +6,7 @@
 //! agent display settings.
 
 use std::cell::RefCell;
+use warp_i18n::t;
 use std::collections::HashMap;
 use std::ops::Not;
 #[cfg(feature = "local_fs")]
@@ -3399,8 +3400,8 @@ struct NextCommandWidget {
 impl SettingsWidget for NextCommandWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. next command suggestions"
+    fn search_terms(&self) -> String {
+        "active ai a.i. next command suggestions".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3445,8 +3446,8 @@ struct PromptSuggestionsWidget {
 impl SettingsWidget for PromptSuggestionsWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. prompt suggestions"
+    fn search_terms(&self) -> String {
+        "active ai a.i. prompt suggestions".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3490,8 +3491,8 @@ struct SuggestedCodeBannersWidget {
 impl SettingsWidget for SuggestedCodeBannersWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. code diffs suggested banners"
+    fn search_terms(&self) -> String {
+        "active ai a.i. code diffs suggested banners".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3535,8 +3536,8 @@ struct NaturalLanguageAutosuggestionsWidget {
 impl SettingsWidget for NaturalLanguageAutosuggestionsWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. natural language autosuggestions passive"
+    fn search_terms(&self) -> String {
+        "active ai a.i. natural language autosuggestions passive".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3589,8 +3590,8 @@ impl SharedBlockTitleGenerationWidget {
 impl SettingsWidget for SharedBlockTitleGenerationWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. shared block title generation"
+    fn search_terms(&self) -> String {
+        "active ai a.i. shared block title generation".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3634,8 +3635,8 @@ struct GitOperationsAutogenWidget {
 impl SettingsWidget for GitOperationsAutogenWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "active ai a.i. unit tests commit pull request pr git code review autogen generate"
+    fn search_terms(&self) -> String {
+        "active ai a.i. unit tests commit pull request pr git code review autogen generate".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -3679,8 +3680,8 @@ struct NaturalLanguageDetectionWidget {
 impl SettingsWidget for NaturalLanguageDetectionWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai natural language detection autodetection prompt terminal command denylist permissions"
+    fn search_terms(&self) -> String {
+        "oz agent ai natural language detection autodetection prompt terminal command denylist permissions".to_string()
     }
 
     fn render(
@@ -3710,8 +3711,8 @@ struct ShowInputHintTextWidget {
 impl SettingsWidget for ShowInputHintTextWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai input show hint text"
+    fn search_terms(&self) -> String {
+        "oz agent ai input show hint text".to_string()
     }
 
     fn render(
@@ -3741,8 +3742,8 @@ struct AiCommandSearchHashTriggerWidget {
 impl SettingsWidget for AiCommandSearchHashTriggerWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "# hash pound trigger ai command search shorthand shell comment"
+    fn search_terms(&self) -> String {
+        "# hash pound trigger ai command search shorthand shell comment".to_string()
     }
 
     fn render(
@@ -3772,8 +3773,8 @@ struct ShowAgentTipsWidget {
 impl SettingsWidget for ShowAgentTipsWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai show agent tips"
+    fn search_terms(&self) -> String {
+        "oz agent ai show agent tips".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -3807,8 +3808,8 @@ struct IncludeAgentCommandsInHistoryWidget {
 impl SettingsWidget for IncludeAgentCommandsInHistoryWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai include agent-executed commands in history shell"
+    fn search_terms(&self) -> String {
+        "oz agent ai include agent-executed commands in history shell".to_string()
     }
 
     fn render(
@@ -3839,8 +3840,8 @@ struct AutoApproveBypassesCommandDenylistWidget {
 impl SettingsWidget for AutoApproveBypassesCommandDenylistWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai auto-approve fast forward bypass denylist permissions"
+    fn search_terms(&self) -> String {
+        "oz agent ai auto-approve fast forward bypass denylist permissions".to_string()
     }
 
     fn render(
@@ -3876,8 +3877,8 @@ struct PromptSubmissionModeWidget;
 impl SettingsWidget for PromptSubmissionModeWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz agent ai default prompt submission mode queue interrupt steer next turn auto-queue long-running long running lrc"
+    fn search_terms(&self) -> String {
+        "oz agent ai default prompt submission mode queue interrupt steer next turn auto-queue long-running long running lrc".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -4195,8 +4196,8 @@ impl VoiceWidget {
 impl SettingsWidget for VoiceWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "voice agent oz ai a.i. speech input natural language talk english spanish french german estonian finnish"
+    fn search_terms(&self) -> String {
+        "voice agent oz ai a.i. speech input natural language talk english spanish french german estonian finnish".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -4314,8 +4315,8 @@ struct ShowOzUpdatesInZeroStateWidget {
 impl SettingsWidget for ShowOzUpdatesInZeroStateWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other oz updates zero state empty changelog new conversation agent what's new"
+    fn search_terms(&self) -> String {
+        "other oz updates zero state empty changelog new conversation agent what's new".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -4350,8 +4351,8 @@ struct UseAgentFooterWidget {
 impl SettingsWidget for UseAgentFooterWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other use agent footer full terminal use long running commands"
+    fn search_terms(&self) -> String {
+        "other use agent footer full terminal use long running commands".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -4394,8 +4395,8 @@ struct AgentToolbarLayoutEditorWidget;
 impl SettingsWidget for AgentToolbarLayoutEditorWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other agent toolbar layout chip chips rearrange re-arrange"
+    fn search_terms(&self) -> String {
+        "other agent toolbar layout chip chips rearrange re-arrange".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -4422,8 +4423,8 @@ struct ShowConversationHistoryWidget {
 impl SettingsWidget for ShowConversationHistoryWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other conversation history tools panel collapse expand hide"
+    fn search_terms(&self) -> String {
+        "other conversation history tools panel collapse expand hide".to_string()
     }
 
     fn render(
@@ -4452,8 +4453,8 @@ struct ThinkingDisplayModeWidget;
 impl SettingsWidget for ThinkingDisplayModeWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other agent thinking display reasoning collapse never show expanded"
+    fn search_terms(&self) -> String {
+        "other agent thinking display reasoning collapse never show expanded".to_string()
     }
 
     fn render(
@@ -4486,8 +4487,8 @@ struct OrchestrationMessageDisplayModeWidget;
 impl SettingsWidget for OrchestrationMessageDisplayModeWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other orchestration messages child agents collapse expand hide display"
+    fn search_terms(&self) -> String {
+        "other orchestration messages child agents collapse expand hide display".to_string()
     }
 
     fn render(
@@ -4525,8 +4526,8 @@ struct ConversationLayoutPreferenceWidget;
 impl SettingsWidget for ConversationLayoutPreferenceWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "other preferred layout opening existing agent conversations new tab split pane"
+    fn search_terms(&self) -> String {
+        "other preferred layout opening existing agent conversations new tab split pane".to_string()
     }
 
     fn render(
@@ -4599,8 +4600,8 @@ struct AgentAttributionWidget {
 impl SettingsWidget for AgentAttributionWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "agent attribution commit pull request co-author author credit oz warp"
+    fn search_terms(&self) -> String {
+        "agent attribution commit pull request co-author author credit oz warp".to_string()
     }
 
     fn render(
@@ -4688,8 +4689,8 @@ struct CloudAgentComputerUseWidget {
 impl SettingsWidget for CloudAgentComputerUseWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "oz cloud agent computer use orchestration multi-agent"
+    fn search_terms(&self) -> String {
+        "oz cloud agent computer use orchestration multi-agent".to_string()
     }
 
     fn render(
@@ -4782,8 +4783,8 @@ struct CloudHandoffWidget {
 impl SettingsWidget for CloudHandoffWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "cloud handoff move to cloud local"
+    fn search_terms(&self) -> String {
+        "cloud handoff move to cloud local".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -4870,8 +4871,8 @@ struct AutoHandoffOnSleepWidget {
 impl SettingsWidget for AutoHandoffOnSleepWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "cloud handoff auto sleep before macos"
+    fn search_terms(&self) -> String {
+        "cloud handoff auto sleep before macos".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -4933,8 +4934,8 @@ struct AmpersandHandoffWidget {
 impl SettingsWidget for AmpersandHandoffWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "cloud handoff ampersand & trigger compose"
+    fn search_terms(&self) -> String {
+        "cloud handoff ampersand & trigger compose".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -5176,7 +5177,7 @@ impl ApiKeysWidget {
                 })
         });
         let grok_cancel_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Cancel", SecondaryTheme)
+            ActionButton::new(t!("common.cancel"), SecondaryTheme)
                 .with_size(ButtonSize::Small)
                 .on_click(|ctx| {
                     ctx.dispatch_typed_action(WarpAgentPageAction::CancelGrokSubscriptionConnect);
@@ -5205,7 +5206,7 @@ impl ApiKeysWidget {
                 })
         });
         let chatgpt_cancel_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Cancel", SecondaryTheme)
+            ActionButton::new(t!("common.cancel"), SecondaryTheme)
                 .with_size(ButtonSize::Small)
                 .on_click(|ctx| {
                     ctx.dispatch_typed_action(
@@ -5912,8 +5913,8 @@ impl CustomInferenceVisibility {
 impl SettingsWidget for ApiKeysWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "api keys bring your own byo openai anthropic google claude gemini gpt custom inference endpoint grok supergrok xai chatgpt subscription plan"
+    fn search_terms(&self) -> String {
+        "api keys bring your own byo openai anthropic google claude gemini gpt custom inference endpoint grok supergrok xai chatgpt subscription plan".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -6544,8 +6545,8 @@ impl AwsBedrockWidget {
 impl SettingsWidget for AwsBedrockWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "aws bedrock amazon credentials login command profile auto refresh"
+    fn search_terms(&self) -> String {
+        "aws bedrock amazon credentials login command profile auto refresh".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -6782,8 +6783,8 @@ impl GeminiEnterpriseWidget {
 impl SettingsWidget for GeminiEnterpriseWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "gemini enterprise geap google vertex credentials refresh"
+    fn search_terms(&self) -> String {
+        "gemini enterprise geap google vertex credentials refresh".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -6827,8 +6828,8 @@ struct AddCustomRouterWidget;
 impl SettingsWidget for AddCustomRouterWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "add new custom model router create"
+    fn search_terms(&self) -> String {
+        "add new custom model router create".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {
@@ -6853,8 +6854,8 @@ struct CustomModelRoutersWidget;
 impl SettingsWidget for CustomModelRoutersWidget {
     type View = WarpAgentPageView;
 
-    fn search_terms(&self) -> &str {
-        "custom model router complexity prompt auto model routing"
+    fn search_terms(&self) -> String {
+        "custom model router complexity prompt auto model routing".to_string()
     }
 
     fn should_render(&self, _app: &AppContext) -> bool {

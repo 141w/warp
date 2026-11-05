@@ -1,4 +1,5 @@
 use ::ai::api_keys::{CustomEndpoint, CustomEndpointSchema, validate_custom_endpoint_url};
+use warp_i18n::t;
 use warp_editor::editor::NavigationKey;
 use warpui::elements::{
     Border, ChildView, ClippedScrollStateHandle, ClippedScrollable, ConstrainedBox, Container,
@@ -999,7 +1000,7 @@ impl View for CustomEndpointModal {
                     ButtonVariant::Secondary,
                     self.cancel_button_mouse_state.clone(),
                 )
-                .with_text_label("Cancel".to_string())
+                .with_text_label(t!("common.cancel").into_owned())
                 .with_style(button_style)
                 .build()
                 .on_click(move |ctx, _, _| {
@@ -1012,7 +1013,7 @@ impl View for CustomEndpointModal {
             .ui_builder()
             .button(ButtonVariant::Accent, self.save_button_mouse_state.clone())
             .with_text_label(if is_editing {
-                "Save".to_string()
+                t!("common.save").into_owned()
             } else {
                 "Add endpoint".to_string()
             })

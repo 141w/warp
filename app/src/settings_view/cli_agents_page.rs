@@ -416,8 +416,8 @@ struct CLIAgentWidget {
 impl SettingsWidget for CLIAgentWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent claude codex gemini toolbar footer quick actions show"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent claude codex gemini toolbar footer quick actions show".to_string()
     }
 
     fn render(
@@ -489,8 +489,8 @@ struct CLIAgentAutoToggleRichInputWidget {
 impl SettingsWidget for CLIAgentAutoToggleRichInputWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent rich input auto show hide status plugin"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent rich input auto show hide status plugin".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -551,8 +551,8 @@ struct CLIAgentAutoOpenRichInputWidget {
 impl SettingsWidget for CLIAgentAutoOpenRichInputWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent rich input auto open session start"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent rich input auto open session start".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -589,8 +589,8 @@ struct CLIAgentAutoDismissRichInputWidget {
 impl SettingsWidget for CLIAgentAutoDismissRichInputWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent rich input auto dismiss prompt submission"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent rich input auto dismiss prompt submission".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -627,8 +627,8 @@ struct CLIAgentSubmitRichInputWidget {
 impl SettingsWidget for CLIAgentSubmitRichInputWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent rich input submit ctrl enter newline"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent rich input submit ctrl enter newline".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -662,8 +662,8 @@ struct CLIAgentCommandsWidget;
 impl SettingsWidget for CLIAgentCommandsWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent claude codex gemini toolbar commands regex patterns"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent claude codex gemini toolbar commands regex patterns".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {
@@ -794,8 +794,8 @@ struct CLIAgentToolbarLayoutWidget;
 impl SettingsWidget for CLIAgentToolbarLayoutWidget {
     type View = CLIAgentsPageView;
 
-    fn search_terms(&self) -> &str {
-        "third party cli coding agent toolbar layout chip chips rearrange re-arrange"
+    fn search_terms(&self) -> String {
+        "third party cli coding agent toolbar layout chip chips rearrange re-arrange".to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {

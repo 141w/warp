@@ -3,7 +3,7 @@
 //! Static keys are translated at compile time via the re-exported `t!` macro;
 //! runtime language switching goes through `set_language`.
 
-use rust_i18n::i18n;
+pub use rust_i18n::i18n;
 
 // Embed the locale files shipped next to this crate. `fallback` makes missing
 // zh-CN keys resolve to English instead of rendering the key itself.
@@ -64,3 +64,4 @@ pub fn setting_description(setting_name: &str, fallback: &str) -> String {
 #[cfg(test)]
 #[path = "lib_tests.rs"]
 mod lib_tests;
+

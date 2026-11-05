@@ -1,2 +1,53 @@
 common:
   cancel: "Cancel"
+  probe_fallback: "Fallback works"
+  save: "Save"
+  done: "Done"
+  back: "Back"
+settings:
+  nav:
+    about: "About"
+    account: "Account"
+    billing_and_usage: "Billing and usage"
+    appearance: "Appearance"
+    features: "Features"
+    keybindings: "Keyboard shortcuts"
+    privacy: "Privacy"
+    referrals: "Referrals"
+    scripting: "Scripting"
+    shared_blocks: "Shared blocks"
+    teams: "Teams"
+    warp_drive: "Warp Drive"
+    warpify: "Warpify"
+    warp_agent: "Warp Agent"
+    agent_profiles: "Profiles"
+    agent_mcp_servers: "MCP servers"
+    knowledge: "Knowledge"
+    third_party_cli_agents: "Third party CLI agents"
+    code_indexing: "Indexing and projects"
+    editor_and_code_review: "Editor and Code Review"
+    cloud_environments: "Environments"
+    warp_cloud_agent_api_keys: "API keys"
+    umbrella:
+      agents: "Agents"
+      code: "Code"
+      cloud_platform: "Cloud platform"
+  window:
+    search_placeholder: "Search"
+    log_out: "Log out"
+    open_settings_file: "Open settings file"
+    referral_cta: "Earn rewards by sharing Warp with friends & colleagues"
+  appearance:
+    language:
+      label: "Language"
+      search: "language locale"
+      option:
+        auto: "Auto"
+        english: "English"
+        chinese: "Chinese"
+  environments:
+    form:
+      create: "Create"
+      create_environment: "Create environment"
+      save: "Save"
+      save_environment: "Save environment"

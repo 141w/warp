@@ -1,4 +1,5 @@
 use chrono::{Local, TimeZone};
+use warp_i18n::t;
 use uuid::Uuid;
 use warp_core::ui::external_product_icon::ExternalProductIcon;
 use warp_core::ui::icons::Icon;
@@ -57,7 +58,7 @@ pub struct UpdateModalBody {
 impl UpdateModalBody {
     pub fn new(ctx: &mut ViewContext<Self>) -> Self {
         let cancel_button = ctx.add_typed_action_view(|_ctx| {
-            ActionButton::new("Cancel", NakedTheme).on_click(|ctx| {
+            ActionButton::new(t!("common.cancel"), NakedTheme).on_click(|ctx| {
                 ctx.dispatch_typed_action(UpdateModalBodyAction::Cancel);
             })
         });

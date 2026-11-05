@@ -1,1 +1,52 @@
-common: {}
+common:
+  cancel: "取消"
+  save: "保存"
+  done: "完成"
+  back: "返回"
+settings:
+  nav:
+    about: "关于"
+    account: "账户"
+    billing_and_usage: "账单与用量"
+    appearance: "外观"
+    features: "功能"
+    keybindings: "键盘快捷键"
+    privacy: "隐私"
+    referrals: "推荐奖励"
+    scripting: "脚本"
+    shared_blocks: "共享 Blocks"
+    teams: "团队"
+    warp_drive: "Warp Drive"
+    warpify: "Warpify"
+    warp_agent: "Warp 代理"
+    agent_profiles: "配置集"
+    agent_mcp_servers: "MCP 服务器"
+    knowledge: "知识库"
+    third_party_cli_agents: "第三方 CLI 代理"
+    code_indexing: "索引与项目"
+    editor_and_code_review: "编辑器与代码审查"
+    cloud_environments: "环境"
+    warp_cloud_agent_api_keys: "API 密钥"
+    umbrella:
+      agents: "代理"
+      code: "代码"
+      cloud_platform: "云平台"
+  window:
+    search_placeholder: "搜索"
+    log_out: "退出登录"
+    open_settings_file: "打开设置文件"
+    referral_cta: "分享 Warp 给朋友和同事，赢取奖励"
+  appearance:
+    language:
+      label: "语言"
+      search: "语言 中文 英文 language locale"
+      option:
+        auto: "自动"
+        english: "English"
+        chinese: "中文"
+  environments:
+    form:
+      create: "创建"
+      create_environment: "创建环境"
+      save: "保存"
+      save_environment: "保存环境"

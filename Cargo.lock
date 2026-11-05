@@ -15557,6 +15557,7 @@ dependencies = [
  "reqwest",
  "rmcp",
  "rust-embed 8.7.2",
+ "rust-i18n",
  "rustc-hash 2.1.1",
  "rustls",
  "schemars 1.0.4",

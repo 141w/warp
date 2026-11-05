@@ -783,8 +783,8 @@ struct StubWidget {
 impl SettingsWidget for StubWidget {
     type View = TestSettingsView;
 
-    fn search_terms(&self) -> &str {
-        self.terms
+    fn search_terms(&self) -> String {
+        self.terms.to_string()
     }
 
     fn render(&self, _: &Self::View, _: &Appearance, _: &AppContext) -> Box<dyn Element> {
@@ -938,8 +938,8 @@ struct NeverRendersWidget {
 impl SettingsWidget for NeverRendersWidget {
     type View = TestSettingsView;
 
-    fn search_terms(&self) -> &str {
-        self.terms
+    fn search_terms(&self) -> String {
+        self.terms.to_string()
     }
 
     fn should_render(&self, _: &AppContext) -> bool {
