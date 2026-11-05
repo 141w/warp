@@ -65,6 +65,7 @@ use crate::pane_group::{BackingView, Direction, PaneConfiguration, PaneEvent, Sp
 use crate::server::server_api::ServerApiProvider;
 use crate::server::telemetry::MCPServerCollectionPaneEntrypoint;
 use crate::settings::{AISettings, BlockVisibilitySettings, SettingsFileError};
+use crate::terminal::general_settings::{GeneralSettings, GeneralSettingsChangedEvent};
 use crate::settings_view::mcp_servers_page::{MCPServersSettingsPage, MCPServersSettingsPageEvent};
 use crate::terminal::SizeInfo;
 use crate::terminal::model::blockgrid::BlockGrid;
@@ -1200,6 +1201,17 @@ pub struct SettingsView {
 impl SettingsView {
     pub fn new(page: Option<SettingsSection>, ctx: &mut ViewContext<Self>) -> Self {
         let pane_configuration = ctx.add_model(|_ctx| PaneConfiguration::new("Settings"));
+
+        // Language changes re-render the whole settings window so every t!()
+        // lookup picks up the new locale.
+        let general_settings = GeneralSettings::handle(ctx);
+        ctx.subscribe_to_model(&general_settings, |_me, settings, event, ctx| {
+            if let GeneralSettingsChangedEvent::Language { .. } = event {
+                let language = settings.read(ctx, |s: &GeneralSettings, _| s.language);
+                warp_i18n::set_language(language.into());
+                ctx.notify();
+            }
+        });
 
         let global_resource_handles = GlobalResourceHandlesProvider::as_ref(ctx).get().clone();
         // Main settings page with accounts info

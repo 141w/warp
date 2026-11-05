@@ -143,6 +143,7 @@ pub fn init(
     let use_thin_strokes = *FontSettings::as_ref(ctx).use_thin_strokes;
 
     let general_settings = GeneralSettings::as_ref(ctx);
+    warp_i18n::set_language(general_settings.language.into());
     let tips_features_used = general_settings.welcome_tips_features_used.clone();
     let tips_skipped_or_completed = *general_settings.welcome_tips_skipped_or_completed;
     let user_default_shell_unsupported_banner_state =

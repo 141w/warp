@@ -5,6 +5,7 @@ use warp_core::settings::{RespectUserSyncSetting, SupportedPlatforms, SyncToClou
 
 use crate::banner::BannerState;
 use crate::resource_center::Tip;
+use crate::settings::Language;
 
 define_settings_group!(GeneralSettings, settings: [
     show_warning_before_quitting: ShowWarningBeforeQuitting {
@@ -177,4 +178,5 @@ define_settings_group!(GeneralSettings, settings: [
         surface: settings::SettingSurfaces::GUI,
         private: true,
     },
+    language: Language,
 ]);
