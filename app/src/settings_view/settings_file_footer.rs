@@ -8,9 +8,9 @@
 //!   error *and* the user has dismissed the workspace banner.
 //! * Otherwise, a plain bordered "Open settings file" button.
 use pathfinder_color::ColorU;
-use warp_i18n::t;
 use warp_core::ui::color::coloru_with_opacity;
 use warp_core::ui::theme::Fill;
+use warp_i18n::t;
 use warpui::elements::{
     Border, Clipped, ClippedScrollStateHandle, ClippedScrollable, ConstrainedBox, Container,
     CornerRadius, CrossAxisAlignment, Element, Empty, Expanded, Flex, Highlight, Hoverable,
@@ -119,12 +119,12 @@ pub fn render_open_settings_file_button(
             ui_font_family,
             FOOTER_FONT_SIZE,
         )
-            .with_color(text_color)
-            .with_style(Properties {
-                weight: Weight::Semibold,
-                ..Default::default()
-            })
-            .finish();
+        .with_color(text_color)
+        .with_style(Properties {
+            weight: Weight::Semibold,
+            ..Default::default()
+        })
+        .finish();
 
         // Use `MainAxisSize::Max` so the row (and its surrounding bordered
         // container) expands to fill the full sidebar width. The icon + text

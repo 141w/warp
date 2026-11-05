@@ -1,8 +1,8 @@
 //! The "Knowledge" settings page, shown under the Agents umbrella.
 
 use std::cell::RefCell;
-use warp_i18n::t;
 use std::collections::HashMap;
+use warp_i18n::t;
 
 use markdown_parser::{FormattedText, FormattedTextFragment, FormattedTextLine};
 use warp_core::features::FeatureFlag;
@@ -26,7 +26,6 @@ use super::{SettingsAction, SettingsSection, ToggleSettingActionPair, flags};
 use crate::appearance::Appearance;
 use crate::settings::{AISettings, MemoryEnabled, RuleSuggestionsEnabled, WarpDriveContextEnabled};
 use crate::util::bindings;
-
 
 const RULES_DOCS_URL: &str = "https://docs.warp.dev/agents/capabilities/rules";
 

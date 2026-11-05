@@ -14,10 +14,7 @@ use crate::terminal::general_settings::{GeneralSettings, GeneralSettingsChangedE
     schemars::JsonSchema,
     settings_value::SettingsValue,
 )]
-#[schemars(
-    description = "Interface language.",
-    rename_all = "snake_case"
-)]
+#[schemars(description = "Interface language.", rename_all = "snake_case")]
 pub enum Language {
     #[default]
     Auto,

@@ -514,7 +514,7 @@ impl EnvironmentsPageView {
             page: PageType::new_monolith(
                 EnvironmentsPageWidget,
                 None::<&'static str>, // Title rendered conditionally in widget
-                true, /* is_dual_scrollable */
+                true,                 /* is_dual_scrollable */
             ),
             current_page: EnvironmentsPage::default(),
             copy_button_mouse_states,
@@ -1035,7 +1035,8 @@ impl SettingsWidget for EnvironmentsPageWidget {
     type View = EnvironmentsPageView;
 
     fn search_terms(&self) -> String {
-        "environments environment ambient agents github warp assisted manual configuration".to_string()
+        "environments environment ambient agents github warp assisted manual configuration"
+            .to_string()
     }
 
     fn render(

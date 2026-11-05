@@ -303,14 +303,19 @@ impl GetBlocksForUserRequestState {
         let ui_builder = appearance.ui_builder();
         match self {
             GetBlocksForUserRequestState::NotStarted => pad(ui_builder
-                .label(t!("settings.shared_blocks.you_don_t_have_any_shared_blocks_yet"))
+                .label(t!(
+                    "settings.shared_blocks.you_don_t_have_any_shared_blocks_yet"
+                ))
                 .build()
                 .finish()),
-            GetBlocksForUserRequestState::InFlight => {
-                pad(ui_builder.label(t!("settings.shared_blocks.getting_blocks")).build().finish())
-            }
+            GetBlocksForUserRequestState::InFlight => pad(ui_builder
+                .label(t!("settings.shared_blocks.getting_blocks"))
+                .build()
+                .finish()),
             GetBlocksForUserRequestState::Failed => pad(ui_builder
-                .label(t!("settings.shared_blocks.failed_to_load_blocks_please_try_again"))
+                .label(t!(
+                    "settings.shared_blocks.failed_to_load_blocks_please_try_again"
+                ))
                 .build()
                 .finish()),
             GetBlocksForUserRequestState::Done(user_blocks) => {
@@ -363,7 +368,9 @@ impl GetBlocksForUserRequestState {
                     .finish()
                 } else {
                     pad(ui_builder
-                        .label(t!("settings.shared_blocks.you_don_t_have_any_shared_blocks_yet"))
+                        .label(t!(
+                            "settings.shared_blocks.you_don_t_have_any_shared_blocks_yet"
+                        ))
                         .build()
                         .finish())
                 }
@@ -424,7 +431,8 @@ impl ShowBlocksView {
 
             menu.set_items(
                 vec![MenuItem::Item(
-                    MenuItemFields::new(t!("settings.shared_blocks.unshare")).with_on_select_action(ShowBlocksAction::Unshare),
+                    MenuItemFields::new(t!("settings.shared_blocks.unshare"))
+                        .with_on_select_action(ShowBlocksAction::Unshare),
                 )],
                 ctx,
             );
@@ -549,14 +557,18 @@ impl ShowBlocksView {
             match request_result {
                 Ok(_) => {
                     ctx.emit(ShowBlocksEvent::ShowToast {
-                        message: t!("settings.shared_blocks.block_was_successfully_unshared").to_string(),
+                        message: t!("settings.shared_blocks.block_was_successfully_unshared")
+                            .to_string(),
                         flavor: ToastFlavor::Success,
                     });
                     user_block.unshare_request_status = UnshareBlockRequestState::Done;
                 }
                 Err(_) => {
                     ctx.emit(ShowBlocksEvent::ShowToast {
-                        message: t!("settings.shared_blocks.failed_to_unshare_block_please_try_again").to_string(),
+                        message: t!(
+                            "settings.shared_blocks.failed_to_unshare_block_please_try_again"
+                        )
+                        .to_string(),
                         flavor: ToastFlavor::Error,
                     });
                     user_block.unshare_request_status = UnshareBlockRequestState::Failed;
@@ -709,7 +721,9 @@ impl ShowBlocksWidget {
                                                         .confirm_dialog_handle
                                                         .clone(),
                                                 )
-                                                .with_text_label(t!("settings.shared_blocks.unshare").into())
+                                                .with_text_label(
+                                                    t!("settings.shared_blocks.unshare").into(),
+                                                )
                                                 .build()
                                                 .on_click(|ctx, _, _| {
                                                     ctx.dispatch_typed_action(
@@ -798,7 +812,11 @@ impl SettingsWidget for ShowBlocksWidget {
             );
         }
 
-        let header = render_page_title(&t!("settings.shared_blocks.shared_blocks"), HEADER_FONT_SIZE, appearance);
+        let header = render_page_title(
+            &t!("settings.shared_blocks.shared_blocks"),
+            HEADER_FONT_SIZE,
+            appearance,
+        );
         let col = Flex::column()
             .with_child(header)
             .with_child(Expanded::new(1., stack.finish()).finish());

@@ -1,7 +1,7 @@
 use std::borrow::Cow;
-use warp_i18n::t;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use warp_i18n::t;
 
 use ai::index::full_source_code_embedding::SyncProgress;
 use ai::index::full_source_code_embedding::manager::{
@@ -87,7 +87,6 @@ const CODEBASE_INDEX_LIMIT_REACHED: &str = "You have reached the maximum number 
 #[cfg(not(target_family = "wasm"))]
 const REMOTE_CODEBASE_INDEX_LIMIT_REACHED_FAILURE: &str =
     "maximum number of codebase indexes has been reached";
-
 
 #[cfg(not(target_family = "wasm"))]
 fn remote_codebase_index_limit_reached(status: &RemoteCodebaseIndexStatus) -> bool {
@@ -364,11 +363,14 @@ impl CodeIndexingPageView {
 
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
         let manual_add_directory_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new(t!("settings.code_indexing.index_new_folder"), SecondaryTheme)
-                .with_icon(Icon::FindAll)
-                .on_click(|ctx| {
-                    ctx.dispatch_typed_action(CodeIndexingPageAction::ManualAddDirectory);
-                })
+            ActionButton::new(
+                t!("settings.code_indexing.index_new_folder"),
+                SecondaryTheme,
+            )
+            .with_icon(Icon::FindAll)
+            .on_click(|ctx| {
+                ctx.dispatch_typed_action(CodeIndexingPageAction::ManualAddDirectory);
+            })
         });
         let widget = CodeIndexingPageWidget {
             inner: CodePageWidget {
@@ -747,7 +749,8 @@ impl SettingsWidget for CodePageWidget {
     type View = CodeIndexingPageView;
 
     fn search_terms(&self) -> String {
-        "code coding codebase repository index indexing indices context path lsp language server".to_string()
+        "code coding codebase repository index indexing indices context path lsp language server"
+            .to_string()
     }
 
     fn render(
@@ -1190,7 +1193,9 @@ impl CodePageWidget {
                 Container::new(
                     appearance
                         .ui_builder()
-                        .paragraph(t!("settings.code_indexing.no_folders_have_been_initialized_yet"))
+                        .paragraph(t!(
+                            "settings.code_indexing.no_folders_have_been_initialized_yet"
+                        ))
                         .build()
                         .finish(),
                 )
@@ -1491,7 +1496,11 @@ impl CodePageWidget {
 
         if let Some(completed_successfully) = index_state.last_sync_successful() {
             let (text, color, icon) = if completed_successfully {
-                (t!("settings.code_indexing.synced"), theme.ansi_fg_green(), Icon::Check)
+                (
+                    t!("settings.code_indexing.synced"),
+                    theme.ansi_fg_green(),
+                    Icon::Check,
+                )
             } else if let Some(CodebaseIndexFinishedStatus::Failed(
                 CodebaseIndexingError::ExceededMaxFileLimit
                 | CodebaseIndexingError::MaxDepthExceeded,
@@ -1509,7 +1518,11 @@ impl CodePageWidget {
                     Icon::ClockRefresh,
                 )
             } else {
-                (t!("settings.code_indexing.failed"), theme.ui_error_color(), Icon::AlertTriangle)
+                (
+                    t!("settings.code_indexing.failed"),
+                    theme.ui_error_color(),
+                    Icon::AlertTriangle,
+                )
             };
 
             return IndexingStatusPresentation {
@@ -1880,9 +1893,15 @@ impl CodePageWidget {
         );
 
         let (description, is_installing) = match &repo_status {
-            Some(LspRepoStatus::DisabledAndInstalled { .. }) => (t!("settings.scripting.installed"), false),
-            Some(LspRepoStatus::Installing { .. }) => (t!("settings.code_indexing.installing"), true),
-            Some(LspRepoStatus::CheckingForInstallation) => (t!("settings.code_indexing.checking"), true),
+            Some(LspRepoStatus::DisabledAndInstalled { .. }) => {
+                (t!("settings.scripting.installed"), false)
+            }
+            Some(LspRepoStatus::Installing { .. }) => {
+                (t!("settings.code_indexing.installing"), true)
+            }
+            Some(LspRepoStatus::CheckingForInstallation) => {
+                (t!("settings.code_indexing.checking"), true)
+            }
             _ => (t!("settings.code_indexing.available_for_download"), false),
         };
 
@@ -2164,12 +2183,16 @@ impl CodePageWidget {
                             .into(),
                         t!("settings.code_indexing.failed"),
                     ),
-                    LspState::Stopped { .. } | LspState::Stopping { .. } => {
-                        (theme.disabled_ui_text_color().into_solid(), t!("settings.code_indexing.stopped"))
-                    }
+                    LspState::Stopped { .. } | LspState::Stopping { .. } => (
+                        theme.disabled_ui_text_color().into_solid(),
+                        t!("settings.code_indexing.stopped"),
+                    ),
                 }
             }
-            None => (theme.disabled_ui_text_color().into_solid(), t!("settings.code_indexing.not_running")),
+            None => (
+                theme.disabled_ui_text_color().into_solid(),
+                t!("settings.code_indexing.not_running"),
+            ),
         }
     }
 }
@@ -2182,7 +2205,8 @@ impl SettingsWidget for CodeIndexingPageWidget {
     type View = CodeIndexingPageView;
 
     fn search_terms(&self) -> String {
-        "codebase index indexing repository code context embedding auto-index lsp language server".to_string()
+        "codebase index indexing repository code context embedding auto-index lsp language server"
+            .to_string()
     }
 
     fn render(

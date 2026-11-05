@@ -1,9 +1,9 @@
 use std::borrow::Cow;
-use warp_i18n::t;
 use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
 use std::sync::LazyLock;
 use std::time::Duration;
+use warp_i18n::t;
 
 use pathfinder_geometry::vector::vec2f;
 use regex::Regex;
@@ -151,34 +151,38 @@ impl PrivacyPageView {
         });
 
         let add_regex_modal_view = ctx.add_typed_action_view(|ctx| {
-            Modal::new(Some(t!("settings.privacy.add_regex_pattern").to_string()), add_regex_body, ctx)
-                .with_modal_style(UiComponentStyles {
-                    width: Some(600.),
-                    height: Some(400.),
-                    ..Default::default()
-                })
-                .with_header_style(UiComponentStyles {
-                    padding: Some(Coords {
-                        top: 24.,
-                        bottom: 0.,
-                        left: 24.,
-                        right: 24.,
-                    }),
-                    font_size: Some(16.),
-                    font_weight: Some(Weight::Bold),
-                    ..Default::default()
-                })
-                .with_body_style(UiComponentStyles {
-                    padding: Some(Coords {
-                        top: 0.,
-                        bottom: 24.,
-                        left: 24.,
-                        right: 24.,
-                    }),
-                    ..Default::default()
-                })
-                .with_background_opacity(100)
-                .with_dismiss_on_click()
+            Modal::new(
+                Some(t!("settings.privacy.add_regex_pattern").to_string()),
+                add_regex_body,
+                ctx,
+            )
+            .with_modal_style(UiComponentStyles {
+                width: Some(600.),
+                height: Some(400.),
+                ..Default::default()
+            })
+            .with_header_style(UiComponentStyles {
+                padding: Some(Coords {
+                    top: 24.,
+                    bottom: 0.,
+                    left: 24.,
+                    right: 24.,
+                }),
+                font_size: Some(16.),
+                font_weight: Some(Weight::Bold),
+                ..Default::default()
+            })
+            .with_body_style(UiComponentStyles {
+                padding: Some(Coords {
+                    top: 0.,
+                    bottom: 24.,
+                    left: 24.,
+                    right: 24.,
+                }),
+                ..Default::default()
+            })
+            .with_background_opacity(100)
+            .with_dismiss_on_click()
         });
         ctx.subscribe_to_view(&add_regex_modal_view, |me, _, event, ctx| {
             me.handle_modal_event(event, ctx);
@@ -912,7 +916,9 @@ impl SecretRedactionWidget {
 
         if enterprise_regex_list.is_empty() {
             return ui_builder
-                .paragraph(t!("settings.privacy.no_enterprise_regexes_have_been_configured_by_your_organizat"))
+                .paragraph(t!(
+                    "settings.privacy.no_enterprise_regexes_have_been_configured_by_your_organizat"
+                ))
                 .with_style(UiComponentStyles {
                     font_color: Some(description_text_color),
                     ..Default::default()
@@ -1011,9 +1017,10 @@ impl SecretRedactionWidget {
                         .with_main_axis_size(MainAxisSize::Max)
                         .with_main_axis_alignment(MainAxisAlignment::SpaceBetween)
                         .with_cross_axis_alignment(CrossAxisAlignment::Center)
-                        .with_child(
-                            self.render_section_title(t!("settings.privacy.recommended").to_string(), appearance),
-                        )
+                        .with_child(self.render_section_title(
+                            t!("settings.privacy.recommended").to_string(),
+                            appearance,
+                        ))
                         .with_child(
                             Container::new(
                                 ui_builder
@@ -1022,7 +1029,8 @@ impl SecretRedactionWidget {
                                         self.add_all_button_mouse_state.clone(),
                                     )
                                     .with_text_and_icon_label(Self::add_button(
-                                        t!("settings.privacy.add_all"), appearance,
+                                        t!("settings.privacy.add_all"),
+                                        appearance,
                                     ))
                                     .with_style(Self::add_button_style())
                                     .build()
@@ -1326,7 +1334,10 @@ impl SettingsWidget for SecretRedactionWidget {
                                 ButtonVariant::Secondary,
                                 self.add_regex_button_mouse_state.clone(),
                             )
-                            .with_text_and_icon_label(Self::add_button(t!("settings.privacy.add_regex"), appearance))
+                            .with_text_and_icon_label(Self::add_button(
+                                t!("settings.privacy.add_regex"),
+                                appearance,
+                            ))
                             .with_style(Self::add_button_style())
                             .build()
                             .on_click(move |ctx, _, _| {
@@ -1513,7 +1524,8 @@ impl SettingsWidget for AppAnalyticsWidget {
         } else {
             switch
                 .with_tooltip(TooltipConfig {
-                    text: t!("settings.privacy.this_setting_is_managed_by_your_organization").to_string(),
+                    text: t!("settings.privacy.this_setting_is_managed_by_your_organization")
+                        .to_string(),
                     styles: ui_builder.default_tool_tip_styles(),
                 })
                 .disable()
@@ -1702,7 +1714,8 @@ impl SettingsWidget for CloudConversationStorageWidget {
         } else {
             switch
                 .with_tooltip(TooltipConfig {
-                    text: t!("settings.privacy.this_setting_is_managed_by_your_organization").to_string(),
+                    text: t!("settings.privacy.this_setting_is_managed_by_your_organization")
+                        .to_string(),
                     styles: ui_builder.default_tool_tip_styles(),
                 })
                 .disable()

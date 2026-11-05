@@ -64,4 +64,3 @@ pub fn setting_description(setting_name: &str, fallback: &str) -> String {
 #[cfg(test)]
 #[path = "lib_tests.rs"]
 mod lib_tests;
-

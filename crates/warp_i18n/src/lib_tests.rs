@@ -1,4 +1,4 @@
-use crate::{Language, setting_description, set_language, t};
+use crate::{Language, set_language, setting_description, t};
 
 fn collect_leaf_keys(value: &serde_yaml::Value, prefix: String, out: &mut Vec<String>) {
     match value {
@@ -31,7 +31,10 @@ fn locales_have_symmetric_keys() {
     collect_leaf_keys(&zh, String::new(), &mut zh_keys);
 
     for key in zh_keys {
-        assert!(en_keys.contains(&key), "zh-CN key `{key}` missing in en.yml");
+        assert!(
+            en_keys.contains(&key),
+            "zh-CN key `{key}` missing in en.yml"
+        );
     }
 }
 

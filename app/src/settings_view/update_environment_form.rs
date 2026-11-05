@@ -1,6 +1,6 @@
+use std::borrow::Cow;
 #[cfg(not(target_family = "wasm"))]
 use std::collections::HashMap;
-use std::borrow::Cow;
 
 use warp_i18n::t;
 

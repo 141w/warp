@@ -16,7 +16,10 @@ fn language_toml_path() {
 
 #[test]
 fn language_serializes_to_snake_case() {
-    assert_eq!(Language::Chinese.to_file_value(), serde_json::json!("chinese"));
+    assert_eq!(
+        Language::Chinese.to_file_value(),
+        serde_json::json!("chinese")
+    );
     assert_eq!(Language::Auto.to_file_value(), serde_json::json!("auto"));
 }
 
@@ -26,4 +29,3 @@ fn language_converts_to_i18n_language() {
     assert_eq!(I18nLanguage::from(Language::Auto), I18nLanguage::Auto);
     assert_eq!(I18nLanguage::from(Language::English), I18nLanguage::English);
 }
-

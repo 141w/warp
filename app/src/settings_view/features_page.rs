@@ -1,9 +1,9 @@
 use std::cell::RefCell;
-use warp_i18n::t;
 use std::collections::HashMap;
 use std::ops::Not as _;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use warp_i18n::t;
 
 use ::settings::{Setting, ToggleableSetting};
 use lazy_static::lazy_static;
@@ -3097,7 +3097,8 @@ impl FeaturesPageView {
             Category::new(t!("settings.section.terminal_input"), editor_widgets),
             Category::new(t!("settings.section.terminal"), terminal_widgets),
             Category::new(t!("settings.section.notifications"), notifications_widgets),
-            Category::new(t!("settings.section.workflows"),
+            Category::new(
+                t!("settings.section.workflows"),
                 vec![Box::new(WorkflowsInCommandSearch::default())],
             ),
             Category::new(t!("settings.section.system"), system_widgets),
@@ -3670,7 +3671,9 @@ impl FeaturesPageView {
     fn new_tab_placement_dropdown_item_label(val: NewTabPlacement) -> String {
         match val {
             NewTabPlacement::AfterAllTabs => t!("settings.features.after_all_tabs").into_owned(),
-            NewTabPlacement::AfterCurrentTab => t!("settings.features.after_current_tab").into_owned(),
+            NewTabPlacement::AfterCurrentTab => {
+                t!("settings.features.after_current_tab").into_owned()
+            }
         }
     }
 
@@ -4217,9 +4220,13 @@ impl FeaturesPageView {
                     Shrinkable::new(
                         2.,
                         Align::new(
-                            Text::new_inline(t!("settings.features.keybinding"), appearance.ui_font_family(), 13.)
-                                .with_color(appearance.theme().active_ui_text_color().into())
-                                .finish(),
+                            Text::new_inline(
+                                t!("settings.features.keybinding"),
+                                appearance.ui_font_family(),
+                                13.,
+                            )
+                            .with_color(appearance.theme().active_ui_text_color().into())
+                            .finish(),
                         )
                         .left()
                         .finish(),
@@ -4238,7 +4245,9 @@ impl FeaturesPageView {
                         } else {
                             appearance
                                 .ui_builder()
-                                .paragraph(t!("settings.features.click_to_set_global_hotkey").to_string())
+                                .paragraph(
+                                    t!("settings.features.click_to_set_global_hotkey").to_string(),
+                                )
                                 .build()
                                 .finish()
                         })
@@ -4380,9 +4389,13 @@ impl FeaturesPageView {
                 }
 
                 Container::new(
-                    Text::new_inline(t!("settings.features.change_keybinding"), appearance.ui_font_family(), 12.)
-                        .with_color(button_color)
-                        .finish(),
+                    Text::new_inline(
+                        t!("settings.features.change_keybinding"),
+                        appearance.ui_font_family(),
+                        12.,
+                    )
+                    .with_color(button_color)
+                    .finish(),
                 )
                 .with_border(border)
                 .finish()
@@ -5087,7 +5100,8 @@ impl SettingsWidget for MouseScrollMultiplierWidget {
                 on_click_action: None,
                 secondary_text: None,
                 tooltip_override_text: Some(
-                    t!("settings.features.supports_floating_point_values_between_1_and_20").to_string(),
+                    t!("settings.features.supports_floating_point_values_between_1_and_20")
+                        .to_string(),
                 ),
             }),
             LocalOnlyIconState::for_setting(
@@ -7388,9 +7402,9 @@ impl SettingsWidget for Osc52ClipboardAccessWidget {
         render_dropdown_item(
             appearance,
             &t!("settings.features.clipboard_access_osc_52"),
-            Some(
-                &t!("settings.features.controls_whether_programs_running_in_the_terminal_can_read_o"),
-            ),
+            Some(&t!(
+                "settings.features.controls_whether_programs_running_in_the_terminal_can_read_o"
+            )),
             None,
             LocalOnlyIconState::for_setting(
                 Osc52ClipboardAccessSetting::storage_key(),
@@ -7575,7 +7589,8 @@ impl SettingsWidget for LinuxSelectionClipboardWidget {
                 on_click_action: None,
                 secondary_text: None,
                 tooltip_override_text: Some(
-                    t!("settings.features.whether_the_linux_primary_clipboard_should_be_supported").into(),
+                    t!("settings.features.whether_the_linux_primary_clipboard_should_be_supported")
+                        .into(),
                 ),
             }),
             LocalOnlyIconState::for_setting(
@@ -7623,7 +7638,8 @@ impl SettingsWidget for GPUWidget {
     ) -> Box<dyn Element> {
         let gpu_settings = GPUSettings::as_ref(app);
         let mut col = Flex::column().with_child(render_body_item::<FeaturesPageAction>(
-            t!("settings.features.prefer_rendering_new_windows_with_integrated_gpu_low_power").into(),
+            t!("settings.features.prefer_rendering_new_windows_with_integrated_gpu_low_power")
+                .into(),
             None,
             LocalOnlyIconState::for_setting(
                 PreferLowPowerGPU::storage_key(),
@@ -7653,7 +7669,10 @@ impl SettingsWidget for GPUWidget {
                 Container::new(
                     appearance
                         .ui_builder()
-                        .wrappable_text(t!("settings.features.changes_will_apply_to_new_windows"), true)
+                        .wrappable_text(
+                            t!("settings.features.changes_will_apply_to_new_windows"),
+                            true,
+                        )
                         .with_style(UiComponentStyles {
                             font_color: Some(theme.sub_text_color(theme.background()).into_solid()),
                             ..Default::default()
@@ -7698,7 +7717,9 @@ impl SettingsWidget for WindowSystemWidget {
                 mouse_state: self.additional_info_link.clone(),
                 on_click_action: None,
                 secondary_text: None,
-                tooltip_override_text: Some(t!("settings.features.enables_the_use_of_wayland").to_string()),
+                tooltip_override_text: Some(
+                    t!("settings.features.enables_the_use_of_wayland").to_string(),
+                ),
             }),
             LocalOnlyIconState::for_setting(
                 ForceX11::storage_key(),
@@ -7804,7 +7825,10 @@ impl SettingsWidget for GraphicsBackendWidget {
                 Container::new(
                     appearance
                         .ui_builder()
-                        .wrappable_text(t!("settings.features.changes_will_apply_to_new_windows"), true)
+                        .wrappable_text(
+                            t!("settings.features.changes_will_apply_to_new_windows"),
+                            true,
+                        )
                         .with_style(UiComponentStyles {
                             font_color: Some(theme.sub_text_color(theme.background()).into_solid()),
                             ..Default::default()
@@ -7883,7 +7907,10 @@ impl SettingsWidget for AsyncFindWidget {
             switch,
             appearance,
             Some(
-                t!("settings.features.use_an_improved_implementation_of_find_to_keep_the_ui_respon").into_owned(),
+                t!(
+                    "settings.features.use_an_improved_implementation_of_find_to_keep_the_ui_respon"
+                )
+                .into_owned(),
             ),
         )
     }

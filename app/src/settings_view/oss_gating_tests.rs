@@ -1,4 +1,4 @@
-use super::{is_hidden_for_channel, LOGIN_GATED_SECTIONS};
+use super::{LOGIN_GATED_SECTIONS, is_hidden_for_channel};
 use crate::settings_view::SettingsSection;
 use warp_core::channel::Channel;
 
@@ -14,7 +14,12 @@ fn oss_hides_login_gated_sections() {
 
 #[test]
 fn release_channels_keep_every_section() {
-    for channel in [Channel::Stable, Channel::Preview, Channel::Dev, Channel::Local] {
+    for channel in [
+        Channel::Stable,
+        Channel::Preview,
+        Channel::Dev,
+        Channel::Local,
+    ] {
         for section in LOGIN_GATED_SECTIONS {
             assert!(
                 !is_hidden_for_channel(*section, channel),
@@ -37,7 +42,10 @@ fn oss_keeps_core_sections() {
         SettingsSection::CodeIndexing,
         SettingsSection::EditorAndCodeReview,
     ] {
-        assert!(!is_hidden_for_channel(section, Channel::Oss), "{section:?} should stay visible");
+        assert!(
+            !is_hidden_for_channel(section, Channel::Oss),
+            "{section:?} should stay visible"
+        );
     }
 }
 

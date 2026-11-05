@@ -1,8 +1,8 @@
 //! The "Editor and Code Review" settings page, shown under the Code umbrella.
 
 use warp_core::settings::{Setting as _, ToggleableSetting as _};
-use warp_i18n::t;
 use warp_errors::report_if_error;
+use warp_i18n::t;
 use warpui::elements::Element;
 #[cfg(feature = "local_fs")]
 use warpui::elements::{ChildView, Empty};
@@ -29,7 +29,6 @@ use crate::terminal::general_settings::GeneralSettings;
 use crate::view_components::{Dropdown, DropdownItem};
 use crate::workspace::tab_settings::TabSettings;
 use crate::{TelemetryEvent, send_telemetry_from_ctx};
-
 
 pub struct EditorAndCodeReviewPageView {
     page: PageType<Self>,
@@ -91,7 +90,10 @@ impl EditorAndCodeReviewPageView {
             Box::new(AutoSaveToggleWidget::default()),
         ]);
 
-        PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.code_editor_review"))))
+        PageType::new_uncategorized(
+            widgets,
+            Some(PageTitle::new(t!("settings.page.code_editor_review"))),
+        )
     }
 
     fn update_code_editor_line_number_mode_dropdown(
@@ -568,7 +570,10 @@ impl SettingsWidget for GlobalSearchToggleWidget {
                     ctx.dispatch_typed_action(EditorAndCodeReviewPageAction::ToggleGlobalSearch);
                 })
                 .finish(),
-            Some(t!("settings.code_review.adds_global_file_search_to_the_left_side_tools_panel").into()),
+            Some(
+                t!("settings.code_review.adds_global_file_search_to_the_left_side_tools_panel")
+                    .into(),
+            ),
         )
     }
 }

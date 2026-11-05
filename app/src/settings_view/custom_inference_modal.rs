@@ -1,6 +1,6 @@
 use ::ai::api_keys::{CustomEndpoint, CustomEndpointSchema, validate_custom_endpoint_url};
-use warp_i18n::t;
 use warp_editor::editor::NavigationKey;
+use warp_i18n::t;
 use warpui::elements::{
     Border, ChildView, ClippedScrollStateHandle, ClippedScrollable, ConstrainedBox, Container,
     CornerRadius, CrossAxisAlignment, Empty, Expanded, Flex, MainAxisSize, MouseStateHandle,

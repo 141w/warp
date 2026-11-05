@@ -6,13 +6,13 @@
 //! agent display settings.
 
 use std::cell::RefCell;
-use warp_i18n::t;
 use std::collections::HashMap;
 use std::ops::Not;
 #[cfg(feature = "local_fs")]
 use std::path::PathBuf;
 use std::sync::LazyLock;
 use std::time::Duration;
+use warp_i18n::t;
 
 use ::ai::api_keys::{
     ApiKeyManager, ApiKeyManagerEvent, ApiKeys, ChatGPTConnectFailure, CustomEndpointParams,
@@ -2327,7 +2327,8 @@ impl WarpAgentPageView {
             ));
         }
 
-        categories.push(Category::new(t!("settings.section.input"),
+        categories.push(Category::new(
+            t!("settings.section.input"),
             vec![
                 Box::new(NaturalLanguageDetectionWidget::default()),
                 Box::new(ShowInputHintTextWidget::default()),
@@ -2344,12 +2345,14 @@ impl WarpAgentPageView {
                 .voice_input_enabled_internal
                 .is_supported_on_current_platform();
         if voice_supported {
-            categories.push(Category::new(t!("settings.section.voice"),
+            categories.push(Category::new(
+                t!("settings.section.voice"),
                 vec![Box::new(VoiceWidget::default())],
             ));
         }
 
-        categories.push(Category::new(t!("settings.section.cloud_handoff"),
+        categories.push(Category::new(
+            t!("settings.section.cloud_handoff"),
             vec![
                 Box::new(CloudHandoffWidget::default()),
                 Box::new(AutoHandoffOnSleepWidget::default()),
@@ -2375,11 +2378,13 @@ impl WarpAgentPageView {
             vec![Box::new(ApiKeysWidget::new(ctx))],
         ));
 
-        categories.push(Category::new(t!("settings.section.aws_bedrock"),
+        categories.push(Category::new(
+            t!("settings.section.aws_bedrock"),
             vec![Box::new(AwsBedrockWidget::new(ctx))],
         ));
 
-        categories.push(Category::new(t!("settings.section.gemini_enterprise"),
+        categories.push(Category::new(
+            t!("settings.section.gemini_enterprise"),
             vec![Box::new(GeminiEnterpriseWidget::new(ctx))],
         ));
 
@@ -2392,10 +2397,14 @@ impl WarpAgentPageView {
                 widgets.push(Box::new(CustomModelRoutersWidget));
                 widgets
             };
-            categories.push(Category::new(t!("settings.section.custom_routers"), custom_router_widgets));
+            categories.push(Category::new(
+                t!("settings.section.custom_routers"),
+                custom_router_widgets,
+            ));
         }
 
-        categories.push(Category::new(t!("settings.section.agent_attribution"),
+        categories.push(Category::new(
+            t!("settings.section.agent_attribution"),
             vec![Box::new(AgentAttributionWidget::default())],
         ));
 
@@ -2413,7 +2422,8 @@ impl WarpAgentPageView {
         categories.push(Category::new(t!("settings.section.other"), other_widgets));
 
         if FeatureFlag::AgentModeComputerUse.is_enabled() {
-            categories.push(Category::new(t!("settings.section.experimental"),
+            categories.push(Category::new(
+                t!("settings.section.experimental"),
                 vec![Box::new(CloudAgentComputerUseWidget::default())],
             ));
         }
@@ -2422,16 +2432,18 @@ impl WarpAgentPageView {
         let global_ai_sign_up_button = MouseStateHandle::default();
         PageType::new_categorized(
             categories,
-            Some(PageTitle::new(t!("settings.page.warp_agent")).with_trailing_element(
-                move |_view, appearance, app| {
-                    render_global_ai_toggle(
-                        &global_ai_switch_state,
-                        &global_ai_sign_up_button,
-                        appearance,
-                        app,
-                    )
-                },
-            )),
+            Some(
+                PageTitle::new(t!("settings.page.warp_agent")).with_trailing_element(
+                    move |_view, appearance, app| {
+                        render_global_ai_toggle(
+                            &global_ai_switch_state,
+                            &global_ai_sign_up_button,
+                            appearance,
+                            app,
+                        )
+                    },
+                ),
+            ),
         )
     }
 
@@ -3629,7 +3641,8 @@ impl SettingsWidget for GitOperationsAutogenWidget {
     type View = WarpAgentPageView;
 
     fn search_terms(&self) -> String {
-        "active ai a.i. unit tests commit pull request pr git code review autogen generate".to_string()
+        "active ai a.i. unit tests commit pull request pr git code review autogen generate"
+            .to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {

@@ -1,9 +1,9 @@
 use chrono::{Local, TimeZone};
-use warp_i18n::t;
 use uuid::Uuid;
 use warp_core::ui::external_product_icon::ExternalProductIcon;
 use warp_core::ui::icons::Icon;
 use warp_core::ui::theme::color::internal_colors;
+use warp_i18n::t;
 use warpui::elements::{
     Align, Border, ChildView, ConstrainedBox, Container, CornerRadius, CrossAxisAlignment, Empty,
     Flex, Hoverable, MainAxisAlignment, MouseStateHandle, Padding, ParentElement, Radius,

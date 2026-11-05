@@ -224,7 +224,8 @@ impl SettingsWidget for BillingAndUsageWidget {
     type View = BillingAndUsageDispatchView;
 
     fn search_terms(&self) -> String {
-        "plan billing a.i. ai usage limit credits dollars cost spend display unit balance overview".to_string()
+        "plan billing a.i. ai usage limit credits dollars cost spend display unit balance overview"
+            .to_string()
     }
 
     fn render(

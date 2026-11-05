@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use warp_i18n::t;
 use std::path::Path;
 #[cfg(feature = "local_fs")]
 use std::sync::Arc;
+use warp_i18n::t;
 
 #[cfg(feature = "local_fs")]
 #[cfg(not(target_family = "wasm"))]

@@ -6,7 +6,6 @@ use std::{
 
 #[cfg(all(feature = "local_fs", not(target_family = "wasm")))]
 use ai::index::full_source_code_embedding::manager::CodebaseIndexManager;
-use warp_i18n::t;
 #[cfg(all(
     feature = "local_fs",
     not(target_family = "wasm"),
@@ -19,6 +18,7 @@ use pathfinder_color::ColorU;
 use warp_core::features::FeatureFlag;
 use warp_core::paths::home_relative_path;
 use warp_core::ui::theme::color::internal_colors;
+use warp_i18n::t;
 use warpui::r#async::{SpawnedFutureHandle, Timer};
 use warpui::elements::{
     Align, Border, ChildView, ClippedScrollStateHandle, ClippedScrollable, ConstrainedBox,

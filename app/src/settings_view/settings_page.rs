@@ -1,7 +1,7 @@
 use core::fmt::{self, Display};
-use warp_i18n::t;
 use std::borrow::Cow;
 use std::collections::HashMap;
+use warp_i18n::t;
 
 use itertools::Itertools as _;
 use markdown_parser::{FormattedText, FormattedTextFragment, FormattedTextLine};
@@ -1613,8 +1613,8 @@ impl<V: warpui::View> PageType<V> {
     pub(super) fn update_filter(&mut self, query: &str, app: &AppContext) -> MatchData {
         match self {
             Self::Monolith { widget, filter, .. } => {
-                *filter =
-                    widget.should_render(app) && search_terms_match(widget.search_terms().as_str(), query);
+                *filter = widget.should_render(app)
+                    && search_terms_match(widget.search_terms().as_str(), query);
                 (*filter).into()
             }
             Self::Uncategorized {
@@ -1764,7 +1764,8 @@ impl<V: warpui::View> PageType<V> {
                         let category = &categories[i];
                         let header = category.header.as_ref();
                         FilteredCategory {
-                            title: header.map_or(std::borrow::Cow::Borrowed(""), |h| h.title.clone()),
+                            title: header
+                                .map_or(std::borrow::Cow::Borrowed(""), |h| h.title.clone()),
                             subtitle: header.and_then(|h| h.subtitle),
                             trailing_element: header.and_then(|h| h.trailing_element.as_ref()),
                             widgets: indices

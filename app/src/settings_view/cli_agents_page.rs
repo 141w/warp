@@ -5,8 +5,8 @@
 //! interactive regardless of the global AI toggle.
 
 use std::cell::RefCell;
-use warp_i18n::t;
 use std::collections::HashMap;
+use warp_i18n::t;
 
 use enum_iterator::all;
 use markdown_parser::{FormattedText, FormattedTextFragment, FormattedTextLine};
@@ -51,7 +51,6 @@ use crate::util::bindings;
 use crate::view_components::dropdown::DropdownAction;
 use crate::view_components::{Dropdown, SubmittableTextInput, SubmittableTextInputEvent};
 use crate::{TelemetryEvent, send_telemetry_from_ctx};
-
 
 pub struct CLIAgentsPageView {
     page: PageType<Self>,
@@ -134,7 +133,10 @@ impl CLIAgentsPageView {
             Box::new(CLIAgentCommandsWidget),
             Box::new(CLIAgentToolbarLayoutWidget),
         ];
-        PageType::new_uncategorized(widgets, Some(PageTitle::new(t!("settings.page.cli_agents"))))
+        PageType::new_uncategorized(
+            widgets,
+            Some(PageTitle::new(t!("settings.page.cli_agents"))),
+        )
     }
 
     fn create_cli_agent_dropdowns(
@@ -417,7 +419,8 @@ impl SettingsWidget for CLIAgentWidget {
     type View = CLIAgentsPageView;
 
     fn search_terms(&self) -> String {
-        "third party cli coding agent claude codex gemini toolbar footer quick actions show".to_string()
+        "third party cli coding agent claude codex gemini toolbar footer quick actions show"
+            .to_string()
     }
 
     fn render(
@@ -663,7 +666,8 @@ impl SettingsWidget for CLIAgentCommandsWidget {
     type View = CLIAgentsPageView;
 
     fn search_terms(&self) -> String {
-        "third party cli coding agent claude codex gemini toolbar commands regex patterns".to_string()
+        "third party cli coding agent claude codex gemini toolbar commands regex patterns"
+            .to_string()
     }
 
     fn should_render(&self, app: &AppContext) -> bool {

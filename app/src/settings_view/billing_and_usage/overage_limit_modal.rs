@@ -1,9 +1,9 @@
+use warp_i18n::t;
 use warpui::elements::{
     Align, Border, ChildView, Clipped, Container, CornerRadius, CrossAxisAlignment, Expanded, Flex,
     MouseStateHandle, Padding, ParentElement, Radius, Text,
 };
 use warpui::ui_components::button::ButtonVariant;
-use warp_i18n::t;
 use warpui::ui_components::components::{Coords, UiComponent, UiComponentStyles};
 use warpui::{
     AppContext, Element, Entity, SingletonEntity, TypedActionView, View, ViewContext, ViewHandle,
