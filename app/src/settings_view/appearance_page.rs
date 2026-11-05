@@ -211,7 +211,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
 
     app.register_fixed_bindings(vec![
         FixedBinding::empty(
-            "Start Input at the Top".to_string(),
+            t!("settings.appearance.start_input_at_the_top").to_string(),
             builder(SettingsAction::AppearancePageToggle(
                 AppearancePageAction::SetInputMode {
                     new_mode: InputMode::Waterfall,
@@ -225,7 +225,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
 
     app.register_fixed_bindings(vec![
         FixedBinding::empty(
-            "Pin Input to the Top".to_string(),
+            t!("settings.appearance.pin_input_to_the_top").to_string(),
             builder(SettingsAction::AppearancePageToggle(
                 AppearancePageAction::SetInputMode {
                     new_mode: InputMode::PinnedToTop,
@@ -238,7 +238,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
     ]);
 
     app.register_fixed_bindings(vec![FixedBinding::empty(
-        "Pin Input to the Bottom".to_string(),
+        t!("settings.appearance.pin_input_to_the_bottom").to_string(),
         builder(SettingsAction::AppearancePageToggle(
             AppearancePageAction::SetInputMode {
                 new_mode: InputMode::PinnedToBottom,
@@ -251,7 +251,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
     // Add command palette entry for toggling between Warp and Classic input modes
     app.register_fixed_bindings(vec![
         FixedBinding::empty(
-            "Toggle Input Mode (Warp/Classic)".to_string(),
+            t!("settings.appearance.toggle_input_mode_warp_classic").to_string(),
             builder(SettingsAction::AppearancePageToggle(
                 AppearancePageAction::ToggleInputMode,
             )),
@@ -331,7 +331,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
         // Add bindings for each visibility option.
         app.register_fixed_bindings([
             FixedBinding::empty(
-                "Always show tab bar".to_string(),
+                t!("settings.appearance.always_show_tab_bar").to_string(),
                 builder(SettingsAction::AppearancePageToggle(
                     AppearancePageAction::SetWorkspaceDecorationVisibility(
                         WorkspaceDecorationVisibility::AlwaysShow,
@@ -341,7 +341,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
             )
             .with_group(bindings::BindingGroup::Settings.as_str()),
             FixedBinding::empty(
-                "Hide tab bar if fullscreen".to_string(),
+                t!("settings.appearance.hide_tab_bar_if_fullscreen").to_string(),
                 builder(SettingsAction::AppearancePageToggle(
                     AppearancePageAction::SetWorkspaceDecorationVisibility(
                         WorkspaceDecorationVisibility::HideFullscreen,
@@ -351,7 +351,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
             )
             .with_group(bindings::BindingGroup::Settings.as_str()),
             FixedBinding::empty(
-                "Only show tab bar on hover".to_string(),
+                t!("settings.appearance.only_show_tab_bar_on_hover").to_string(),
                 builder(SettingsAction::AppearancePageToggle(
                     AppearancePageAction::SetWorkspaceDecorationVisibility(
                         WorkspaceDecorationVisibility::OnHover,
@@ -1657,11 +1657,11 @@ impl AppearanceSettingsPageView {
         initial_dropdown_item
     }
 
-    fn input_mode_dropdown_item_label(val: InputMode) -> &'static str {
+    fn input_mode_dropdown_item_label(val: InputMode) -> String {
         match val {
-            InputMode::PinnedToBottom => "Pin to the bottom (Warp mode)",
-            InputMode::PinnedToTop => "Pin to the top (Reverse mode)",
-            InputMode::Waterfall => "Start at the top (Classic mode)",
+            InputMode::PinnedToBottom => t!("settings.appearance.pin_to_the_bottom_warp_mode").into_owned(),
+            InputMode::PinnedToTop => t!("settings.appearance.pin_to_the_top_reverse_mode").into_owned(),
+            InputMode::Waterfall => t!("settings.appearance.start_at_the_top_classic_mode").into_owned(),
         }
     }
 
@@ -1687,39 +1687,39 @@ impl AppearanceSettingsPageView {
         }
     }
 
-    fn thin_strokes_dropdown_item_label(val: ThinStrokes) -> &'static str {
+    fn thin_strokes_dropdown_item_label(val: ThinStrokes) -> String {
         match val {
-            ThinStrokes::Never => "Never",
-            ThinStrokes::OnLowDpiDisplays => "On low-DPI displays",
-            ThinStrokes::OnHighDpiDisplays => "On high-DPI displays",
-            ThinStrokes::Always => "Always",
+            ThinStrokes::Never => t!("settings.appearance.never").into_owned(),
+            ThinStrokes::OnLowDpiDisplays => t!("settings.appearance.on_low_dpi_displays").into_owned(),
+            ThinStrokes::OnHighDpiDisplays => t!("settings.appearance.on_high_dpi_displays").into_owned(),
+            ThinStrokes::Always => t!("settings.appearance.always").into_owned(),
         }
     }
 
-    fn enforce_minimum_contrast_dropdown_item_label(val: EnforceMinimumContrast) -> &'static str {
+    fn enforce_minimum_contrast_dropdown_item_label(val: EnforceMinimumContrast) -> String {
         match val {
-            EnforceMinimumContrast::Always => "Always",
-            EnforceMinimumContrast::OnlyNamedColors => "Only for named colors",
-            EnforceMinimumContrast::Never => "Never",
+            EnforceMinimumContrast::Always => t!("settings.appearance.always").into_owned(),
+            EnforceMinimumContrast::OnlyNamedColors => t!("settings.appearance.only_for_named_colors").into_owned(),
+            EnforceMinimumContrast::Never => t!("settings.appearance.never").into_owned(),
         }
     }
 
     fn workspace_decoration_visibility_dropdown_item_label(
         value: WorkspaceDecorationVisibility,
-    ) -> &'static str {
+    ) -> String {
         match value {
-            WorkspaceDecorationVisibility::AlwaysShow => "Always",
-            WorkspaceDecorationVisibility::HideFullscreen => "When windowed",
-            WorkspaceDecorationVisibility::OnHover => "Only on hover",
+            WorkspaceDecorationVisibility::AlwaysShow => t!("settings.appearance.always").into_owned(),
+            WorkspaceDecorationVisibility::HideFullscreen => t!("settings.appearance.when_windowed").into_owned(),
+            WorkspaceDecorationVisibility::OnHover => t!("settings.appearance.only_on_hover").into_owned(),
         }
     }
 
     fn tab_close_button_position_dropdown_item_label(
         value: TabCloseButtonPosition,
-    ) -> &'static str {
+    ) -> String {
         match value {
-            TabCloseButtonPosition::Right => "Right",
-            TabCloseButtonPosition::Left => "Left",
+            TabCloseButtonPosition::Right => t!("settings.appearance.right").into_owned(),
+            TabCloseButtonPosition::Left => t!("settings.appearance.left").into_owned(),
         }
     }
 
@@ -2645,12 +2645,12 @@ impl AppearanceSettingsPageView {
         ctx.notify();
     }
 
-    fn window_backdrop_dropdown_item_label(backdrop: WindowBackdrop) -> &'static str {
+    fn window_backdrop_dropdown_item_label(backdrop: WindowBackdrop) -> String {
         match backdrop {
-            WindowBackdrop::None => "No material",
-            WindowBackdrop::Mica => "Mica",
-            WindowBackdrop::Acrylic => "Acrylic",
-            WindowBackdrop::MicaAlt => "Mica Alt",
+            WindowBackdrop::None => t!("settings.appearance.no_material").into_owned(),
+            WindowBackdrop::Mica => "Mica".to_string(),
+            WindowBackdrop::Acrylic => "Acrylic".to_string(),
+            WindowBackdrop::MicaAlt => "Mica Alt".to_string(),
         }
     }
     fn build_workspace_decoration_visibility_dropdown(
@@ -2877,7 +2877,7 @@ impl SettingsWidget for CreateCustomThemeWidget {
             appearance
                 .ui_builder()
                 .link(
-                    "Create your own custom theme".to_string(),
+                    t!("settings.appearance.create_your_own_custom_theme").to_string(),
                     Some("https://docs.warp.dev/terminal/appearance/custom-themes".to_string()),
                     None,
                     self.mouse_state.clone(),
@@ -2912,9 +2912,9 @@ impl ThemeSelectWidget {
     ) -> Box<dyn Element> {
         let theme: WarpTheme = WarpConfig::as_ref(app).theme_config().theme(&theme_kind);
         let mode_ui_label = match theme_chooser_mode {
-            ThemeChooserMode::SystemLight => "Light",
-            ThemeChooserMode::SystemDark => "Dark",
-            ThemeChooserMode::SystemAgnostic => "Current theme",
+            ThemeChooserMode::SystemLight => t!("settings.appearance.light").into_owned(),
+            ThemeChooserMode::SystemDark => t!("settings.appearance.dark").into_owned(),
+            ThemeChooserMode::SystemAgnostic => t!("settings.appearance.current_theme").into_owned(),
         };
 
         ConstrainedBox::new(
@@ -3033,7 +3033,7 @@ impl SettingsWidget for ThemeSelectWidget {
         Flex::column()
             .with_cross_axis_alignment(CrossAxisAlignment::Stretch)
             .with_child(render_body_item::<AppearancePageAction>(
-                "Sync with OS".into(),
+                t!("settings.appearance.sync_with_os").into(),
                 None,
                 LocalOnlyIconState::for_setting(
                     UseSystemTheme::storage_key(),
@@ -3061,7 +3061,7 @@ impl SettingsWidget for ThemeSelectWidget {
                 appearance
                     .ui_builder()
                     .span(
-                        "Automatically switch between light and dark themes when your system does."
+                        t!("settings.appearance.automatically_switch_between_light_and_dark_themes_when_your")
                             .to_string(),
                     )
                     .with_style(
@@ -3114,8 +3114,8 @@ impl SettingsWidget for CustomAppIconWidget {
 
         let dropdown = render_dropdown_item(
             appearance,
-            "Customize your app icon",
-            show_bundle_warning.then_some("Changing the app icon requires the app to be bundled."),
+            &t!("settings.appearance.customize_your_app_icon"),
+            show_bundle_warning.then_some(&t!("settings.appearance.changing_the_app_icon_requires_the_app_to_be_bundled")),
             None,
             LocalOnlyIconState::Hidden,
             None,
@@ -3123,7 +3123,7 @@ impl SettingsWidget for CustomAppIconWidget {
         );
 
         let show_dock_icon_toggle = render_body_item::<AppearancePageAction>(
-            "Show Warp in Dock".into(),
+            t!("settings.appearance.show_warp_in_dock").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShowDockIconState::storage_key(),
@@ -3163,7 +3163,7 @@ impl SettingsWidget for CustomAppIconWidget {
                     appearance
                         .ui_builder()
                         .wrappable_text(
-                            "You may need to restart Warp for MacOS to apply the preferred icon style.",
+                            t!("settings.appearance.you_may_need_to_restart_warp_for_macos_to_apply_the_preferre"),
                             true,
                         )
                         .with_style(UiComponentStyles {
@@ -3219,7 +3219,7 @@ impl SettingsWidget for CustomWindowSizeWidget {
         let row_border_color: Option<Fill> =
             (!view.valid_new_window_rows).then(|| themes::theme::Fill::error().into());
         let mut column = Flex::column().with_child(render_body_item::<AppearancePageAction>(
-            "Open new windows with custom size".into(),
+            t!("settings.appearance.open_new_windows_with_custom_size").into(),
             None,
             LocalOnlyIconState::for_setting(
                 OpenWindowsAtCustomSize::storage_key(),
@@ -3243,7 +3243,7 @@ impl SettingsWidget for CustomWindowSizeWidget {
         if *window_settings.open_windows_at_custom_size.value() {
             column.add_child(
                 Container::new(render_body_item::<AppearancePageAction>(
-                    "Columns".into(),
+                    t!("settings.appearance.columns").into(),
                     None,
                     // We show the local-only icon for this with the toggle, not the individual inputs.
                     LocalOnlyIconState::Hidden,
@@ -3279,7 +3279,7 @@ impl SettingsWidget for CustomWindowSizeWidget {
             );
             column.add_child(
                 Container::new(render_body_item::<AppearancePageAction>(
-                    "Rows".into(),
+                    t!("settings.appearance.rows").into(),
                     None,
                     // We show the local-only icon for this with the toggle, not the individual inputs.
                     LocalOnlyIconState::Hidden,
@@ -3344,7 +3344,7 @@ impl SettingsWidget for WindowOpacityWidget {
             return Flex::column()
                 .with_child(
                     Container::new(render_body_item_label::<AppearancePageAction>(
-                        "Window Opacity:".to_owned(),
+                        t!("settings.appearance.window_opacity").into_owned(),
                         None,
                         None,
                         LocalOnlyIconState::Hidden,
@@ -3356,7 +3356,7 @@ impl SettingsWidget for WindowOpacityWidget {
                 .with_child(
                     Container::new(
                         FormattedTextElement::from_str(
-                            "Transparency is not supported with your graphics drivers.",
+                            t!("settings.appearance.transparency_is_not_supported_with_your_graphics_drivers"),
                             appearance.ui_font_family(),
                             appearance.ui_font_size(),
                         )
@@ -3371,7 +3371,7 @@ impl SettingsWidget for WindowOpacityWidget {
 
         let opacity_value = *window_settings.background_opacity;
         let mut col = Flex::column().with_child(render_body_item::<AppearancePageAction>(
-            format!("Window Opacity: {opacity_value}"),
+            format!("{} {opacity_value}", t!("settings.appearance.window_opacity")),
             // TODO(CORE-3384) add AdditionalInfo here.
             None,
             LocalOnlyIconState::for_setting(
@@ -3407,9 +3407,7 @@ impl SettingsWidget for WindowOpacityWidget {
             // Skip showing the warning for OpenGL since WGPU often incorrectly reports it as not
             // supporting alpha.
             if !window.supports_transparency() && window.graphics_backend() != GraphicsBackend::Gl {
-                let mut message = Cow::Borrowed(
-                    "The selected graphics settings may not support rendering transparent windows.",
-                );
+                let mut message = t!("settings.appearance.the_selected_graphics_settings_may_not_support_rendering_tra");
                 let gpu_settings = GPUSettings::as_ref(app);
                 if (gpu_settings
                     .prefer_low_power_gpu
@@ -3476,7 +3474,7 @@ impl SettingsWidget for WindowBlurWidget {
 
         Flex::column()
             .with_child(render_body_item::<AppearancePageAction>(
-                format!("Window Blur Radius: {blur_value}"),
+                format!("{} {blur_value}", t!("settings.appearance.window_blur_radius")),
                 Some(label_info),
                 LocalOnlyIconState::for_setting(
                     BackgroundBlurRadius::storage_key(),
@@ -3561,9 +3559,9 @@ impl SettingsWidget for WindowBackdropWidget {
     ) -> Box<dyn Element> {
         let mut col = Flex::column().with_child(render_dropdown_item(
             appearance,
-            "Window backdrop",
+            &t!("settings.appearance.window_backdrop"),
             (*WindowSettings::as_ref(app).background_opacity == BackgroundOpacity::MAX)
-                .then_some("Backdrop is not visible at opacity 100%"),
+                .then_some(&t!("settings.appearance.backdrop_is_not_visible_at_opacity_100")),
             None,
             LocalOnlyIconState::for_setting(
                 BackgroundBackdrop::storage_key(),
@@ -3581,7 +3579,7 @@ impl SettingsWidget for WindowBackdropWidget {
             col.add_child(
                 Container::new(
                     FormattedTextElement::from_str(
-                        "The selected hardware may not support rendering transparent windows.",
+                            t!("settings.appearance.the_selected_hardware_may_not_support_rendering_transparent_"),
                         appearance.ui_font_family(),
                         appearance.ui_font_size(),
                     )
@@ -3618,7 +3616,7 @@ impl SettingsWidget for ToolsPanelStateScopeWidget {
         let is_enabled = *window_settings.left_panel_visibility_across_tabs;
 
         render_body_item::<AppearancePageAction>(
-            "Tools panel visibility is consistent across tabs".to_string(),
+            t!("settings.appearance.tools_panel_visibility_is_consistent_across_tabs").to_string(),
             None,
             LocalOnlyIconState::for_setting(
                 LeftPanelVisibilityAcrossTabs::storage_key(),
@@ -3665,7 +3663,7 @@ impl SettingsWidget for ToolsPanelProjectExplorerWidget {
         app: &AppContext,
     ) -> Box<dyn Element> {
         render_body_item::<AppearancePageAction>(
-            "Project explorer".to_string(),
+            t!("settings.appearance.project_explorer").to_string(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
@@ -3681,7 +3679,7 @@ impl SettingsWidget for ToolsPanelProjectExplorerWidget {
                     );
                 })
                 .finish(),
-            Some("Show the project explorer / file tree tab in the tools panel.".to_string()),
+            Some(t!("settings.appearance.show_the_project_explorer_file_tree_tab_in_the_tools_panel").to_string()),
         )
     }
 }
@@ -3705,7 +3703,7 @@ impl SettingsWidget for ToolsPanelConversationHistoryWidget {
         app: &AppContext,
     ) -> Box<dyn Element> {
         render_body_item::<AppearancePageAction>(
-            "Agent conversations".to_string(),
+            t!("settings.appearance.agent_conversations").to_string(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
@@ -3721,7 +3719,7 @@ impl SettingsWidget for ToolsPanelConversationHistoryWidget {
                     );
                 })
                 .finish(),
-            Some("Show the agent conversation history tab in the tools panel.".to_string()),
+            Some(t!("settings.appearance.show_the_agent_conversation_history_tab_in_the_tools_panel").to_string()),
         )
     }
 }
@@ -3745,7 +3743,7 @@ impl SettingsWidget for ToolsPanelGlobalSearchWidget {
         app: &AppContext,
     ) -> Box<dyn Element> {
         render_body_item::<AppearancePageAction>(
-            "Global search".to_string(),
+            t!("settings.appearance.global_search").to_string(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
@@ -3760,7 +3758,7 @@ impl SettingsWidget for ToolsPanelGlobalSearchWidget {
                         .dispatch_typed_action(AppearancePageAction::ToggleToolsPanelGlobalSearch);
                 })
                 .finish(),
-            Some("Show the global file search tab in the tools panel.".to_string()),
+            Some(t!("settings.appearance.show_the_global_file_search_tab_in_the_tools_panel").to_string()),
         )
     }
 }
@@ -3798,7 +3796,7 @@ impl SettingsWidget for ToolsPanelWarpDriveWidget {
                     evt_ctx.dispatch_typed_action(AppearancePageAction::ToggleToolsPanelWarpDrive);
                 })
                 .finish(),
-            Some("Show the Warp Drive tab in the tools panel.".to_string()),
+            Some(t!("settings.appearance.show_the_warp_drive_tab_in_the_tools_panel").to_string()),
         )
     }
 }
@@ -3855,7 +3853,7 @@ impl SettingsWidget for InputTypeWidget {
             .finish();
 
         render_body_item::<AppearancePageAction>(
-            "Input type".into(),
+            t!("settings.appearance.input_type").into(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
@@ -3884,7 +3882,7 @@ impl SettingsWidget for InputModeWidget {
     ) -> Box<dyn Element> {
         render_dropdown_item(
             appearance,
-            "Input position",
+            &t!("settings.appearance.input_position"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4006,7 +4004,7 @@ impl SettingsWidget for DimInactivePanesWidget {
         app: &AppContext,
     ) -> Box<dyn Element> {
         render_body_item::<AppearancePageAction>(
-            "Dim inactive panes".into(),
+            t!("settings.appearance.dim_inactive_panes").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShouldDimInactivePanes::storage_key(),
@@ -4049,7 +4047,7 @@ impl SettingsWidget for FocusFollowsMouseWidget {
         app: &AppContext,
     ) -> Box<dyn Element> {
         render_body_item::<AppearancePageAction>(
-            "Focus follows mouse".into(),
+            t!("settings.appearance.focus_follows_mouse").into(),
             None,
             LocalOnlyIconState::for_setting(
                 FocusPaneOnHover::storage_key(),
@@ -4097,7 +4095,7 @@ impl SettingsWidget for CompactModeWidget {
         );
 
         render_body_item::<AppearancePageAction>(
-            "Compact mode".into(),
+            t!("settings.appearance.compact_mode").into(),
             None,
             LocalOnlyIconState::for_setting(
                 Spacing::storage_key(),
@@ -4144,7 +4142,7 @@ impl SettingsWidget for JumpToBottomOfBlockWidget {
             .show_jump_to_bottom_of_block_button
             .value();
         render_body_item::<AppearancePageAction>(
-            "Show Jump to Bottom of Block button".into(),
+            t!("settings.appearance.show_jump_to_bottom_of_block_button").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShowJumpToBottomOfBlockButton::storage_key(),
@@ -4191,7 +4189,7 @@ impl SettingsWidget for ShowBlockDividersWidget {
         let block_list_settings = BlockListSettings::as_ref(app);
         let enabled = block_list_settings.show_block_dividers.value();
         render_body_item::<AppearancePageAction>(
-            "Show block dividers".into(),
+            t!("settings.appearance.show_block_dividers").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShowBlockDividers::storage_key(),
@@ -4237,7 +4235,7 @@ impl SettingsWidget for AIFontWidget {
         let mut ai_font_row = Flex::row().with_cross_axis_alignment(CrossAxisAlignment::Center);
         let mut ai_font = Flex::column();
         ai_font.add_child(render_body_item_label::<AppearancePageAction>(
-            "Agent font".to_string(),
+            t!("settings.appearance.agent_font").to_string(),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4273,7 +4271,7 @@ impl SettingsWidget for AIFontWidget {
         ai_font_row.add_child(
             appearance
                 .ui_builder()
-                .span("Match terminal".to_string())
+                .span(t!("settings.appearance.match_terminal").to_string())
                 .build()
                 .with_margin_left(2.)
                 .with_margin_right(16.)
@@ -4301,7 +4299,7 @@ impl TerminalFontWidget {
         line_height.add_child(
             appearance
                 .ui_builder()
-                .label("Line height".to_string())
+                .label(t!("settings.appearance.line_height").to_string())
                 .with_style(UiComponentStyles {
                     margin: Some(Coords {
                         left: 12.,
@@ -4368,7 +4366,7 @@ impl TerminalFontWidget {
                     font_size: Some(appearance.ui_font_size() * 0.8),
                     ..Default::default()
                 })
-                .with_text_label("Reset to default".to_string());
+                .with_text_label(t!("settings.appearance.reset_to_default").to_string());
 
             button
                 .build()
@@ -4399,7 +4397,7 @@ impl SettingsWidget for TerminalFontWidget {
         // Terminal Font
         let mut terminal_font = Flex::column();
         terminal_font.add_child(render_body_item_label::<AppearancePageAction>(
-            "Terminal font".to_string(),
+            t!("settings.appearance.terminal_font").to_string(),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4442,7 +4440,7 @@ impl SettingsWidget for TerminalFontWidget {
                             1.,
                             appearance
                                 .ui_builder()
-                                .span("View all available system fonts".to_string())
+                                .span(t!("settings.appearance.view_all_available_system_fonts").to_string())
                                 .build()
                                 .with_margin_left(2.)
                                 .finish(),
@@ -4463,7 +4461,7 @@ impl SettingsWidget for TerminalFontWidget {
         font_weight.add_child(
             appearance
                 .ui_builder()
-                .label("Font weight".to_string())
+                .label(t!("settings.appearance.font_weight").to_string())
                 .with_style(UiComponentStyles {
                     font_size: Some(CONTENT_FONT_SIZE),
                     ..Default::default()
@@ -4486,7 +4484,7 @@ impl SettingsWidget for TerminalFontWidget {
         font_size.add_child(
             appearance
                 .ui_builder()
-                .label("Font size (px)".to_string())
+                .label(t!("settings.appearance.font_size_px").to_string())
                 .with_style(UiComponentStyles {
                     margin: Some(Coords {
                         left: 2.,
@@ -4570,7 +4568,7 @@ impl SettingsWidget for NotebookFontSizeWidget {
                         Align::new(
                             appearance
                                 .ui_builder()
-                                .span("Notebook font size".to_string())
+                                .span(t!("settings.appearance.notebook_font_size").to_string())
                                 .build()
                                 .with_margin_right(16.)
                                 .finish(),
@@ -4596,7 +4594,7 @@ impl SettingsWidget for NotebookFontSizeWidget {
                 .with_child(
                     appearance
                         .ui_builder()
-                        .span("Match terminal".to_string())
+                        .span(t!("settings.appearance.match_terminal").to_string())
                         .build()
                         .with_margin_left(2.)
                         .with_margin_right(16.)
@@ -4654,7 +4652,7 @@ impl SettingsWidget for ThinStrokesWidget {
     ) -> Box<dyn Element> {
         render_dropdown_item(
             appearance,
-            "Use thin strokes",
+            &t!("settings.appearance.use_thin_strokes"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4687,7 +4685,7 @@ impl SettingsWidget for MinimumContrastWidget {
     ) -> Box<dyn Element> {
         render_dropdown_item(
             appearance,
-            "Enforce minimum contrast",
+            &t!("settings.appearance.enforce_minimum_contrast"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4725,12 +4723,12 @@ impl SettingsWidget for LigaturesWidget {
         let ligature_rendering_enabled = ligature_rendering.value();
 
         render_body_item::<AppearancePageAction>(
-            "Show ligatures in terminal".into(),
+            t!("settings.appearance.show_ligatures_in_terminal").into(),
             Some(AdditionalInfo {
                 mouse_state: self.info_mouse_state.clone(),
                 on_click_action: None,
                 secondary_text: None,
-                tooltip_override_text: Some("Ligatures may reduce performance".to_string()),
+                tooltip_override_text: Some(t!("settings.appearance.ligatures_may_reduce_performance").to_string()),
             }),
             LocalOnlyIconState::for_setting(
                 LigatureRenderingEnabled::storage_key(),
@@ -4790,7 +4788,7 @@ impl SettingsWidget for CursorTypeWidget {
         let cursor_display_types: Vec<CursorDisplayType> = all::<CursorDisplayType>().collect();
 
         render_body_item::<AppearancePageAction>(
-            "Cursor type".into(),
+            t!("settings.appearance.cursor_type").into(),
             None,
             LocalOnlyIconState::for_setting(
                 CursorBlinkEnabled::storage_key(),
@@ -4805,7 +4803,7 @@ impl SettingsWidget for CursorTypeWidget {
                     .with_child(
                         appearance
                             .ui_builder()
-                            .span("Cursor type is disabled in Vim mode".to_string())
+                            .span(t!("settings.appearance.cursor_type_is_disabled_in_vim_mode").to_string())
                             .build()
                             .finish(),
                     )
@@ -4859,7 +4857,7 @@ impl SettingsWidget for BlinkingCursorWidget {
         let settings = AppEditorSettings::as_ref(app);
         let cursor_blink = &settings.cursor_blink;
         render_body_item::<AppearancePageAction>(
-            "Blinking cursor".into(),
+            t!("settings.appearance.blinking_cursor").into(),
             None,
             LocalOnlyIconState::for_setting(
                 CursorBlinkEnabled::storage_key(),
@@ -4901,7 +4899,7 @@ impl SettingsWidget for TabCloseButtonPositionWidget {
     ) -> Box<dyn Element> {
         render_dropdown_item(
             appearance,
-            "Tab close button position",
+            &t!("settings.appearance.tab_close_button_position"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4937,7 +4935,7 @@ impl SettingsWidget for TabIndicatorWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Show tab indicators".into(),
+            t!("settings.appearance.show_tab_indicators").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShowIndicatorsButton::storage_key(),
@@ -4982,7 +4980,7 @@ impl SettingsWidget for PreserveActiveTabColorWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Preserve active tab color for new tabs".into(),
+            t!("settings.appearance.preserve_active_tab_color_for_new_tabs").into(),
             None,
             LocalOnlyIconState::for_setting(
                 PreserveActiveTabColor::storage_key(),
@@ -5027,7 +5025,7 @@ impl SettingsWidget for VerticalTabsWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Use vertical tab layout".into(),
+            t!("settings.appearance.use_vertical_tab_layout").into(),
             None,
             LocalOnlyIconState::for_setting(
                 UseVerticalTabs::storage_key(),
@@ -5072,7 +5070,7 @@ impl SettingsWidget for ShowVerticalTabPanelInRestoredWindowsWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Show vertical tabs panel in restored windows".into(),
+            t!("settings.appearance.show_vertical_tabs_panel_in_restored_windows").into(),
             None,
             LocalOnlyIconState::for_setting(
                 ShowVerticalTabPanelInRestoredWindows::storage_key(),
@@ -5094,7 +5092,7 @@ impl SettingsWidget for ShowVerticalTabPanelInRestoredWindowsWidget {
                 })
                 .finish(),
             Some(
-                "When enabled, reopening or restoring a window opens the vertical tabs panel even if it was closed when the window was last saved."
+                t!("settings.appearance.when_enabled_reopening_or_restoring_a_window_opens_the_verti")
                     .to_string(),
             ),
         )
@@ -5122,7 +5120,7 @@ impl SettingsWidget for HideTitleBarSearchBarInVerticalTabsWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Hide search bar in vertical tab layout".into(),
+            t!("settings.appearance.hide_search_bar_in_vertical_tab_layout").into(),
             None,
             LocalOnlyIconState::for_setting(
                 HideTitleBarSearchBarInVerticalTabs::storage_key(),
@@ -5144,7 +5142,7 @@ impl SettingsWidget for HideTitleBarSearchBarInVerticalTabsWidget {
                 })
                 .finish(),
             Some(
-                "When using the vertical tab layout, hide the search bar in the title bar. Search stays available via the command palette and keyboard shortcuts."
+                t!("settings.appearance.when_using_the_vertical_tab_layout_hide_the_search_bar_in_th")
                     .to_string(),
             ),
         )
@@ -5172,7 +5170,7 @@ impl SettingsWidget for UseLatestUserPromptAsConversationTitleInTabNamesWidget {
         let tab_settings = TabSettings::as_ref(app);
 
         render_body_item::<AppearancePageAction>(
-            "Use latest user prompt as conversation title in tab names".into(),
+            t!("settings.appearance.use_latest_user_prompt_as_conversation_title_in_tab_names").into(),
             None,
             LocalOnlyIconState::for_setting(
                 UseLatestUserPromptAsConversationTitleInTabNames::storage_key(),
@@ -5197,7 +5195,7 @@ impl SettingsWidget for UseLatestUserPromptAsConversationTitleInTabNamesWidget {
                 })
                 .finish(),
             Some(
-                "Show the latest user prompt instead of the generated conversation title for Oz and third-party agent sessions in vertical tabs."
+                t!("settings.appearance.show_the_latest_user_prompt_instead_of_the_generated_convers")
                     .to_string(),
             ),
         )
@@ -5221,7 +5219,7 @@ impl SettingsWidget for EditToolbarWidget {
         _app: &AppContext,
     ) -> Box<dyn Element> {
         let label = render_body_item_label::<AppearancePageAction>(
-            "Header toolbar layout".to_string(),
+            t!("settings.appearance.header_toolbar_layout").to_string(),
             None,
             None,
             LocalOnlyIconState::Hidden,
@@ -5327,7 +5325,7 @@ impl SettingsWidget for DirectoryTabColorsWidget {
             .with_spacing(4.)
             .with_child(
                 Text::new(
-                    "Directory tab colors",
+                    t!("settings.appearance.directory_tab_colors"),
                     appearance.ui_font_family(),
                     appearance.ui_font_size(),
                 )
@@ -5337,7 +5335,7 @@ impl SettingsWidget for DirectoryTabColorsWidget {
             )
             .with_child(
                 Text::new(
-                    "Automatically color tabs based on the directory or repo you're working in.",
+                    t!("settings.appearance.automatically_color_tabs_based_on_the_directory_or_repo_you_"),
                     appearance.ui_font_family(),
                     appearance.ui_font_size(),
                 )
@@ -5396,7 +5394,7 @@ impl SettingsWidget for DirectoryTabColorsWidget {
                 };
                 let is_selected = current_color == tab_color;
                 let tooltip_text = match ansi_id {
-                    None => "Default (no color)".to_string(),
+                    None => t!("settings.appearance.default_no_color").to_string(),
                     Some(id) => id.to_string(),
                 };
                 let dir_path_clone = PathBuf::from(&dir_path);
@@ -5477,7 +5475,7 @@ impl SettingsWidget for ZenModeWidget {
     ) -> Box<dyn Element> {
         render_dropdown_item(
             appearance,
-            "Show the tab bar",
+            &t!("settings.appearance.show_the_tab_bar"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -5514,7 +5512,7 @@ impl SettingsWidget for AltScreenPaddingWidget {
         let terminal_settings = &TerminalSettings::as_ref(app);
         let theme = appearance.theme();
         let mut column = Flex::column().with_child(render_body_item::<AppearancePageAction>(
-            "Use custom padding in alt-screen".into(),
+            t!("settings.appearance.use_custom_padding_in_alt_screen").into(),
             Some(AdditionalInfo {
                 mouse_state: self.additional_info_mouse_state.clone(),
                 on_click_action: Some(AppearancePageAction::OpenUrl(
@@ -5575,7 +5573,7 @@ impl SettingsWidget for AltScreenPaddingWidget {
                     Container::new(
                         Align::new(
                             Text::new(
-                                "Uniform padding (px)",
+                    t!("settings.appearance.uniform_padding_px"),
                                 appearance.ui_font_family(),
                                 appearance.ui_font_size(),
                             )
@@ -5633,8 +5631,9 @@ impl SettingsWidget for ZoomLevelWidget {
 
         render_dropdown_item(
             appearance,
-            "Zoom",
-            Some("Adjusts the default zoom level across all windows"),
+            &t!("settings.appearance.zoom"),
+            Some(
+                &t!("settings.appearance.adjusts_the_default_zoom_level_across_all_windows")),
             Some(reset_button),
             LocalOnlyIconState::for_setting(
                 crate::window_settings::ZoomLevel::storage_key(),
