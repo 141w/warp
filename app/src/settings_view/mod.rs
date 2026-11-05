@@ -90,6 +90,7 @@ mod billing_and_usage_page_v2;
 mod cli_agents_page;
 mod code_editor_review_page;
 mod code_indexing_page;
+mod oss_gating;
 pub(crate) mod custom_inference_modal;
 mod custom_router_view;
 mod delete_environment_confirmation_dialog;
@@ -1483,6 +1484,13 @@ impl SettingsView {
             }
             other => other.unwrap_or_default(),
         };
+        // Sections hidden in this channel (e.g. the account page in OSS) must
+        // not become the landing page, or the window would render blank.
+        let initial_page = if oss_gating::is_hidden(initial_page) {
+            SettingsSection::Appearance
+        } else {
+            initial_page
+        };
 
         // Auto-expand the umbrella if the initial page is one of its subpages.
         for item in &mut nav_items {
@@ -2132,6 +2140,9 @@ impl SettingsView {
     }
 
     fn should_render_page(&self, settings_page: &SettingsPage, app: &AppContext) -> bool {
+        if oss_gating::is_hidden(settings_page.section) {
+            return false;
+        }
         match &settings_page.view_handle {
             SettingsPageViewHandle::Main(v) => v.as_ref(app).should_render(app),
             SettingsPageViewHandle::Teams(v) => v.as_ref(app).should_render(app),
