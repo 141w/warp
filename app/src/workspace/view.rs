@@ -552,6 +552,7 @@ use crate::{
     AgentNotificationsModel, BlocklistAIHistoryModel, GlobalResourceHandles, TelemetryEvent,
     autoupdate, send_telemetry_from_ctx, settings,
 };
+use warp_i18n::t;
 
 /// The padding that should be applied to the workspace as a whole.
 ///
@@ -1433,7 +1434,7 @@ impl Workspace {
             EditorView::single_line(options, ctx)
         });
         editor.update(ctx, |editor, ctx| {
-            editor.set_placeholder_text("Search tabs...", ctx);
+            editor.set_placeholder_text(t!("search.tabs"), ctx);
         });
         ctx.subscribe_to_view(&editor, |me, editor_view, event, ctx| match event {
             EditorEvent::Edited(_) => {
@@ -21126,14 +21127,10 @@ impl Workspace {
                     .with_child(
                         Shrinkable::new(
                             1.,
-                            Text::new_inline(
-                                "Search sessions, agents, files...",
-                                appearance.ui_font_family(),
-                                14.,
-                            )
-                            .with_color(text_color.into())
-                            .with_clip(ClipConfig::ellipsis())
-                            .finish(),
+                            Text::new_inline(t!("search.global"), appearance.ui_font_family(), 14.)
+                                .with_color(text_color.into())
+                                .with_clip(ClipConfig::ellipsis())
+                                .finish(),
                         )
                         .finish(),
                     )

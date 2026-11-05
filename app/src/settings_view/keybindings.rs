@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::borrow::Cow;
+use std::collections::HashMap;
 
 use warp_i18n::t;
 
@@ -48,7 +48,6 @@ const ROW_LEFT_MARGIN: f32 = 20.0;
 const ROW_HEIGHT: f32 = 28.;
 const EDIT_BUTTONS_BORDER_RADIUS: f32 = 4.0;
 
-pub const SEARCH_PLACEHOLDER: &str = "Search by name or by keys (ex. \"cmd d\")";
 const SHORTCUT_CONFLICT_WARNING_TEXT: &str = "This shortcut conflicts with other keybinds";
 const KEYBINDINGS_PAGE_SHORTCUT: &str = "workspace:toggle_keybindings_page";
 const RESET_BUTTON_TEXT: &str = "Default";
@@ -325,7 +324,11 @@ impl KeybindingRow {
             Empty::new().finish()
         };
 
-        let press_new_shortcut_text = render_text(&t!("settings.keybindings.press_new_keyboard_shortcut"), None, appearance);
+        let press_new_shortcut_text = render_text(
+            &t!("settings.keybindings.press_new_keyboard_shortcut"),
+            None,
+            appearance,
+        );
 
         let new_shortcut_element = Container::new(press_new_shortcut_text)
             .with_margin_left(ROW_LEFT_MARGIN)
@@ -507,12 +510,13 @@ impl KeybindingsView {
 
         search_editor.update(ctx, |editor, ctx| {
             editor.clear_buffer_and_reset_undo_stack(ctx);
-            editor.set_placeholder_text(SEARCH_PLACEHOLDER, ctx);
+            editor.set_placeholder_text(t!("search.keybindings"), ctx);
         });
 
         let search_bar = ctx.add_typed_action_view(|_| SearchBar::new(search_editor.clone()));
 
-        let page = PageType::new_monolith(KeybindingsWidget::default(), None::<&'static str>, false);
+        let page =
+            PageType::new_monolith(KeybindingsWidget::default(), None::<&'static str>, false);
         Self {
             page,
             clipped_scroll_state: Default::default(),
@@ -803,7 +807,7 @@ impl SettingsPageMeta for KeybindingsView {
 
         self.search_editor.update(ctx, |editor, ctx| {
             editor.clear_buffer_and_reset_undo_stack(ctx);
-            editor.set_placeholder_text(SEARCH_PLACEHOLDER, ctx);
+            editor.set_placeholder_text(t!("search.keybindings"), ctx);
         });
 
         if allow_steal_focus {
@@ -1107,7 +1111,10 @@ impl SettingsWidget for KeybindingsWidget {
         {
             Some(LocalOnlyIconState::Visible {
                 mouse_state: self.local_only_icon_mouse_state.clone(),
-                custom_tooltip: Some(t!("settings.keybindings.keyboard_shortcuts_are_not_synced_to_the_cloud").to_string()),
+                custom_tooltip: Some(
+                    t!("settings.keybindings.keyboard_shortcuts_are_not_synced_to_the_cloud")
+                        .to_string(),
+                ),
             })
         } else {
             None

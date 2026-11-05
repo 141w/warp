@@ -48,6 +48,7 @@ use crate::themes::theme::WarpTheme;
 use crate::view_components::DismissibleToast;
 use crate::workspace::{ForkedConversationDestination, WorkspaceAction, active_terminal_in_window};
 use crate::{ToastStack, send_telemetry_from_ctx};
+use warp_i18n::t;
 
 lazy_static! {
     /// Set of hardcoded action names that we want to show in the command palette zero state.
@@ -285,7 +286,7 @@ impl View {
             SearchBar::new(
                 mixer.clone(),
                 search_bar_state.clone(),
-                "Search for a command",
+                t!("search.command"),
                 Self::create_query_result_renderer,
                 ctx,
             )

@@ -6,6 +6,7 @@ use warpui::{
 
 use crate::TelemetryEvent;
 use crate::coding_entrypoints::glowing_editor::{GlowingEditor, GlowingEditorEvent};
+use warp_i18n::t;
 
 pub struct CloneRepoView {
     editor: ViewHandle<GlowingEditor>,
@@ -20,10 +21,7 @@ pub enum CloneRepoEvent {
 impl CloneRepoView {
     pub fn new(is_ftux: bool, ctx: &mut ViewContext<Self>) -> Self {
         let editor = ctx.add_typed_action_view(|ctx| {
-            GlowingEditor::new(
-                "Provide a repository URL e.g. \"git@github.com:username/project.git\"",
-                ctx,
-            )
+            GlowingEditor::new(t!("new_tab.clone_url_placeholder"), ctx)
         });
 
         ctx.subscribe_to_view(&editor, move |me, _, event, ctx| {

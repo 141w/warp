@@ -13,8 +13,7 @@ use crate::workspace::header_toolbar_item::HeaderToolbarItemKind;
 use crate::workspace::tab_settings::{
     HeaderToolbarChipSelection, TabSettings, TabSettingsChangedEvent,
 };
-
-const MODAL_TITLE: &str = "Edit toolbar";
+use warp_i18n::t;
 
 pub fn init(app: &mut AppContext) {
     use warpui::keymap::macros::*;
@@ -250,7 +249,7 @@ impl View for HeaderToolbarInlineEditor {
         render_chip_editor_sections(
             &self.chip_configurator,
             ChipEditorSectionsConfig {
-                available_section_label: "Available items",
+                available_section_label: &t!("settings.toolbar.available_items"),
                 is_at_defaults: is_toolbar_editor_at_defaults(&self.chip_configurator),
                 reset_action: HeaderToolbarInlineEditorAction::ResetDefault,
                 activate_action: HeaderToolbarInlineEditorAction::Activate,
@@ -344,8 +343,8 @@ impl View for HeaderToolbarEditorModal {
         render_chip_editor_modal(
             &self.chip_configurator,
             ChipEditorModalConfig {
-                title: MODAL_TITLE,
-                available_section_label: "Available items",
+                title: &t!("settings.toolbar.edit"),
+                available_section_label: &t!("settings.toolbar.available_items"),
                 is_at_defaults: self.is_at_defaults(),
                 is_dirty: self.is_dirty,
                 cancel_action: HeaderToolbarEditorAction::Cancel,
@@ -362,9 +361,8 @@ impl View for HeaderToolbarEditorModal {
 
 fn build_configurable_item(kind: &HeaderToolbarItemKind) -> ConfigurableItem {
     let id = serde_json::to_string(kind).expect("HeaderToolbarItemKind is serializable");
-    let renderer =
-        ControlItemRenderer::new_with_label_and_icon(kind.display_label().to_string(), kind.icon())
-            .with_identifier(id);
+    let renderer = ControlItemRenderer::new_with_label_and_icon(kind.display_label(), kind.icon())
+        .with_identifier(id);
     let renderer = match kind {
         HeaderToolbarItemKind::TabsPanel => renderer.non_removable(),
         _ => renderer,

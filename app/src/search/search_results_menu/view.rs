@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::marker::PhantomData;
 use std::ops::Range;
 
@@ -84,7 +85,7 @@ impl<T: Action + Clone> SearchResultsMenuView<T> {
             SearchBar::new(
                 mixer.clone(),
                 search_bar_state.clone(),
-                "", // No placeholder for slash commands
+                Cow::Borrowed(""), // No placeholder for slash commands
                 query_result_renderer,
                 ctx,
             )

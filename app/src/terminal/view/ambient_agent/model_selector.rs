@@ -33,6 +33,7 @@ use crate::terminal::view::ambient_agent::{AmbientAgentViewModel, AmbientAgentVi
 use crate::ui_components::icons::Icon;
 use crate::view_components::action_button::{ActionButton, ButtonSize};
 use crate::workspaces::user_workspaces::{ResolvedTeamScope, UserWorkspaces};
+use warp_i18n::t;
 
 const ITEM_FONT_SIZE: f32 = 14.;
 
@@ -57,7 +58,7 @@ const SEARCH_VERTICAL_PADDING: f32 = 4.;
 // of total breathing room above the divider line.
 const SEARCH_FOOTER_TOP_MARGIN: f32 = 4.;
 
-const SEARCH_PLACEHOLDER_TEXT: &str = "Search models";
+const SEARCH_PLACEHOLDER_KEY: &str = "search.models";
 
 const BUTTON_TOOLTIP: &str = "Choose agent model";
 
@@ -139,7 +140,7 @@ impl ModelSelector {
                 },
                 ctx,
             );
-            editor.set_placeholder_text(SEARCH_PLACEHOLDER_TEXT, ctx);
+            editor.set_placeholder_text(t!(SEARCH_PLACEHOLDER_KEY), ctx);
             editor
         });
         ctx.subscribe_to_view(&search_editor, |me, _, event, ctx| {

@@ -23,6 +23,7 @@ use crate::search::external_secrets::searcher::{
 };
 use crate::search::result_renderer::{QueryResultRenderer, QueryResultRendererStyles};
 use crate::search::search_bar::{SearchBar, SearchBarEvent, SearchBarState, SearchResultOrdering};
+use warp_i18n::t;
 
 lazy_static! {
     static ref QUERY_RESULT_RENDERER_STYLES: QueryResultRendererStyles =
@@ -37,8 +38,6 @@ lazy_static! {
             ..Default::default()
         };
 }
-
-const DEFAULT_PLACEHOLDER_TEXT: &str = "Search for a secret";
 
 pub struct ExternalSecretsMenu {
     scroll_state: ScrollStateHandle,
@@ -85,7 +84,7 @@ impl ExternalSecretsMenu {
             SearchBar::new(
                 mixer.clone(),
                 search_bar_state.clone(),
-                DEFAULT_PLACEHOLDER_TEXT,
+                t!("search.secret"),
                 |result_index, result| {
                     QueryResultRenderer::new(
                         result,

@@ -65,10 +65,11 @@ mod editing;
 mod render;
 
 use crate::settings::{CodeSettings, CodeSettingsChangedEvent};
+use warp_i18n::t;
 
-const REMOTE_TEXT: &str = "The Project Explorer requires access to your local workspace, which isn’t supported in remote sessions.";
-const DISABLED_TEXT: &str = "The Project Explorer requires access to your local workspace. Open a new session or navigate to an active session to view.";
-const WSL_TEXT: &str = "The Project Explorer doesn't currently work in WSL.";
+const REMOTE_TEXT_KEY: &str = "workspace.project_explorer_remote";
+const DISABLED_TEXT_KEY: &str = "workspace.project_explorer_disabled";
+const WSL_TEXT_KEY: &str = "workspace.project_explorer_wsl";
 
 /// Stable identifier for an item in the file tree.
 /// Includes both the root directory and the index within that root's flattened list.
@@ -2757,7 +2758,7 @@ impl FileTreeView {
             )
             .with_child(
                 Text::new(
-                    "Project explorer unavailable",
+                    t!("workspace.project_explorer_unavailable"),
                     appearance.ui_font_family(),
                     appearance.ui_font_size() + 2.,
                 )
@@ -2944,13 +2945,13 @@ impl View for FileTreeView {
 
     #[cfg(not(feature = "local_fs"))]
     fn render(&self, app: &AppContext) -> Box<dyn Element> {
-        self.render_error_state(REMOTE_TEXT.to_string(), app)
+        self.render_error_state(t!(REMOTE_TEXT_KEY).into_owned(), app)
     }
 
     #[cfg(feature = "local_fs")]
     fn render(&self, app: &AppContext) -> Box<dyn Element> {
         if matches!(self.enablement, CodingPanelEnablementState::Disabled) {
-            return self.render_error_state(DISABLED_TEXT.to_string(), app);
+            return self.render_error_state(t!(DISABLED_TEXT_KEY).into_owned(), app);
         }
 
         if matches!(
@@ -2971,7 +2972,7 @@ impl View for FileTreeView {
                 return if has_remote_server {
                     self.render_loading_state(app)
                 } else {
-                    self.render_error_state(REMOTE_TEXT.to_string(), app)
+                    self.render_error_state(t!(REMOTE_TEXT_KEY).into_owned(), app)
                 };
             }
 
@@ -2979,7 +2980,7 @@ impl View for FileTreeView {
                 self.enablement,
                 CodingPanelEnablementState::UnsupportedSession
             ) {
-                return self.render_error_state(WSL_TEXT.to_string(), app);
+                return self.render_error_state(t!(WSL_TEXT_KEY).into_owned(), app);
             }
 
             return self.render_loading_state(app);

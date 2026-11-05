@@ -7,6 +7,7 @@ use crate::features::FeatureFlag;
 use crate::settings::AISettings;
 use crate::ui_components::icons::Icon;
 use crate::workspace::tab_settings::TabSettings;
+use warp_i18n::t;
 
 /// A configurable item in the vertical tabs header toolbar.
 ///
@@ -34,13 +35,13 @@ pub enum HeaderToolbarItemKind {
 }
 
 impl HeaderToolbarItemKind {
-    pub fn display_label(&self) -> &'static str {
+    pub fn display_label(&self) -> String {
         match self {
-            Self::TabsPanel => "Tabs Panel",
-            Self::ToolsPanel => "Tools Panel",
-            Self::AgentManagement => "Agent Management",
-            Self::CodeReview => "Code Review",
-            Self::NotificationsMailbox => "Notifications",
+            Self::TabsPanel => t!("settings.toolbar.tabs_panel").into_owned(),
+            Self::ToolsPanel => t!("settings.toolbar.tools_panel").into_owned(),
+            Self::AgentManagement => t!("settings.toolbar.agent_management").into_owned(),
+            Self::CodeReview => t!("settings.toolbar.code_review").into_owned(),
+            Self::NotificationsMailbox => t!("settings.toolbar.notifications").into_owned(),
         }
     }
 

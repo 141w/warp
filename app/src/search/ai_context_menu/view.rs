@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::collections::HashSet;
 use std::ops::Range;
 use std::time::Duration;
@@ -558,7 +559,7 @@ impl AIContextMenu {
             SearchBar::new(
                 mixer.clone(),
                 search_bar_state.clone(),
-                "",
+                Cow::Borrowed(""),
                 Self::create_query_result_renderer,
                 ctx,
             )

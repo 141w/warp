@@ -22,8 +22,7 @@ use crate::search::notebook_embedding::notebooks::CloudNotebooksDataSource;
 use crate::search::notebook_embedding::workflows::CloudWorkflowsDataSource;
 use crate::search::result_renderer::{QueryResultRenderer, QueryResultRendererStyles};
 use crate::search::search_bar::{SearchBar, SearchBarEvent, SearchBarState, SearchResultOrdering};
-
-const DEFAULT_PLACEHOLDER_TEXT: &str = "Search for a reference";
+use warp_i18n::t;
 
 lazy_static! {
     static ref QUERY_RESULT_RENDERER_STYLES: QueryResultRendererStyles =
@@ -83,7 +82,7 @@ impl EmbeddingSearchMenu {
             SearchBar::new(
                 mixer.clone(),
                 search_bar_state.clone(),
-                DEFAULT_PLACEHOLDER_TEXT,
+                t!("search.reference"),
                 |result_index, result| {
                     QueryResultRenderer::new(
                         result,

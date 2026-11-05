@@ -65,10 +65,9 @@ use crate::pane_group::{BackingView, Direction, PaneConfiguration, PaneEvent, Sp
 use crate::server::server_api::ServerApiProvider;
 use crate::server::telemetry::MCPServerCollectionPaneEntrypoint;
 use crate::settings::{AISettings, BlockVisibilitySettings, SettingsFileError};
-use crate::terminal::general_settings::{GeneralSettings, GeneralSettingsChangedEvent};
-use warp_i18n::t;
 use crate::settings_view::mcp_servers_page::{MCPServersSettingsPage, MCPServersSettingsPageEvent};
 use crate::terminal::SizeInfo;
+use crate::terminal::general_settings::{GeneralSettings, GeneralSettingsChangedEvent};
 use crate::terminal::model::blockgrid::BlockGrid;
 use crate::ui_components::icons;
 use crate::util::bindings::{BindingGroup, CustomAction, keybinding_name_to_display_string};
@@ -76,6 +75,7 @@ use crate::view_components::ToastFlavor;
 use crate::workspace::WorkspaceAction;
 use crate::workspaces::workspace::{BillingMetadata, CustomerType};
 use crate::{GlobalResourceHandlesProvider, TelemetryEvent};
+use warp_i18n::t;
 
 mod about_page;
 mod admin_actions;
@@ -90,7 +90,6 @@ mod billing_and_usage_page_v2;
 mod cli_agents_page;
 mod code_editor_review_page;
 mod code_indexing_page;
-mod oss_gating;
 pub(crate) mod custom_inference_modal;
 mod custom_router_view;
 mod delete_environment_confirmation_dialog;
@@ -107,6 +106,7 @@ mod main_page;
 pub mod mcp_servers;
 pub mod mcp_servers_page;
 mod nav;
+mod oss_gating;
 pub mod pane_manager;
 mod platform;
 mod platform_page;
@@ -350,7 +350,9 @@ impl Display for SettingsSection {
         match self {
             SettingsSection::About => write!(f, "{}", t!("settings.nav.about")),
             SettingsSection::Account => write!(f, "{}", t!("settings.nav.account")),
-            SettingsSection::BillingAndUsage => write!(f, "{}", t!("settings.nav.billing_and_usage")),
+            SettingsSection::BillingAndUsage => {
+                write!(f, "{}", t!("settings.nav.billing_and_usage"))
+            }
             SettingsSection::Appearance => write!(f, "{}", t!("settings.nav.appearance")),
             SettingsSection::Features => write!(f, "{}", t!("settings.nav.features")),
             SettingsSection::Keybindings => write!(f, "{}", t!("settings.nav.keybindings")),
@@ -363,13 +365,23 @@ impl Display for SettingsSection {
             SettingsSection::Warpify => write!(f, "{}", t!("settings.nav.warpify")),
             SettingsSection::WarpAgent => write!(f, "{}", t!("settings.nav.warp_agent")),
             SettingsSection::AgentProfiles => write!(f, "{}", t!("settings.nav.agent_profiles")),
-            SettingsSection::AgentMCPServers => write!(f, "{}", t!("settings.nav.agent_mcp_servers")),
+            SettingsSection::AgentMCPServers => {
+                write!(f, "{}", t!("settings.nav.agent_mcp_servers"))
+            }
             SettingsSection::Knowledge => write!(f, "{}", t!("settings.nav.knowledge")),
-            SettingsSection::ThirdPartyCLIAgents => write!(f, "{}", t!("settings.nav.third_party_cli_agents")),
+            SettingsSection::ThirdPartyCLIAgents => {
+                write!(f, "{}", t!("settings.nav.third_party_cli_agents"))
+            }
             SettingsSection::CodeIndexing => write!(f, "{}", t!("settings.nav.code_indexing")),
-            SettingsSection::EditorAndCodeReview => write!(f, "{}", t!("settings.nav.editor_and_code_review")),
-            SettingsSection::CloudEnvironments => write!(f, "{}", t!("settings.nav.cloud_environments")),
-            SettingsSection::WarpCloudAgentAPIKeys => write!(f, "{}", t!("settings.nav.warp_cloud_agent_api_keys")),
+            SettingsSection::EditorAndCodeReview => {
+                write!(f, "{}", t!("settings.nav.editor_and_code_review"))
+            }
+            SettingsSection::CloudEnvironments => {
+                write!(f, "{}", t!("settings.nav.cloud_environments"))
+            }
+            SettingsSection::WarpCloudAgentAPIKeys => {
+                write!(f, "{}", t!("settings.nav.warp_cloud_agent_api_keys"))
+            }
         }
     }
 }
@@ -1209,7 +1221,8 @@ pub struct SettingsView {
 
 impl SettingsView {
     pub fn new(page: Option<SettingsSection>, ctx: &mut ViewContext<Self>) -> Self {
-        let pane_configuration = ctx.add_model(|_ctx| PaneConfiguration::new("Settings"));
+        let pane_configuration =
+            ctx.add_model(|_ctx| PaneConfiguration::new(t!("settings.window.title")));
 
         // Language changes re-render the whole settings window so every t!()
         // lookup picks up the new locale.
@@ -2930,7 +2943,7 @@ impl BackingView for SettingsView {
         _ctx: &view::HeaderRenderContext<'_>,
         _app: &AppContext,
     ) -> view::HeaderContent {
-        view::HeaderContent::simple("Settings")
+        view::HeaderContent::simple(t!("settings.window.title"))
     }
 
     fn set_focus_handle(&mut self, focus_handle: PaneFocusHandle, _ctx: &mut ViewContext<Self>) {

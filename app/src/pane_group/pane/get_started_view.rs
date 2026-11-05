@@ -26,6 +26,7 @@ use crate::util::bindings::{BindingGroup, CustomAction, keybinding_name_to_displ
 use crate::view_components::DismissibleToast;
 use crate::workspace::{ToastStack, Workspace, WorkspaceAction};
 use crate::{TelemetryEvent, send_telemetry_from_ctx};
+use warp_i18n::t;
 
 pub fn init(app: &mut AppContext) {
     use warpui::keymap::macros::*;
@@ -60,7 +61,7 @@ pub struct GetStartedView {
 
 impl GetStartedView {
     pub fn new(ctx: &mut ViewContext<Self>) -> Self {
-        let pane_configuration = ctx.add_model(|_ctx| PaneConfiguration::new("Get started"));
+        let pane_configuration = ctx.add_model(|_ctx| PaneConfiguration::new(t!("new_tab.header")));
         let project_buttons = ctx.add_typed_action_view(ProjectButtons::new);
         ctx.subscribe_to_view(&project_buttons, Self::handle_project_buttons_event);
 
@@ -223,7 +224,7 @@ impl GetStartedView {
                 .finish(),
                 appearance
                     .ui_builder()
-                    .paragraph("Welcome to Warp")
+                    .paragraph(t!("new_tab.welcome_title"))
                     .with_style(UiComponentStyles {
                         font_size: Some(20.),
                         ..Default::default()
@@ -233,7 +234,7 @@ impl GetStartedView {
                 Container::new(
                     appearance
                         .ui_builder()
-                        .paragraph("The Agentic Development Environment")
+                        .paragraph(t!("new_tab.welcome_subtitle"))
                         .with_style(UiComponentStyles {
                             font_size: Some(14.),
                             font_family_id: Some(appearance.monospace_font_family()),
@@ -272,12 +273,12 @@ impl GetStartedView {
                     })
                     .with_text_and_icon_label(TextAndIcon::new(
                         TextAndIconAlignment::IconFirst,
-                        format!(
-                            " New session in {}  {}",
-                            dirs::home_dir()
+                        t!(
+                            "new_tab.new_session_in",
+                            dir = dirs::home_dir()
                                 .map(|dir| dir.display().to_string())
-                                .unwrap_or("~".to_string()),
-                            keybinding_name_to_display_string("workspace:new_tab", app)
+                                .unwrap_or_else(|| "~".to_string()),
+                            key = keybinding_name_to_display_string("workspace:new_tab", app)
                                 .unwrap_or_default()
                         ),
                         ui::Icon::Terminal.to_warpui_icon(theme.foreground()),
@@ -361,7 +362,7 @@ impl BackingView for GetStartedView {
         _ctx: &view::HeaderRenderContext<'_>,
         _app: &AppContext,
     ) -> view::HeaderContent {
-        view::HeaderContent::simple("Get started")
+        view::HeaderContent::simple(t!("new_tab.header"))
     }
 
     fn set_focus_handle(&mut self, focus_handle: PaneFocusHandle, _ctx: &mut ViewContext<Self>) {

@@ -87,6 +87,7 @@ use crate::workspace::{
     VerticalTabsPaneDropTargetData, Workspace,
 };
 use crate::{FeatureFlag, send_telemetry_from_app_ctx};
+use warp_i18n::t;
 
 const PANEL_WIDTH: f32 = 248.;
 const MIN_PANEL_WIDTH: f32 = 200.;
@@ -4315,7 +4316,7 @@ fn terminal_primary_line_data(
     }
 
     TerminalPrimaryLineData::Text {
-        text: "New session".to_string(),
+        text: t!("workspace.new_session").into_owned(),
         font: TerminalPrimaryLineFont::Ui,
     }
 }
@@ -4324,9 +4325,9 @@ fn terminal_kind_badge_label(is_oz_agent: bool, cli_agent: Option<CLIAgent>) -> 
     if let Some(cli_agent) = cli_agent {
         cli_agent.display_name().to_string()
     } else if is_oz_agent {
-        "Warp Agent".to_string()
+        t!("workspace.warp_agent").into_owned()
     } else {
-        "Terminal".to_string()
+        t!("workspace.terminal").into_owned()
     }
 }
 
