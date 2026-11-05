@@ -198,7 +198,7 @@ pub struct CodeIndexingPageView {
     lsp_row_mouse_states: Vec<LspServerRowMouseStates>,
     open_project_rules_mouse_states: Vec<MouseStateHandle>,
     /// Tracks installation status for suggested LSP servers so the UI can decide
-    /// whether to show "Available for download" vs "Installed" and whether the
+    /// whether to show the section label vs the section label and whether the
     /// "+" button should trigger install or just enable.
     suggested_server_statuses: HashMap<(PathBuf, LSPServerType), LspRepoStatus>,
 }
@@ -330,7 +330,7 @@ impl CodeIndexingPageView {
         });
 
         // Re-render when project rules are added or removed so the
-        // "Open project rules" button visibility stays up to date.
+        // &t!("settings.code_indexing.open_project_rules") button visibility stays up to date.
         ctx.subscribe_to_model(&ProjectContextModel::handle(ctx), |_me, _, event, ctx| {
             if matches!(event, ProjectContextModelEvent::KnownRulesChanged(_)) {
                 ctx.notify();
@@ -364,7 +364,7 @@ impl CodeIndexingPageView {
 
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
         let manual_add_directory_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new("Index new folder", SecondaryTheme)
+            ActionButton::new(t!("settings.code_indexing.index_new_folder"), SecondaryTheme)
                 .with_icon(Icon::FindAll)
                 .on_click(|ctx| {
                     ctx.dispatch_typed_action(CodeIndexingPageAction::ManualAddDirectory);
@@ -969,7 +969,7 @@ impl CodePageWidget {
         .finish()
     }
 
-    /// Renders the "Codebase indexing" toggle row (legacy layout).
+    /// Renders the the section label toggle row (legacy layout).
     fn render_codebase_indexing_toggle_row(
         &self,
         global_ai_enabled: bool,
@@ -1033,7 +1033,7 @@ impl CodePageWidget {
         .finish()
     }
 
-    /// Renders the "Initialized / indexed folders" section.
+    /// Renders the the section label section.
     fn render_initialized_folders(
         &self,
         mouse_states: InitializedFoldersMouseStates,
@@ -1066,7 +1066,7 @@ impl CodePageWidget {
                     .with_cross_axis_alignment(CrossAxisAlignment::Center)
                     .with_child(
                         ui_builder
-                            .span("Initialized / indexed folders")
+                            .span(t!("settings.code_indexing.initialized_indexed_folders"))
                             .with_style(UiComponentStyles {
                                 font_size: Some(16.0),
                                 font_weight: Some(Weight::Semibold),
@@ -1190,7 +1190,7 @@ impl CodePageWidget {
                 Container::new(
                     appearance
                         .ui_builder()
-                        .paragraph("No folders have been initialized yet.")
+                        .paragraph(t!("settings.code_indexing.no_folders_have_been_initialized_yet"))
                         .build()
                         .finish(),
                 )
@@ -1223,7 +1223,7 @@ impl CodePageWidget {
 
         let mut workspace_content = Flex::column().with_spacing(MAIN_SECTION_MARGIN);
 
-        // Workspace path header with "Open project rules" button
+        // Workspace path header with &t!("settings.code_indexing.open_project_rules") button
         let home_dir =
             dirs::home_dir().and_then(|home_dir| home_dir.to_str().map(|s| s.to_owned()));
         let user_friendly = user_friendly_path(
@@ -1236,7 +1236,7 @@ impl CodePageWidget {
         let workspace_rule_paths =
             ProjectContextModel::as_ref(app).rules_for_workspace(workspace_path);
 
-        // Only show "Open project rules" button if rules exist for this workspace
+        // Only show &t!("settings.code_indexing.open_project_rules") button if rules exist for this workspace
         let open_rules_button: Option<Box<dyn Element>> = if !workspace_rule_paths.is_empty() {
             let open_rules_button = ui_builder
                 .button(ButtonVariant::Secondary, open_rules_mouse)
@@ -1257,7 +1257,7 @@ impl CodePageWidget {
                 .with_text_and_icon_label(
                     warpui::ui_components::button::TextAndIcon::new(
                         warpui::ui_components::button::TextAndIconAlignment::IconFirst,
-                        "Open project rules",
+                        t!("settings.code_indexing.open_project_rules"),
                         warpui::elements::Icon::new(
                             "bundled/svg/file-code-02.svg",
                             theme.foreground(),
@@ -1421,7 +1421,7 @@ impl CodePageWidget {
         let mut column = Flex::column().with_spacing(SUB_SECTION_MARGIN);
         column.add_child(
             ui_builder
-                .span("INDEXING")
+                .span(t!("settings.code_indexing.indexing_section"))
                 .with_style(UiComponentStyles {
                     font_size: Some(11.0),
                     font_weight: Some(Weight::Semibold),
@@ -1460,7 +1460,7 @@ impl CodePageWidget {
         let theme = appearance.theme();
         let Some(index_state) = index_state else {
             return IndexingStatusPresentation {
-                text: Cow::from("No index created"),
+                text: Cow::from(t!("settings.code_indexing.no_index_created")),
                 color: theme.disabled_ui_text_color().into_solid(),
                 icon: Some(Icon::SlashCircle),
                 refresh_action: None,
@@ -1477,7 +1477,7 @@ impl CodePageWidget {
                     completed_nodes,
                     total_nodes,
                 }) => Cow::from(format!("Syncing - {completed_nodes} / {total_nodes}")),
-                None => Cow::from("Syncing..."),
+                None => Cow::from(t!("settings.code_indexing.syncing")),
             };
 
             return IndexingStatusPresentation {
@@ -1491,25 +1491,25 @@ impl CodePageWidget {
 
         if let Some(completed_successfully) = index_state.last_sync_successful() {
             let (text, color, icon) = if completed_successfully {
-                ("Synced", theme.ansi_fg_green(), Icon::Check)
+                (t!("settings.code_indexing.synced"), theme.ansi_fg_green(), Icon::Check)
             } else if let Some(CodebaseIndexFinishedStatus::Failed(
                 CodebaseIndexingError::ExceededMaxFileLimit
                 | CodebaseIndexingError::MaxDepthExceeded,
             )) = index_state.last_sync_result()
             {
                 (
-                    "Codebase too large",
+                    t!("settings.code_indexing.codebase_too_large"),
                     theme.ui_warning_color(),
                     Icon::AlertTriangle,
                 )
             } else if index_state.has_synced_version() {
                 (
-                    "Stale",
+                    t!("settings.code_indexing.stale"),
                     theme.nonactive_ui_detail().into_solid(),
                     Icon::ClockRefresh,
                 )
             } else {
-                ("Failed", theme.ui_error_color(), Icon::AlertTriangle)
+                (t!("settings.code_indexing.failed"), theme.ui_error_color(), Icon::AlertTriangle)
             };
 
             return IndexingStatusPresentation {
@@ -1523,7 +1523,7 @@ impl CodePageWidget {
 
         log::warn!("No index state for codebase");
         IndexingStatusPresentation {
-            text: Cow::from("No index built"),
+            text: Cow::from(t!("settings.code_indexing.no_index_built")),
             color: theme.nonactive_ui_text_color().into_solid(),
             icon: None,
             refresh_action: None,
@@ -1541,7 +1541,7 @@ impl CodePageWidget {
 
         match status.state {
             RemoteCodebaseIndexState::NotEnabled => IndexingStatusPresentation {
-                text: Cow::from("No index created"),
+                text: Cow::from(t!("settings.code_indexing.no_index_created")),
                 color: theme.disabled_ui_text_color().into_solid(),
                 icon: Some(Icon::SlashCircle),
                 refresh_action: Some(IndexingRefreshAction::RequestRemote),
@@ -1551,9 +1551,9 @@ impl CodePageWidget {
                 let limit_reached = remote_codebase_index_limit_reached(status);
                 IndexingStatusPresentation {
                     text: Cow::from(if limit_reached {
-                        "Index limit reached"
+                        t!("settings.code_indexing.index_limit_reached")
                     } else {
-                        "Unavailable"
+                        t!("settings.code_indexing.unavailable")
                     }),
                     color: if limit_reached {
                         theme.ui_warning_color()
@@ -1570,14 +1570,14 @@ impl CodePageWidget {
                 }
             }
             RemoteCodebaseIndexState::Disabled => IndexingStatusPresentation {
-                text: Cow::from("Disabled"),
+                text: Cow::from(t!("settings.code_indexing.disabled")),
                 color: theme.disabled_ui_text_color().into_solid(),
                 icon: Some(Icon::SlashCircle),
                 refresh_action: Some(IndexingRefreshAction::RequestRemote),
                 show_delete: true,
             },
             RemoteCodebaseIndexState::Queued => IndexingStatusPresentation {
-                text: Cow::from("Queued"),
+                text: Cow::from(t!("settings.code_indexing.queued")),
                 color: theme.disabled_ui_text_color().into_solid(),
                 icon: None,
                 refresh_action: None,
@@ -1590,7 +1590,7 @@ impl CodePageWidget {
                     }
                     (Some(completed), None) => Cow::from(format!("Indexing - {completed}")),
                     (None, Some(total)) => Cow::from(format!("Indexing - 0 / {total}")),
-                    (None, None) => Cow::from("Indexing..."),
+                    (None, None) => Cow::from(t!("settings.code_indexing.indexing")),
                 };
 
                 IndexingStatusPresentation {
@@ -1602,21 +1602,21 @@ impl CodePageWidget {
                 }
             }
             RemoteCodebaseIndexState::Ready => IndexingStatusPresentation {
-                text: Cow::from("Synced"),
+                text: Cow::from(t!("settings.code_indexing.synced")),
                 color: theme.ansi_fg_green(),
                 icon: Some(Icon::Check),
                 refresh_action: Some(IndexingRefreshAction::Resync),
                 show_delete: true,
             },
             RemoteCodebaseIndexState::Stale => IndexingStatusPresentation {
-                text: Cow::from("Stale"),
+                text: Cow::from(t!("settings.code_indexing.stale")),
                 color: theme.nonactive_ui_detail().into_solid(),
                 icon: Some(Icon::ClockRefresh),
                 refresh_action: Some(IndexingRefreshAction::Resync),
                 show_delete: true,
             },
             RemoteCodebaseIndexState::Failed => IndexingStatusPresentation {
-                text: Cow::from("Failed"),
+                text: Cow::from(t!("settings.code_indexing.failed")),
                 color: theme.ui_error_color(),
                 icon: Some(Icon::AlertTriangle),
                 refresh_action: Some(IndexingRefreshAction::Resync),
@@ -1764,10 +1764,10 @@ impl CodePageWidget {
 
         let mut content = Flex::column().with_spacing(SUB_SECTION_MARGIN);
 
-        // "LSP SERVERS" label
+        // LSP servers label
         content.add_child(
             ui_builder
-                .span("LSP SERVERS")
+                .span(t!("settings.code_indexing.lsp_servers"))
                 .with_style(UiComponentStyles {
                     font_size: Some(11.0),
                     font_weight: Some(Weight::Semibold),
@@ -1880,10 +1880,10 @@ impl CodePageWidget {
         );
 
         let (description, is_installing) = match &repo_status {
-            Some(LspRepoStatus::DisabledAndInstalled { .. }) => ("Installed", false),
-            Some(LspRepoStatus::Installing { .. }) => ("Installing...", true),
-            Some(LspRepoStatus::CheckingForInstallation) => ("Checking...", true),
-            _ => ("Available for download", false),
+            Some(LspRepoStatus::DisabledAndInstalled { .. }) => (t!("settings.scripting.installed"), false),
+            Some(LspRepoStatus::Installing { .. }) => (t!("settings.code_indexing.installing"), true),
+            Some(LspRepoStatus::CheckingForInstallation) => (t!("settings.code_indexing.checking"), true),
+            _ => (t!("settings.code_indexing.available_for_download"), false),
         };
 
         name_desc_column.add_child(
@@ -2064,7 +2064,7 @@ impl CodePageWidget {
                     background: Some(theme.surface_3().into()),
                     ..Default::default()
                 })
-                .with_text_label("Restart server".to_owned())
+                .with_text_label(t!("settings.code_indexing.restart_server").into_owned())
                 .build()
                 .with_cursor(Cursor::PointingHand)
                 .on_click(move |ctx, _, _| {
@@ -2077,7 +2077,7 @@ impl CodePageWidget {
             right_content.add_child(restart_button);
         }
 
-        // Show "View logs" when the server has been started (Available, Starting/Busy, or Failed)
+        // Show &t!("settings.code_indexing.view_logs") when the server has been started (Available, Starting/Busy, or Failed)
         #[cfg(not(target_family = "wasm"))]
         {
             let has_logs = server_model.is_some_and(|model| {
@@ -2094,7 +2094,7 @@ impl CodePageWidget {
                         font_size: Some(12.),
                         ..Default::default()
                     })
-                    .with_text_label("View logs".to_owned())
+                    .with_text_label(t!("settings.code_indexing.view_logs").into_owned())
                     .build()
                     .with_cursor(Cursor::PointingHand)
                     .on_click(move |ctx, _, _| {
@@ -2141,7 +2141,7 @@ impl CodePageWidget {
         server_model: Option<&warpui::ModelHandle<LspServerModel>>,
         app: &AppContext,
         theme: &warp_core::ui::theme::WarpTheme,
-    ) -> (ColorU, &'static str) {
+    ) -> (ColorU, std::borrow::Cow<'static, str>) {
         match server_model {
             Some(model) => {
                 let server = model.as_ref(app);
@@ -2150,26 +2150,26 @@ impl CodePageWidget {
                         AnsiColorIdentifier::Green
                             .to_ansi_color(&theme.terminal_colors().normal)
                             .into(),
-                        "Available",
+                        t!("settings.code_indexing.available"),
                     ),
                     LspState::Starting | LspState::Available { .. } => (
                         AnsiColorIdentifier::Yellow
                             .to_ansi_color(&theme.terminal_colors().normal)
                             .into(),
-                        "Busy",
+                        t!("settings.code_indexing.busy"),
                     ),
                     LspState::Failed { .. } => (
                         AnsiColorIdentifier::Red
                             .to_ansi_color(&theme.terminal_colors().normal)
                             .into(),
-                        "Failed",
+                        t!("settings.code_indexing.failed"),
                     ),
                     LspState::Stopped { .. } | LspState::Stopping { .. } => {
-                        (theme.disabled_ui_text_color().into_solid(), "Stopped")
+                        (theme.disabled_ui_text_color().into_solid(), t!("settings.code_indexing.stopped"))
                     }
                 }
             }
-            None => (theme.disabled_ui_text_color().into_solid(), "Not running"),
+            None => (theme.disabled_ui_text_color().into_solid(), t!("settings.code_indexing.not_running")),
         }
     }
 }

@@ -234,9 +234,9 @@ impl SettingsWidget for WarpControlCliInstallWidget {
         let label = if view.warpctrl_installing {
             "Installing…"
         } else if installed {
-            "Installed"
+            &t!("settings.scripting.installed")
         } else {
-            "Install"
+            &t!("settings.scripting.install")
         };
         let mut button = appearance
             .ui_builder()
@@ -260,13 +260,13 @@ impl SettingsWidget for WarpControlCliInstallWidget {
         };
 
         render_body_item::<ScriptingSettingsPageAction>(
-            "Warp Control CLI command".into(),
+            t!("settings.scripting.warp_control_cli_command").into(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
             appearance,
             button,
-            Some("Install the warpctrl command for scripting Warp from your terminal.".to_owned()),
+            Some(t!("settings.scripting.install_the_warpctrl_command_for_scripting_warp_from_your_te").into_owned()),
         )
     }
 }
