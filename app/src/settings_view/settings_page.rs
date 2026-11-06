@@ -1011,7 +1011,7 @@ pub fn render_dropdown_item_label(
 
 pub(crate) fn render_dropdown_item<T: DropdownItemAction>(
     appearance: &Appearance,
-    label: &str,
+    label: impl AsRef<str>,
     secondary_text: Option<&str>,
     dropdown_subtext: Option<Box<dyn Element>>,
     local_only_icon_state: LocalOnlyIconState,
@@ -1021,7 +1021,7 @@ pub(crate) fn render_dropdown_item<T: DropdownItemAction>(
     let row = Flex::row().with_cross_axis_alignment(CrossAxisAlignment::Center);
 
     let dropdown_item_label = Align::new(render_dropdown_item_label(
-        label.to_string(),
+        AsRef::<str>::as_ref(&label).to_owned(),
         secondary_text.map(|secondary_text| secondary_text.to_string()),
         local_only_icon_state,
         color_override,
@@ -1064,7 +1064,7 @@ pub(crate) fn render_filterable_dropdown_item<T: DropdownItemAction>(
     let row = Flex::row().with_cross_axis_alignment(CrossAxisAlignment::Center);
 
     let dropdown_item_label = Align::new(render_dropdown_item_label(
-        label.to_string(),
+        AsRef::<str>::as_ref(&label).to_owned(),
         secondary_text.map(|secondary_text| secondary_text.to_string()),
         local_only_icon_state,
         color_override,

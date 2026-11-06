@@ -73,17 +73,6 @@ const SUB_SECTION_MARGIN: f32 = 8.;
 const STATUS_ICON_SIZE: f32 = 16.;
 const LSP_STATUS_INDICATOR_SIZE: f32 = 8.;
 const CODE_FEATURE_NAME: &str = "Code";
-const INITIALIZATION_SETTINGS_HEADER: &str = "Initialization Settings";
-const CODEBASE_INDEXING_LABEL: &str = "Codebase indexing";
-const CODEBASE_INDEX_DESCRIPTION: &str = "Warp can automatically index code repositories as you navigate them, helping agents quickly understand context and provide solutions. Code is never stored on the server. If a codebase is unable to be indexed, Warp can still navigate your codebase and gain insights via grep and find tool calling.";
-const WARP_INDEXING_IGNORE_DESCRIPTION: &str = "To exclude specific files or directories from indexing, add them to the .warpindexingignore file in your repository directory. These files will still be accessible to AI features, but they won't be included in codebase embeddings.";
-const AUTO_INDEX_FEATURE_NAME: &str = "Index new folders by default";
-const AUTO_INDEX_DESCRIPTION: &str = "When set to true, Warp will automatically index code repositories as you navigate them - helping agents quickly understand context and provide targeted solutions.";
-const INDEXING_DISABLED_ADMIN_TEXT: &str = "Team admins have disabled codebase indexing.";
-const INDEXING_WORKSPACE_ENABLED_ADMIN_TEXT: &str = "Team admins have enabled codebase indexing.";
-const INDEXING_DISABLED_GLOBAL_AI_TEXT: &str =
-    "AI Features must be enabled to use codebase indexing.";
-const CODEBASE_INDEX_LIMIT_REACHED: &str = "You have reached the maximum number of codebase indices for your plan. Delete existing indices to auto-index new codebases.";
 #[cfg(not(target_family = "wasm"))]
 const REMOTE_CODEBASE_INDEX_LIMIT_REACHED_FAILURE: &str =
     "maximum number of codebase indexes has been reached";
@@ -101,11 +90,12 @@ fn codebase_indexing_disabled_admin_text(
     current_team_disables: bool,
 ) -> String {
     if current_team_disables {
-        return INDEXING_DISABLED_ADMIN_TEXT.to_string();
+        return t!("settings.code_indexing.team_admins_have_disabled_codebase_indexing")
+            .into_owned();
     }
 
     blocking_team_name.map_or_else(
-        || INDEXING_DISABLED_ADMIN_TEXT.to_string(),
+        || t!("settings.code_indexing.team_admins_have_disabled_codebase_indexing").into_owned(),
         |team_name| {
             format!("Codebase indexing is unavailable because {team_name} has disabled it.")
         },
@@ -119,7 +109,9 @@ fn codebase_indexing_tooltip_text(
 ) -> Option<String> {
     let user_workspaces = UserWorkspaces::as_ref(app);
     match user_workspaces.teams_allow_codebase_context() {
-        AdminEnablementSetting::Enable => Some(INDEXING_WORKSPACE_ENABLED_ADMIN_TEXT.to_string()),
+        AdminEnablementSetting::Enable => Some(
+            t!("settings.code_indexing.team_admins_have_enabled_codebase_indexing").into_owned(),
+        ),
         AdminEnablementSetting::Disable => Some(codebase_indexing_disabled_admin_text(
             user_workspaces
                 .team_disabling_codebase_context()
@@ -130,9 +122,10 @@ fn codebase_indexing_tooltip_text(
                     team.settings.codebase_context.value == AdminEnablementSetting::Disable
                 }),
         )),
-        AdminEnablementSetting::RespectUserSetting if !global_ai_enabled => {
-            Some(INDEXING_DISABLED_GLOBAL_AI_TEXT.to_string())
-        }
+        AdminEnablementSetting::RespectUserSetting if !global_ai_enabled => Some(
+            t!("settings.code_indexing.ai_features_must_be_enabled_to_use_codebase_indexing")
+                .into_owned(),
+        ),
         AdminEnablementSetting::RespectUserSetting => None,
     }
 }
@@ -777,12 +770,12 @@ impl SettingsWidget for CodePageWidget {
         ));
         content.add_child(self.render_settings_subtext(
             global_ai_enabled,
-            CODEBASE_INDEX_DESCRIPTION,
+            t!("settings.code_indexing.codebase_indexing_description"),
             appearance,
         ));
         content.add_child(self.render_settings_subtext(
             global_ai_enabled,
-            WARP_INDEXING_IGNORE_DESCRIPTION,
+            t!("settings.code_indexing.warp_indexing_ignore_description"),
             appearance,
         ));
 
@@ -829,7 +822,7 @@ impl CodePageWidget {
 
         let mut rows = vec![
             self.render_autoindex_row(
-                AUTO_INDEX_FEATURE_NAME,
+                t!("settings.code_indexing.index_new_folders_by_default"),
                 self.auto_index_switch_state.clone(),
                 auto_indexing_enabled,
                 CodeIndexingPageAction::ToggleAutoIndexing,
@@ -838,7 +831,7 @@ impl CodePageWidget {
             // Use subtext styling for description (gray color per Figma)
             self.render_settings_subtext(
                 codebase_indexing_enabled,
-                AUTO_INDEX_DESCRIPTION,
+                t!("settings.code_indexing.auto_index_description"),
                 appearance,
             ),
         ];
@@ -847,7 +840,7 @@ impl CodePageWidget {
         {
             rows.push(self.render_settings_subtext(
                 false,
-                CODEBASE_INDEX_LIMIT_REACHED,
+                t!("settings.code_indexing.index_limit_reached_message"),
                 appearance,
             ));
         }
@@ -862,7 +855,7 @@ impl CodePageWidget {
 
     fn render_autoindex_row(
         &self,
-        label: &'static str,
+        label: impl Into<Cow<'static, str>>,
         switch_state: SwitchStateHandle,
         auto_indexing_enabled: bool,
         action: CodeIndexingPageAction,
@@ -877,7 +870,7 @@ impl CodePageWidget {
                 .with_main_axis_alignment(MainAxisAlignment::SpaceBetween)
                 .with_child(
                     ui_builder
-                        .span(label)
+                        .span(label.into())
                         .with_style(UiComponentStyles {
                             font_size: Some(16.0),
                             font_weight: Some(Weight::Semibold),
@@ -911,7 +904,7 @@ impl CodePageWidget {
     fn render_settings_subtext(
         &self,
         _active: bool,
-        description: &'static str,
+        description: impl Into<Cow<'static, str>>,
         appearance: &Appearance,
     ) -> Box<dyn Element> {
         let ui_builder = appearance.ui_builder();
@@ -919,7 +912,7 @@ impl CodePageWidget {
 
         // Per Figma: subtext uses disabled_ui_text_color (#9b9b9b)
         ui_builder
-            .paragraph(description)
+            .paragraph(description.into())
             .with_style(UiComponentStyles {
                 font_color: Some(theme.disabled_ui_text_color().into()),
                 ..Default::default()
@@ -957,7 +950,7 @@ impl CodePageWidget {
 
         Container::new(
             ui_builder
-                .span(INITIALIZATION_SETTINGS_HEADER)
+                .span(t!("settings.code_indexing.initialization_settings"))
                 .with_style(UiComponentStyles {
                     font_size: Some(18.0),
                     font_weight: Some(Weight::Semibold),
@@ -984,7 +977,7 @@ impl CodePageWidget {
         let theme = appearance.theme();
 
         let label = ui_builder
-            .span(CODEBASE_INDEXING_LABEL)
+            .span(t!("settings.code_indexing.codebase_indexing"))
             .with_style(UiComponentStyles {
                 font_size: Some(16.0),
                 font_weight: Some(Weight::Semibold),
@@ -2247,13 +2240,13 @@ impl SettingsWidget for CodeIndexingPageWidget {
         };
 
         content.add_child(render_body_item::<CodeIndexingPageAction>(
-            CODEBASE_INDEXING_LABEL.into(),
+            t!("settings.code_indexing.codebase_indexing").into_owned(),
             None,
             LocalOnlyIconState::Hidden,
             ToggleState::Enabled,
             appearance,
             toggle_element,
-            Some(CODEBASE_INDEX_DESCRIPTION.into()),
+            Some(t!("settings.code_indexing.codebase_indexing_description").into_owned()),
         ));
 
         // Auto-indexing toggle (only shown when codebase indexing is enabled)
@@ -2261,7 +2254,7 @@ impl SettingsWidget for CodeIndexingPageWidget {
             let auto_indexing_enabled = *CodeSettings::as_ref(app).auto_indexing_enabled;
 
             content.add_child(render_body_item::<CodeIndexingPageAction>(
-                AUTO_INDEX_FEATURE_NAME.into(),
+                t!("settings.code_indexing.index_new_folders_by_default").into_owned(),
                 None,
                 LocalOnlyIconState::Hidden,
                 ToggleState::Enabled,
@@ -2274,13 +2267,13 @@ impl SettingsWidget for CodeIndexingPageWidget {
                         ctx.dispatch_typed_action(CodeIndexingPageAction::ToggleAutoIndexing);
                     })
                     .finish(),
-                Some(AUTO_INDEX_DESCRIPTION.into()),
+                Some(t!("settings.code_indexing.auto_index_description").into_owned()),
             ));
 
             if !CodebaseIndexManager::as_ref(app).can_create_new_indices() {
                 content.add_child(
                     ui_builder
-                        .paragraph(CODEBASE_INDEX_LIMIT_REACHED)
+                        .paragraph(t!("settings.code_indexing.index_limit_reached_message"))
                         .with_style(UiComponentStyles {
                             font_color: Some(appearance.theme().disabled_ui_text_color().into()),
                             ..Default::default()

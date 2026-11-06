@@ -342,15 +342,16 @@ settings:
     unshare_block: "Unshare block"
     shared_blocks: "Shared blocks"
   code_indexing:
+    initialization_settings: "Initialization Settings"
     codebase_indexing: "Codebase indexing"
-    warp_can_automatically_index_code_repositories_as_you_naviga: "Warp can automatically index code repositories as you navigate them, helping agents quickly understand context and provide solutions. Code is never stored on the server. If a codebase is unable to be indexed, Warp can still navigate your codebase and gain insights via grep and find tool calling."
-    to_exclude_specific_files_or_directories_from_indexing_add_t: "To exclude specific files or directories from indexing, add them to the .warpindexingignore file in your repository directory. These files will still be accessible to AI features, but they won't be included in codebase embeddings."
+    codebase_indexing_description: "Warp can automatically index code repositories as you navigate them, helping agents quickly understand context and provide solutions. Code is never stored on the server. If a codebase is unable to be indexed, Warp can still navigate your codebase and gain insights via grep and find tool calling."
+    warp_indexing_ignore_description: "To exclude specific files or directories from indexing, add them to the .warpindexingignore file in your repository directory. These files will still be accessible to AI features, but they won't be included in codebase embeddings."
     index_new_folders_by_default: "Index new folders by default"
-    when_set_to_true_warp_will_automatically_index_code_reposito: "When set to true, Warp will automatically index code repositories as you navigate them - helping agents quickly understand context and provide targeted solutions."
+    auto_index_description: "When set to true, Warp will automatically index code repositories as you navigate them - helping agents quickly understand context and provide targeted solutions."
     team_admins_have_disabled_codebase_indexing: "Team admins have disabled codebase indexing."
     team_admins_have_enabled_codebase_indexing: "Team admins have enabled codebase indexing."
     ai_features_must_be_enabled_to_use_codebase_indexing: "AI Features must be enabled to use codebase indexing."
-    you_have_reached_the_maximum_number_of_codebase_indices_for_: "You have reached the maximum number of codebase indices for your plan. Delete existing indices to auto-index new codebases."
+    index_limit_reached_message: "You have reached the maximum number of codebase indices for your plan. Delete existing indices to auto-index new codebases."
     index_new_folder: "Index new folder"
     initialized_indexed_folders: "Initialized / indexed folders"
     no_folders_have_been_initialized_yet: "No folders have been initialized yet."
@@ -379,6 +380,17 @@ settings:
     busy: "Busy"
     stopped: "Stopped"
     not_running: "Not running"
+  code_editor:
+    choose_editor_file_links: "Choose an editor to open file links"
+    choose_editor_code_panels: "Choose an editor to open files from the code review panel, project explorer, and global search"
+    choose_layout: "Choose a layout to open files in Warp"
+    group_files_single_pane: "Group files into single editor pane"
+    group_files_single_pane_desc: "When this setting is on, any files opened in the same tab will be automatically grouped into a single editor pane."
+    open_markdown_in_viewer: "Open Markdown files in Warp's Markdown Viewer by default"
+    default_app: "Default App"
+    layout:
+      split_pane: "Split Pane"
+      new_tab: "New Tab"
   code_review:
     auto_open_code_review_panel: "Auto open code review panel"
     when_this_setting_is_on_the_code_review_panel_will_open_on_t: "When this setting is on, the code review panel will open on the first accepted diff of a conversation"
@@ -472,6 +484,8 @@ workspace:
   global_search_title: "Global search"
   global_search_subtitle: "Search in files across your current directories."
   global_search_unavailable_title: "Global search unavailable"
+
+
 
 
 

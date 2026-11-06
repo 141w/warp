@@ -7,6 +7,7 @@ use lazy_static::lazy_static;
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use strum_macros::AsRefStr;
 use warp_core::features::FeatureFlag;
 use warp_core::ui::appearance::Appearance;
 use warp_core::ui::icons::Icon;
@@ -144,7 +145,8 @@ impl FilterAtom {
 }
 
 /// Filters that may be included as part of the universal search query.
-#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, Serialize, Sequence)]
+#[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, Serialize, Sequence, AsRefStr)]
+#[strum(serialize_all = "snake_case")]
 pub enum QueryFilter {
     /// Only include results from HistoryDataSource.
     History,
@@ -233,39 +235,7 @@ impl QueryFilter {
 
     /// Returns placeholder text to be shown in an empty input when the filter is active.
     pub fn placeholder_text(&self) -> String {
-        warp_i18n::tr(&format!("search.filter.{}", self.slug()))
-    }
-
-    /// Stable, translation-key-safe identifier for this filter.
-    fn slug(&self) -> &'static str {
-        match self {
-            QueryFilter::History => "history",
-            QueryFilter::Workflows => "workflows",
-            QueryFilter::AgentModeWorkflows => "agent_mode_workflows",
-            QueryFilter::Notebooks => "notebooks",
-            QueryFilter::Plans => "plans",
-            QueryFilter::NaturalLanguage => "natural_language",
-            QueryFilter::Actions => "actions",
-            QueryFilter::Sessions => "sessions",
-            QueryFilter::Tabs => "tabs",
-            QueryFilter::Conversations => "conversations",
-            QueryFilter::LaunchConfigurations => "launch_configurations",
-            QueryFilter::Drive => "drive",
-            QueryFilter::EnvironmentVariables => "environment_variables",
-            QueryFilter::PromptHistory => "prompt_history",
-            QueryFilter::Files => "files",
-            QueryFilter::Commands => "commands",
-            QueryFilter::Blocks => "blocks",
-            QueryFilter::Code => "code",
-            QueryFilter::Rules => "rules",
-            QueryFilter::Repos => "repos",
-            QueryFilter::DiffSets => "diff_sets",
-            QueryFilter::StaticSlashCommands => "static_slash_commands",
-            QueryFilter::Skills => "skills",
-            QueryFilter::BaseModels => "base_models",
-            QueryFilter::FullTerminalUseModels => "full_terminal_use_models",
-            QueryFilter::CurrentDirectoryConversations => "current_directory_conversations",
-        }
+        warp_i18n::tr(&format!("search.filter.{}", self.as_ref()))
     }
 
     /// Returns text that is used to represent the filter as a filter 'atom' in the search input.

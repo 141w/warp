@@ -341,15 +341,16 @@ settings:
     unshare_block: "取消共享 Block"
     shared_blocks: "共享 Block"
   code_indexing:
+    initialization_settings: "初始化设置"
     codebase_indexing: "代码库索引"
-    warp_can_automatically_index_code_repositories_as_you_naviga: "Warp 可以在你浏览代码仓库时自动为其建立索引，帮助代理快速理解上下文并提供解决方案。代码永远不会存储在服务器上。如果某个代码库无法被索引，Warp 仍可通过 grep 和 find 工具调用浏览你的代码库并获取洞察。"
-    to_exclude_specific_files_or_directories_from_indexing_add_t: "要将特定文件或目录排除在索引之外，请将其添加到仓库目录中的 .warpindexingignore 文件。这些文件仍可被 AI 功能访问，但不会包含在代码库嵌入中。"
+    codebase_indexing_description: "Warp 可以在你浏览代码仓库时自动为其建立索引，帮助代理快速理解上下文并提供解决方案。代码永远不会存储在服务器上。如果某个代码库无法被索引，Warp 仍可通过 grep 和 find 工具调用浏览你的代码库并获取洞察。"
+    warp_indexing_ignore_description: "要将特定文件或目录排除在索引之外，请将其添加到仓库目录中的 .warpindexingignore 文件。这些文件仍可被 AI 功能访问，但不会包含在代码库嵌入中。"
     index_new_folders_by_default: "默认索引新文件夹"
-    when_set_to_true_warp_will_automatically_index_code_reposito: "启用后，Warp 会在你浏览代码仓库时自动为其建立索引——帮助代理快速理解上下文并提供有针对性的解决方案。"
+    auto_index_description: "启用后，Warp 会在你浏览代码仓库时自动为其建立索引——帮助代理快速理解上下文并提供有针对性的解决方案。"
     team_admins_have_disabled_codebase_indexing: "团队管理员已禁用代码库索引。"
     team_admins_have_enabled_codebase_indexing: "团队管理员已启用代码库索引。"
     ai_features_must_be_enabled_to_use_codebase_indexing: "必须启用 AI 功能才能使用代码库索引。"
-    you_have_reached_the_maximum_number_of_codebase_indices_for_: "你已达到套餐允许的代码库索引上限。删除现有索引以便自动索引新代码库。"
+    index_limit_reached_message: "你已达到套餐允许的代码库索引上限。删除现有索引以便自动索引新代码库。"
     index_new_folder: "索引新文件夹"
     initialized_indexed_folders: "已初始化 / 已索引的文件夹"
     no_folders_have_been_initialized_yet: "尚未初始化任何文件夹。"
@@ -378,6 +379,17 @@ settings:
     busy: "忙碌"
     stopped: "已停止"
     not_running: "未运行"
+  code_editor:
+    choose_editor_file_links: "选择用于打开文件链接的编辑器"
+    choose_editor_code_panels: "选择用于从代码审查面板、项目浏览器和全局搜索中打开文件的编辑器"
+    choose_layout: "选择在 Warp 中打开文件时的布局"
+    group_files_single_pane: "将文件归组到单个编辑器窗格"
+    group_files_single_pane_desc: "开启后，在同一标签页中打开的所有文件将自动归组到单个编辑器窗格中。"
+    open_markdown_in_viewer: "默认在 Warp 的 Markdown 查看器中打开 Markdown 文件"
+    default_app: "默认应用"
+    layout:
+      split_pane: "拆分窗格"
+      new_tab: "新标签页"
   code_review:
     auto_open_code_review_panel: "自动打开代码审查面板"
     when_this_setting_is_on_the_code_review_panel_will_open_on_t: "启用后，代码审查面板会在对话中第一个被接受的 diff 出现时打开"
@@ -471,6 +483,8 @@ workspace:
   global_search_title: "全局搜索"
   global_search_subtitle: "在你当前的目录中搜索文件。"
   global_search_unavailable_title: "全局搜索不可用"
+
+
 
 
 

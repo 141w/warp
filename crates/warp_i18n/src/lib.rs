@@ -55,17 +55,23 @@ pub fn tr(key: &str) -> String {
     t!(key).into_owned()
 }
 
-/// Translates a macro-defined setting description via its derived key
-/// `settings.desc.<SettingName>`, falling back to the English literal baked
-/// into the settings macro when no translation exists.
-pub fn setting_description(setting_name: &str, fallback: &str) -> String {
-    let key = format!("settings.desc.{setting_name}");
-    let translated = t!(key.as_str()).into_owned();
+/// Like [`tr`], but returns `fallback` when the key has no translation. Lets a
+/// surface be translated incrementally: untranslated entries keep showing their
+/// original text instead of the raw key.
+pub fn tr_or(key: &str, fallback: &str) -> String {
+    let translated = tr(key);
     if translated == key {
         fallback.to_string()
     } else {
         translated
     }
+}
+
+/// Translates a macro-defined setting description via its derived key
+/// `settings.desc.<SettingName>`, falling back to the English literal baked
+/// into the settings macro when no translation exists.
+pub fn setting_description(setting_name: &str, fallback: &str) -> String {
+    tr_or(&format!("settings.desc.{setting_name}"), fallback)
 }
 
 #[cfg(test)]
