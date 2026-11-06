@@ -48,6 +48,13 @@ pub fn detect_system_language() -> Language {
     }
 }
 
+/// Translates a dynamic (runtime-computed) key. Used by crates that cannot embed a
+/// literal key in the compile-time `t!` macro, such as search filters whose key
+/// derives from an enum variant.
+pub fn tr(key: &str) -> String {
+    t!(key).into_owned()
+}
+
 /// Translates a macro-defined setting description via its derived key
 /// `settings.desc.<SettingName>`, falling back to the English literal baked
 /// into the settings macro when no translation exists.

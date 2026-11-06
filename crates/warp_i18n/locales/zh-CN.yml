@@ -432,6 +432,33 @@ search:
   mcp_servers: "搜索 MCP 服务器"
   models: "搜索模型"
   rules: "搜索规则"
+  filter:
+    history: "搜索历史"
+    workflows: "搜索工作流"
+    agent_mode_workflows: "搜索提示词"
+    notebooks: "搜索笔记本"
+    plans: "搜索计划"
+    natural_language: "例如：在文件中替换字符串"
+    actions: "搜索操作"
+    sessions: "搜索会话"
+    tabs: "搜索标签页"
+    conversations: "搜索对话"
+    launch_configurations: "搜索启动配置"
+    drive: "搜索 Drive 中的对象"
+    environment_variables: "搜索环境变量"
+    prompt_history: "搜索提示词历史"
+    files: "搜索文件"
+    commands: "搜索命令"
+    blocks: "搜索 Block"
+    code: "搜索代码符号"
+    rules: "搜索 AI 规则"
+    repos: "搜索代码仓库"
+    diff_sets: "搜索 diff 集"
+    static_slash_commands: "搜索静态斜杠命令"
+    skills: "搜索技能"
+    base_models: "搜索基础模型"
+    full_terminal_use_models: "搜索全终端使用模型"
+    current_directory_conversations: "搜索当前目录中的对话"
 workspace:
   new_session: "新会话"
   warp_agent: "Warp 智能体"
@@ -444,6 +471,7 @@ workspace:
   global_search_title: "全局搜索"
   global_search_subtitle: "在你当前的目录中搜索文件。"
   global_search_unavailable_title: "全局搜索不可用"
+
 
 
 

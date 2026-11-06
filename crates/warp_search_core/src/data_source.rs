@@ -232,36 +232,39 @@ impl QueryFilter {
     }
 
     /// Returns placeholder text to be shown in an empty input when the filter is active.
-    pub fn placeholder_text(&self) -> &'static str {
+    pub fn placeholder_text(&self) -> String {
+        warp_i18n::tr(&format!("search.filter.{}", self.slug()))
+    }
+
+    /// Stable, translation-key-safe identifier for this filter.
+    fn slug(&self) -> &'static str {
         match self {
-            QueryFilter::History => "Search history",
-            QueryFilter::Workflows => "Search workflows",
-            QueryFilter::AgentModeWorkflows => "Search prompts",
-            QueryFilter::Notebooks => "Search notebooks",
-            QueryFilter::Plans => "Search plans",
-            QueryFilter::NaturalLanguage => "e.g. replace string in file",
-            QueryFilter::Actions => "Search actions",
-            QueryFilter::Sessions => "Search sessions",
-            QueryFilter::Tabs => "Search tabs",
-            QueryFilter::Conversations => "Search conversations",
-            QueryFilter::LaunchConfigurations => "Search launch configurations",
-            QueryFilter::Drive => "Search objects in drive",
-            QueryFilter::EnvironmentVariables => "Search environment variables",
-            QueryFilter::PromptHistory => "Search prompt history",
-            QueryFilter::Files => "Search files",
-            QueryFilter::Commands => "Search commands",
-            QueryFilter::Blocks => "Search blocks",
-            QueryFilter::Code => "Search code symbols",
-            QueryFilter::Rules => "Search AI rules",
-            QueryFilter::Repos => "Search code repos",
-            QueryFilter::DiffSets => "Search diff sets",
-            QueryFilter::StaticSlashCommands => "Search static slash commands",
-            QueryFilter::Skills => "Search skills",
-            QueryFilter::BaseModels => "Search base models",
-            QueryFilter::FullTerminalUseModels => "Search full terminal use models",
-            QueryFilter::CurrentDirectoryConversations => {
-                "Search conversations in current directory"
-            }
+            QueryFilter::History => "history",
+            QueryFilter::Workflows => "workflows",
+            QueryFilter::AgentModeWorkflows => "agent_mode_workflows",
+            QueryFilter::Notebooks => "notebooks",
+            QueryFilter::Plans => "plans",
+            QueryFilter::NaturalLanguage => "natural_language",
+            QueryFilter::Actions => "actions",
+            QueryFilter::Sessions => "sessions",
+            QueryFilter::Tabs => "tabs",
+            QueryFilter::Conversations => "conversations",
+            QueryFilter::LaunchConfigurations => "launch_configurations",
+            QueryFilter::Drive => "drive",
+            QueryFilter::EnvironmentVariables => "environment_variables",
+            QueryFilter::PromptHistory => "prompt_history",
+            QueryFilter::Files => "files",
+            QueryFilter::Commands => "commands",
+            QueryFilter::Blocks => "blocks",
+            QueryFilter::Code => "code",
+            QueryFilter::Rules => "rules",
+            QueryFilter::Repos => "repos",
+            QueryFilter::DiffSets => "diff_sets",
+            QueryFilter::StaticSlashCommands => "static_slash_commands",
+            QueryFilter::Skills => "skills",
+            QueryFilter::BaseModels => "base_models",
+            QueryFilter::FullTerminalUseModels => "full_terminal_use_models",
+            QueryFilter::CurrentDirectoryConversations => "current_directory_conversations",
         }
     }
 

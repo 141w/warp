@@ -433,6 +433,33 @@ search:
   mcp_servers: "Search MCP Servers"
   models: "Search models"
   rules: "Search rules"
+  filter:
+    history: "Search history"
+    workflows: "Search workflows"
+    agent_mode_workflows: "Search prompts"
+    notebooks: "Search notebooks"
+    plans: "Search plans"
+    natural_language: "e.g. replace string in file"
+    actions: "Search actions"
+    sessions: "Search sessions"
+    tabs: "Search tabs"
+    conversations: "Search conversations"
+    launch_configurations: "Search launch configurations"
+    drive: "Search objects in drive"
+    environment_variables: "Search environment variables"
+    prompt_history: "Search prompt history"
+    files: "Search files"
+    commands: "Search commands"
+    blocks: "Search blocks"
+    code: "Search code symbols"
+    rules: "Search AI rules"
+    repos: "Search code repos"
+    diff_sets: "Search diff sets"
+    static_slash_commands: "Search static slash commands"
+    skills: "Search skills"
+    base_models: "Search base models"
+    full_terminal_use_models: "Search full terminal use models"
+    current_directory_conversations: "Search conversations in current directory"
 workspace:
   new_session: "New session"
   warp_agent: "Warp Agent"
@@ -445,6 +472,7 @@ workspace:
   global_search_title: "Global search"
   global_search_subtitle: "Search in files across your current directories."
   global_search_unavailable_title: "Global search unavailable"
+
 
 
 
