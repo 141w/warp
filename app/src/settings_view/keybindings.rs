@@ -279,12 +279,16 @@ impl KeybindingRow {
                 keyshortcut.build().finish()
             }
         };
+        // `name` is the stable binding id (also the persistence key), so it is
+        // safe to derive the translation key from it. The English display name is
+        // the fallback, which keeps untranslated commands readable.
+        let command_name = warp_i18n::tr_or(
+            &format!("bindings.{}", binding.name),
+            binding.description.in_context(DescriptionContext::Default),
+        );
+
         let element = render_columns(
-            render_text(
-                binding.description.in_context(DescriptionContext::Default),
-                None,
-                appearance,
-            ),
+            render_text(&command_name, None, appearance),
             keystroke,
             0.7,
             background,

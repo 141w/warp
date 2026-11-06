@@ -75,11 +75,18 @@ impl MatchedBinding {
         item_highlight_state: ItemHighlightState,
         appearance: &Appearance,
     ) -> Box<dyn Element> {
-        Text::new_inline(
+        // `name` is the stable binding id (also the persistence key), so it is
+        // safe to derive the translation key from it. The English display name is
+        // the fallback, which keeps untranslated commands readable.
+        let command_name = warp_i18n::tr_or(
+            &format!("bindings.{}", self.binding.name),
             self.binding
                 .description
-                .in_context(DescriptionContext::Default)
-                .to_owned(),
+                .in_context(DescriptionContext::Default),
+        );
+
+        Text::new_inline(
+            command_name,
             appearance.ui_font_family(),
             appearance.monospace_font_size(),
         )
