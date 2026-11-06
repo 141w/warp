@@ -11,7 +11,7 @@ use warpui_core::elements::{
 use warpui_core::fonts::Weight;
 use warpui_core::text_layout::TextAlignment;
 
-/// Content for a "you'll lose these features" opt-out confirmation dialog.
+/// Content for a warp_i18n::tr("onboarding.optout.lose_features") opt-out confirmation dialog.
 pub struct FeatureOptOutDialog {
     pub title: &'static str,
     pub body: &'static str,

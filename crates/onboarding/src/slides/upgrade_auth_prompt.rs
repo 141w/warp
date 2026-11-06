@@ -44,7 +44,7 @@ pub(super) fn render_upgrade_auth_prompt_bar(
 
     let copy_url_link = ui_builder
         .link(
-            "copy the URL".into(),
+            warp_i18n::tr("onboarding.auth.copy_url").into(),
             None,
             Some(on_copy_url),
             copy_url_mouse_state,
@@ -56,7 +56,7 @@ pub(super) fn render_upgrade_auth_prompt_bar(
 
     let paste_token_link = ui_builder
         .link(
-            "Click here".into(),
+            warp_i18n::tr("onboarding.auth.click_here").into(),
             None,
             Some(on_paste_token),
             paste_token_mouse_state,
@@ -72,7 +72,7 @@ pub(super) fn render_upgrade_auth_prompt_bar(
         .with_child(
             Container::new(
                 ui_builder
-                    .span("If your browser hasn't launched, ")
+                    .span(warp_i18n::tr("onboarding.auth.no_browser"))
                     .with_style(text_styles)
                     .build()
                     .finish(),
@@ -83,7 +83,7 @@ pub(super) fn render_upgrade_auth_prompt_bar(
         .with_child(copy_url_link)
         .with_child(
             ui_builder
-                .span(" and open the page manually. ")
+                .span(warp_i18n::tr("onboarding.auth.open_manually"))
                 .with_style(text_styles)
                 .build()
                 .finish(),
@@ -91,7 +91,7 @@ pub(super) fn render_upgrade_auth_prompt_bar(
         .with_child(paste_token_link)
         .with_child(
             ui_builder
-                .span(" to paste your token from the browser.")
+                .span(warp_i18n::tr("onboarding.auth.paste_token"))
                 .with_style(text_styles)
                 .build()
                 .finish(),

@@ -61,27 +61,36 @@ fn offer_slide_can_render_before_classification() {
 fn head_start_copy_and_telemetry_names_match_spec() {
     let variant = OfferVariant::HeadStart;
 
-    assert_eq!(variant.title(), "You've got a head start");
+    assert_eq!(
+        variant.title(),
+        warp_i18n::tr("onboarding.offer.head_start")
+    );
     assert_eq!(
         variant.subtitle(),
-        Some("Your account includes AI usage to help you get started.")
+        Some(warp_i18n::tr("onboarding.offer.account_includes"))
     );
-    assert_eq!(variant.primary_label(), "Unlock the full AI experience");
+    assert_eq!(
+        variant.primary_label(),
+        warp_i18n::tr("onboarding.offer.unlock")
+    );
     assert_eq!(
         variant.primary_description(),
-        "Get more monthly usage, expanded cloud agent access, and collaboration features."
+        warp_i18n::tr("onboarding.offer.more_usage")
     );
-    assert_eq!(variant.secondary_label(), "Start with included AI");
+    assert_eq!(
+        variant.secondary_label(),
+        warp_i18n::tr("onboarding.offer.start_included")
+    );
     assert_eq!(
         variant.secondary_description(),
-        "Explore with the AI usage included with your account and upgrade to add more anytime."
+        warp_i18n::tr("onboarding.offer.explore_included")
     );
     assert_eq!(
         variant.included_features(),
-        &[
-            "Limited monthly AI usage for occasional tasks",
-            "Access to premium and open-source models",
-            "Use the Warp Agent locally and in the cloud",
+        vec![
+            warp_i18n::tr("onboarding.offer.limited_usage"),
+            warp_i18n::tr("onboarding.offer.premium_models"),
+            warp_i18n::tr("onboarding.offer.agent_local_cloud"),
         ]
     );
     assert_eq!(variant.slide_name(), "head_start");
@@ -93,20 +102,26 @@ fn head_start_copy_and_telemetry_names_match_spec() {
 fn choose_how_to_start_copy_and_telemetry_names_match_spec() {
     let variant = OfferVariant::ChooseHowToStart;
 
-    assert_eq!(variant.title(), "Choose how to start");
+    assert_eq!(variant.title(), warp_i18n::tr("onboarding.offer.choose"));
     assert_eq!(
         variant.subtitle(),
-        Some("To use AI, start with a plan or one-time credit packs.")
+        Some(warp_i18n::tr("onboarding.offer.need_plan"))
     );
-    assert_eq!(variant.primary_label(), "Use Warp with AI");
+    assert_eq!(
+        variant.primary_label(),
+        warp_i18n::tr("onboarding.offer.use_warp_ai")
+    );
     assert_eq!(
         variant.primary_description(),
-        "Warp Agent works locally or in the cloud with frontier and OSS models. Proactively fix terminal errors, implement changes, and ship verified code."
+        warp_i18n::tr("onboarding.offer.agent_desc")
     );
-    assert_eq!(variant.secondary_label(), "Set up AI later");
+    assert_eq!(
+        variant.secondary_label(),
+        warp_i18n::tr("onboarding.offer.setup_later")
+    );
     assert_eq!(
         variant.secondary_description(),
-        "Explore the terminal, bring your own inference, or use another CLI agent. Add AI usage and features anytime."
+        warp_i18n::tr("onboarding.offer.explore_terminal")
     );
     assert!(variant.included_features().is_empty());
     assert_eq!(variant.slide_name(), "choose_how_to_start");
@@ -124,7 +139,7 @@ fn promotion_replaces_recommended_on_both_offer_variants() {
     );
     assert_eq!(
         OfferVariant::ChooseHowToStart.primary_badge_label(None),
-        "Recommended"
+        warp_i18n::tr("onboarding.offer.recommended")
     );
     assert_eq!(
         OfferVariant::HeadStart.primary_badge_label(promotion),
@@ -132,7 +147,7 @@ fn promotion_replaces_recommended_on_both_offer_variants() {
     );
     assert_eq!(
         OfferVariant::HeadStart.primary_badge_label(None),
-        "Recommended"
+        warp_i18n::tr("onboarding.offer.recommended")
     );
 }
 

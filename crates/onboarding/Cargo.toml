@@ -33,6 +33,7 @@ warp_core = { workspace = true }
 warp_errors.workspace = true
 warpui.workspace = true
 warpui_core.workspace = true
+warp_i18n.workspace = true
 warp_logging.workspace = true
 
 [dev-dependencies]

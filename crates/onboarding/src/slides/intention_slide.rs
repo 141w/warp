@@ -81,7 +81,7 @@ impl IntentionSlide {
 
         let title = appearance
             .ui_builder()
-            .paragraph("Welcome to Warp")
+            .paragraph(warp_i18n::tr("onboarding.intention.welcome"))
             .with_style(UiComponentStyles {
                 font_size: Some(36.),
                 font_weight: Some(Weight::Medium),
@@ -91,7 +91,7 @@ impl IntentionSlide {
             .finish();
 
         let subtitle = FormattedTextElement::from_str(
-            "How do you want to work?",
+            warp_i18n::tr("onboarding.intention.question"),
             appearance.ui_font_family(),
             16.,
         )
@@ -200,7 +200,7 @@ impl IntentionSlide {
         let header_row = {
             let label = appearance
                 .ui_builder()
-                .paragraph("Build faster with agents")
+                .paragraph(warp_i18n::tr("onboarding.intention.agents_title"))
                 .with_style(UiComponentStyles {
                     font_size: Some(16.),
                     font_weight: Some(Weight::Semibold),
@@ -238,7 +238,7 @@ impl IntentionSlide {
         };
 
         let description = FormattedTextElement::from_str(
-            "Get AI features to accelerate terminal and agent-driven workflows:",
+            warp_i18n::tr("onboarding.intention.agents_body"),
             appearance.ui_font_family(),
             14.,
         )
@@ -319,7 +319,7 @@ impl IntentionSlide {
 
         let label = appearance
             .ui_builder()
-            .paragraph("Just use the terminal")
+            .paragraph(warp_i18n::tr("onboarding.intention.terminal_only"))
             .with_style(UiComponentStyles {
                 font_size: Some(16.),
                 font_weight: Some(Weight::Semibold),
@@ -332,7 +332,7 @@ impl IntentionSlide {
         let badge = {
             let badge_text = appearance
                 .ui_builder()
-                .paragraph("No AI features")
+                .paragraph(warp_i18n::tr("onboarding.intention.no_ai_title"))
                 .with_style(UiComponentStyles {
                     font_size: Some(12.),
                     font_weight: Some(Weight::Semibold),
@@ -358,7 +358,7 @@ impl IntentionSlide {
             .finish();
 
         let description = FormattedTextElement::from_str(
-            "A modern terminal optimized for speed, context, and control without AI.",
+            warp_i18n::tr("onboarding.intention.no_ai_body"),
             appearance.ui_font_family(),
             14.,
         )
@@ -386,7 +386,7 @@ impl IntentionSlide {
         let back_button = self.back_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Back".into()),
+                content: button::Content::Label(warp_i18n::tr("onboarding.intention.back").into()),
                 theme: &button::themes::Naked,
                 options: button::Options {
                     on_click: Some(Box::new(|ctx, _app, _pos| {
@@ -401,7 +401,7 @@ impl IntentionSlide {
         let next_button = self.next_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Next".into()),
+                content: button::Content::Label(warp_i18n::tr("onboarding.intention.next").into()),
                 theme: &button::themes::Primary,
                 options: button::Options {
                     keystroke: Some(enter),
@@ -480,7 +480,7 @@ impl IntentionSlide {
     fn next(&mut self, ctx: &mut ViewContext<Self>) {
         self.onboarding_state.update(ctx, |model, ctx| {
             match model.intention() {
-                // "Just use the terminal" confirms leaving AI behind before advancing.
+                // warp_i18n::tr("onboarding.intention.terminal_only") confirms leaving AI behind before advancing.
                 OnboardingIntention::Terminal => {
                     model.request_no_ai_confirmation(NoAiConfirmationSource::Intention, ctx);
                 }

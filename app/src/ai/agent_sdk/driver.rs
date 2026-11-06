@@ -88,6 +88,7 @@ use crate::server::server_api::harness_support::{
 };
 use crate::server::server_api::managed_secrets::AppManagedSecretManager as ManagedSecretManager;
 use crate::server::team_scope::RequestTeamScope;
+use crate::settings::AISettings;
 use crate::terminal::ShellLaunchData;
 use crate::terminal::cli_agent_sessions::plugin_manager::{
     CliAgentPluginManager, PluginInstallError, plugin_manager_for_with_shell,
@@ -1389,6 +1390,21 @@ impl From<PrepareEnvironmentError> for AgentDriverError {
     }
 }
 
+impl AgentDriverOptions {
+    /// Whether this run executes entirely on-device: the pi harness with no server-backed
+    /// feature (task, execution, sharing, resume, cloud providers) attached. Structural
+    /// only — the caller combines it with the user's opt-in setting and auth state to
+    /// decide whether login may be skipped.
+    fn is_local_pi_only(&self) -> bool {
+        self.selected_harness == Harness::Pi
+            && self.task_id.is_none()
+            && self.execution_id.is_none()
+            && !self.should_share
+            && self.resume.is_none()
+            && self.cloud_providers.is_empty()
+    }
+}
+
 impl AgentDriver {
     fn idle_timeout_sender<T: Send + 'static>(
         &self,
@@ -1422,7 +1438,11 @@ impl AgentDriver {
     ) -> Result<ModelHandle<Self>, AgentDriverError> {
         // If we're not logged in, the root view will go to an auth screen, and all subsequent steps will fail.
         // This should be impossible, since we enforce login before reaching this point.
-        if !AuthStateProvider::as_ref(ctx).get().is_logged_in() {
+        // The one exception is a local pi-only run: it executes on-device, and the CLI gate
+        // already verified the user's opt-in before dispatch.
+        if !(AuthStateProvider::as_ref(ctx).get().is_logged_in()
+            || (options.is_local_pi_only() && AISettings::as_ref(ctx).is_local_pi_only_enabled()))
+        {
             return Err(AgentDriverError::NotLoggedIn);
         }
         let (terminal_inputs, config) = split_run_options(options)?;

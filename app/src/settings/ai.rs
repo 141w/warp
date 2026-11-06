@@ -1232,6 +1232,20 @@ define_settings_group!(AISettings, settings: [
         toml_path: "agents.warp_agent.is_any_ai_enabled",
         description: "Controls whether all AI features are enabled.",
     },
+    // Opt-in for account-free agent runs. With this on, `agent run --harness pi` executes
+    // entirely on-device — the pi harness is a local process with its own provider
+    // credentials — and skips the login requirement. Every server-backed run (the Oz loop,
+    // tasks, sharing, cloud environments, saved prompts) still requires an account.
+    local_pi_only_enabled: LocalPiOnlyEnabled {
+        type: bool,
+        default: false,
+        supported_platforms: SupportedPlatforms::ALL,
+        sync_to_cloud: SyncToCloud::Never,
+        surface: settings::SettingSurfaces::GUI,
+        private: false,
+        toml_path: "agents.warp_agent.local_pi_only_enabled",
+        description: "Allow local pi-harness agent runs without a Warp account.",
+    },
     // This field should not be referenced directly to lookup active AI enablement -- use the
     // `is_active_ai_enabled()` getter.
     is_active_ai_enabled_internal: IsActiveAIEnabled {
@@ -2283,6 +2297,13 @@ impl AISettings {
         *self.is_any_ai_enabled
             && !is_anonymous_or_logged_out
             && !self.is_ai_disabled_due_to_remote_session_org_policy(app)
+    }
+
+    /// Whether local pi-harness agent runs may execute without an account. Independent of
+    /// auth state by design: the exemption exists precisely for logged-out users, while the
+    /// run path separately enforces the pi-only, no-server conditions.
+    pub fn is_local_pi_only_enabled(&self) -> bool {
+        *self.local_pi_only_enabled
     }
 
     /// Returns whether conversation history is available for the current

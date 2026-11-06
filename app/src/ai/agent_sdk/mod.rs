@@ -85,6 +85,7 @@ use crate::server::server_api::ai::{
 use crate::server::server_api::managed_secrets::AppManagedSecretManager as ManagedSecretManager;
 use crate::server::server_api::{ServerApi, ServerApiProvider};
 use crate::server::team_scope::RequestTeamScope;
+use crate::settings::AISettings;
 use crate::terminal::view::ConversationRestorationInNewPaneType;
 use crate::workflows::workflow::Workflow;
 #[cfg(not(target_family = "wasm"))]
@@ -928,6 +929,19 @@ impl AgentDriverRunner {
             let execution_config = execution_data.as_ref().map(|data| &data.config);
             let has_execution_config = execution_config.is_some();
 
+            // The local pi-only exemption skips every warp-server setup step: without an
+            // account the Warp Drive sync would block for its full timeout, team-scope
+            // resolution can fail on stale workspace state, and task creation would be
+            // rejected. The CLI gate already verified the opt-in before dispatch.
+            let args_for_exemption = args.clone();
+            let local_pi_only_exempt = foreground
+                .spawn(move |_, ctx| {
+                    !AuthStateProvider::as_ref(ctx).get().is_logged_in()
+                        && agent_run_is_local_pi_only(&args_for_exemption)
+                        && AISettings::as_ref(ctx).is_local_pi_only_enabled()
+                })
+                .await?;
+
             // Ensure we've synced team state before starting the driver.
             setup_events
                 .record_result(
@@ -935,7 +949,9 @@ impl AgentDriverRunner {
                     Self::refresh_team_metadata(&foreground, args.task_id.is_some()),
                 )
                 .await?;
-            let agent_driver_team_scope = if let Some(config) = execution_config {
+            let agent_driver_team_scope = if local_pi_only_exempt {
+                None
+            } else if let Some(config) = execution_config {
                 Some(execution_config::team_scope(config.team_id.as_ref())
                     .map_err(AgentDriverError::ConfigBuildFailed)?)
             } else {
@@ -949,19 +965,21 @@ impl AgentDriverRunner {
             // Wait for Warp Drive to sync before building the task config, since
             // prompt resolution (SavedPrompt -> workflow lookup) and environment
             // resolution (CloudAmbientAgentEnvironment lookup) depend on it.
-            setup_events
-                .record_result(SetupStep::WarpDriveSync, async {
-                    if foreground
-                        .spawn(|_, ctx| common::refresh_warp_drive(ctx))
-                        .await?
-                        .await
-                        .is_err()
-                    {
-                        return Err(AgentDriverError::WarpDriveSyncFailed);
-                    }
-                    Ok(())
-                })
-                .await?;
+            if !local_pi_only_exempt {
+                setup_events
+                    .record_result(SetupStep::WarpDriveSync, async {
+                        if foreground
+                            .spawn(|_, ctx| common::refresh_warp_drive(ctx))
+                            .await?
+                            .await
+                            .is_err()
+                        {
+                            return Err(AgentDriverError::WarpDriveSyncFailed);
+                        }
+                        Ok(())
+                    })
+                    .await?;
+            }
 
             // Pull relevant variables out of args before moving it into the closure.
             let share_requests = match execution_config {
@@ -1000,6 +1018,7 @@ impl AgentDriverRunner {
                     &server_api,
                     &setup_events,
                     execution_data,
+                    local_pi_only_exempt,
                 )
                 .await?;
 
@@ -1403,6 +1422,7 @@ impl AgentDriverRunner {
         server_api: &Arc<dyn AIClient>,
         setup_events: &SetupClientEventReporter,
         execution_data: Option<ExecutionTaskData>,
+        local_pi_only_exempt: bool,
     ) -> Result<(AgentDriverOptions, Task, Option<String>), AgentDriverError> {
         // Get the working directory
         let working_dir = match args.cwd.as_ref() {
@@ -1601,6 +1621,10 @@ impl AgentDriverRunner {
                     ),
                 )
                 .await?
+        } else if local_pi_only_exempt {
+            // No server task is created on the exemption path; `driver_options.task_id` stays
+            // `None` and every server-reported step no-ops.
+            (None, Vec::new())
         } else {
             // Extract the prompt text that we'll pass up to the server when we create the task.
             let prompt_for_task_creation = match &prompt {
@@ -2152,6 +2176,36 @@ fn command_authentication(
     }
 }
 
+/// A run that touches no warp-server surface: the pi harness executes as a local
+/// process with its own provider credentials, and no server-backed feature (task,
+/// execution, cloud environment, conversation resume, sharing, saved prompt) is requested.
+/// Sandboxed and GUI runs are excluded — the sandbox control plane and the GUI root view
+/// both assume an account.
+pub(crate) fn agent_run_is_local_pi_only(args: &RunAgentArgs) -> bool {
+    args.harness == Harness::Pi
+        && args.task_id.is_none()
+        && args.execution_id.is_none()
+        && args.environment.is_none()
+        && args.conversation.is_none()
+        && !args.share.is_shared()
+        && args.prompt_arg.saved_prompt.is_none()
+        && !args.sandboxed
+        && !args.gui
+}
+
+/// Whether `command` may run without authenticating: a local pi-only `agent run` while
+/// logged out, with `agents.warp_agent.local_pi_only_enabled` set. Logged-in users and
+/// every server-backed run keep authenticating exactly as before.
+fn command_skips_auth(command: &CliCommand, ctx: &AppContext) -> bool {
+    if AuthStateProvider::as_ref(ctx).get().is_logged_in() {
+        return false;
+    }
+    let CliCommand::Agent(AgentCommand::Run(args)) = command else {
+        return false;
+    };
+    agent_run_is_local_pi_only(args) && AISettings::as_ref(ctx).is_local_pi_only_enabled()
+}
+
 /// Returns `true` if the given CLI command requires authentication.
 fn command_requires_auth(command: &CliCommand) -> bool {
     match command {
@@ -2220,7 +2274,10 @@ fn launch_command(
     let parent_span = tracing::Span::current();
     let requires_auth = command_requires_auth(&command);
 
-    if !requires_auth {
+    // A logged-out local pi-only run has nothing to authenticate against: the pi harness
+    // executes on-device with its own provider credentials and the opt-in setting stands in
+    // for an account. Every other command keeps its existing auth requirement.
+    if !requires_auth || command_skips_auth(&command, ctx) {
         return dispatch_command(ctx, command, global_options);
     }
 

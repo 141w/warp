@@ -16,6 +16,7 @@ use mockito::Matcher;
 use repo_metadata::{DirectoryWatcher, RepoMetadataEvent, RepoMetadataModel, RepositoryIdentifier};
 use serde_json::json;
 use session_sharing_protocol::common::{AgentAttachment, ParticipantId};
+use settings::Setting;
 use tempfile::TempDir;
 use warp_cli::agent::{Harness, HarnessTransport};
 use warp_cli::skill::SkillSpec;
@@ -24,6 +25,7 @@ use warp_cli::{
     SESSION_SHARING_SERVER_URL_OVERRIDE_ENV, WS_SERVER_URL_OVERRIDE_ENV,
 };
 use warp_core::channel::ChannelState;
+use warp_core::features::FeatureFlag;
 use warp_graphql::ai::AgentTaskState;
 use warp_graphql::platform_error::PlatformErrorMessageFormat;
 use warp_managed_secrets::ManagedSecretValue;
@@ -63,6 +65,8 @@ use crate::ai::blocklist::{
 use crate::ai::cloud_environments::{GithubRepo, SourceRepo};
 use crate::ai::llms::LLMId;
 use crate::ai::skills::SkillManager;
+use crate::auth::AuthStateProvider;
+use crate::settings::AISettings;
 use crate::test_util::assert_eventually;
 use crate::test_util::terminal::{add_window_with_terminal, initialize_app_for_terminal_view};
 use crate::workspace::view::tests::initialize_app as initialize_workspace_test_app;
@@ -116,6 +120,96 @@ fn driver_keeps_uninterpreted_factory_experiments() {
         driver.read(&app, |driver, _| {
             assert_eq!(driver.experimental, Some(experimental));
         });
+    });
+}
+
+fn log_out_test_app(app: &mut App) {
+    app.update(|ctx| {
+        let auth_state = AuthStateProvider::as_ref(ctx).get();
+        auth_state.set_user(None);
+        auth_state.set_credentials(None);
+    });
+}
+
+fn set_local_pi_only_opt_in(app: &mut App) {
+    AISettings::handle(app).update(app, |settings, ctx| {
+        settings
+            .local_pi_only_enabled
+            .set_value(true, ctx)
+            .expect("enable local pi-only runs");
+    });
+}
+
+#[test]
+fn local_pi_only_options_require_pi_harness_and_no_server_features() {
+    let mut options = crate::ai::agent_sdk::tests::agent_driver_options();
+    assert!(!options.is_local_pi_only());
+
+    options.selected_harness = Harness::Pi;
+    assert!(options.is_local_pi_only());
+
+    options.task_id = Some("00000000-0000-0000-0000-000000000001".parse().unwrap());
+    assert!(!options.is_local_pi_only());
+
+    let mut options = crate::ai::agent_sdk::tests::agent_driver_options();
+    options.selected_harness = Harness::Pi;
+    options.execution_id = Some("execution-1".to_string());
+    assert!(!options.is_local_pi_only());
+
+    let mut options = crate::ai::agent_sdk::tests::agent_driver_options();
+    options.selected_harness = Harness::Pi;
+    options.should_share = true;
+    assert!(!options.is_local_pi_only());
+}
+
+#[test]
+fn logged_out_local_pi_run_creates_driver_with_opt_in() {
+    // The loginless workspace configuration a local pi-only run relies on: with
+    // SkipFirebaseAnonymousUser a logged-out root view opens the workspace directly, and
+    // AgentOnboarding off keeps a profile that never finished the onboarding slides from
+    // diverting to the onboarding view. Both flags ship on by default; this pins the
+    // combination for the run to reach terminal creation while logged out.
+    let _skip_anon_guard = FeatureFlag::SkipFirebaseAnonymousUser.override_enabled(true);
+    let _agent_onboarding_guard = FeatureFlag::AgentOnboarding.override_enabled(false);
+
+    App::test((), |mut app| async move {
+        initialize_workspace_test_app(&mut app);
+        log_out_test_app(&mut app);
+        set_local_pi_only_opt_in(&mut app);
+
+        let mut options = crate::ai::agent_sdk::tests::agent_driver_options();
+        options.selected_harness = Harness::Pi;
+        app.update(|ctx| AgentDriver::create(options, ctx).unwrap());
+    });
+}
+
+#[test]
+fn logged_out_oz_run_still_requires_login() {
+    App::test((), |mut app| async move {
+        initialize_workspace_test_app(&mut app);
+        log_out_test_app(&mut app);
+        set_local_pi_only_opt_in(&mut app);
+
+        let options = crate::ai::agent_sdk::tests::agent_driver_options();
+        let error = app
+            .update(|ctx| AgentDriver::create(options, ctx))
+            .unwrap_err();
+        assert!(matches!(error, AgentDriverError::NotLoggedIn));
+    });
+}
+
+#[test]
+fn logged_out_pi_run_without_opt_in_requires_login() {
+    App::test((), |mut app| async move {
+        initialize_workspace_test_app(&mut app);
+        log_out_test_app(&mut app);
+
+        let mut options = crate::ai::agent_sdk::tests::agent_driver_options();
+        options.selected_harness = Harness::Pi;
+        let error = app
+            .update(|ctx| AgentDriver::create(options, ctx))
+            .unwrap_err();
+        assert!(matches!(error, AgentDriverError::NotLoggedIn));
     });
 }
 

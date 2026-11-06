@@ -33,65 +33,53 @@ pub enum OfferVariant {
 }
 
 impl OfferVariant {
-    pub(crate) fn title(self) -> &'static str {
+    pub(crate) fn title(self) -> String {
         match self {
-            OfferVariant::HeadStart => "You've got a head start",
-            OfferVariant::ChooseHowToStart => "Choose how to start",
+            OfferVariant::HeadStart => warp_i18n::tr("onboarding.offer.head_start"),
+            OfferVariant::ChooseHowToStart => warp_i18n::tr("onboarding.offer.choose"),
         }
     }
 
-    pub(crate) fn primary_badge_label(self, pricing_promotion_message: Option<&str>) -> &str {
+    pub(crate) fn primary_badge_label(self, pricing_promotion_message: Option<&str>) -> String {
         match self {
-            OfferVariant::HeadStart | OfferVariant::ChooseHowToStart => {
-                pricing_promotion_message.unwrap_or("Recommended")
-            }
+            OfferVariant::HeadStart | OfferVariant::ChooseHowToStart => pricing_promotion_message
+                .map(str::to_owned)
+                .unwrap_or_else(|| warp_i18n::tr("onboarding.offer.recommended")),
         }
     }
 
-    pub(crate) fn subtitle(self) -> Option<&'static str> {
+    pub(crate) fn subtitle(self) -> Option<String> {
         match self {
-            OfferVariant::HeadStart => {
-                Some("Your account includes AI usage to help you get started.")
-            }
-            OfferVariant::ChooseHowToStart => {
-                Some("To use AI, start with a plan or one-time credit packs.")
-            }
+            OfferVariant::HeadStart => Some(warp_i18n::tr("onboarding.offer.account_includes")),
+            OfferVariant::ChooseHowToStart => Some(warp_i18n::tr("onboarding.offer.need_plan")),
         }
     }
 
-    pub(crate) fn primary_label(self) -> &'static str {
+    pub(crate) fn primary_label(self) -> String {
         match self {
-            OfferVariant::HeadStart => "Unlock the full AI experience",
-            OfferVariant::ChooseHowToStart => "Use Warp with AI",
+            OfferVariant::HeadStart => warp_i18n::tr("onboarding.offer.unlock"),
+            OfferVariant::ChooseHowToStart => warp_i18n::tr("onboarding.offer.use_warp_ai"),
         }
     }
 
-    pub(crate) fn primary_description(self) -> &'static str {
+    pub(crate) fn primary_description(self) -> String {
         match self {
-            OfferVariant::HeadStart => {
-                "Get more monthly usage, expanded cloud agent access, and collaboration features."
-            }
-            OfferVariant::ChooseHowToStart => {
-                "Warp Agent works locally or in the cloud with frontier and OSS models. Proactively fix terminal errors, implement changes, and ship verified code."
-            }
+            OfferVariant::HeadStart => warp_i18n::tr("onboarding.offer.more_usage"),
+            OfferVariant::ChooseHowToStart => warp_i18n::tr("onboarding.offer.agent_desc"),
         }
     }
 
-    pub(crate) fn secondary_label(self) -> &'static str {
+    pub(crate) fn secondary_label(self) -> String {
         match self {
-            OfferVariant::HeadStart => "Start with included AI",
-            OfferVariant::ChooseHowToStart => "Set up AI later",
+            OfferVariant::HeadStart => warp_i18n::tr("onboarding.offer.start_included"),
+            OfferVariant::ChooseHowToStart => warp_i18n::tr("onboarding.offer.setup_later"),
         }
     }
 
-    pub(crate) fn secondary_description(self) -> &'static str {
+    pub(crate) fn secondary_description(self) -> String {
         match self {
-            OfferVariant::HeadStart => {
-                "Explore with the AI usage included with your account and upgrade to add more anytime."
-            }
-            OfferVariant::ChooseHowToStart => {
-                "Explore the terminal, bring your own inference, or use another CLI agent. Add AI usage and features anytime."
-            }
+            OfferVariant::HeadStart => warp_i18n::tr("onboarding.offer.explore_included"),
+            OfferVariant::ChooseHowToStart => warp_i18n::tr("onboarding.offer.explore_terminal"),
         }
     }
 
@@ -102,14 +90,14 @@ impl OfferVariant {
         matches!(self, OfferVariant::ChooseHowToStart)
     }
 
-    pub(crate) fn included_features(self) -> &'static [&'static str] {
+    pub(crate) fn included_features(self) -> Vec<String> {
         match self {
-            OfferVariant::HeadStart => &[
-                "Limited monthly AI usage for occasional tasks",
-                "Access to premium and open-source models",
-                "Use the Warp Agent locally and in the cloud",
+            OfferVariant::HeadStart => vec![
+                warp_i18n::tr("onboarding.offer.limited_usage"),
+                warp_i18n::tr("onboarding.offer.premium_models"),
+                warp_i18n::tr("onboarding.offer.agent_local_cloud"),
             ],
-            OfferVariant::ChooseHowToStart => &[],
+            OfferVariant::ChooseHowToStart => vec![],
         }
     }
 
@@ -274,7 +262,7 @@ impl OfferSlide {
                 .finish();
                 let text = appearance
                     .ui_builder()
-                    .paragraph(*feature)
+                    .paragraph(feature)
                     .with_style(UiComponentStyles {
                         font_size: Some(13.),
                         ..Default::default()
@@ -337,7 +325,7 @@ impl OfferSlide {
         let back = self.back_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Back".into()),
+                content: button::Content::Label(warp_i18n::tr("onboarding.offer.back").into()),
                 theme: &button::themes::Naked,
                 options: button::Options {
                     on_click: Some(Box::new(|ctx, _app, _pos| {
@@ -351,7 +339,9 @@ impl OfferSlide {
         let get_warping = self.get_warping_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Get Warping".into()),
+                content: button::Content::Label(
+                    warp_i18n::tr("onboarding.offer.get_warping").into(),
+                ),
                 theme: &button::themes::Primary,
                 options: button::Options {
                     keystroke: Some(enter),
@@ -374,8 +364,8 @@ impl OfferSlide {
 
     fn render_option_card(
         appearance: &Appearance,
-        label: &'static str,
-        description: &'static str,
+        label: String,
+        description: String,
         selected: bool,
         badge_label: Option<String>,
         mouse_state: MouseStateHandle,

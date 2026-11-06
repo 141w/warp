@@ -12,6 +12,7 @@ use futures::FutureExt;
 use http::StatusCode;
 use mockito::{Matcher, Server};
 use serde_json::json;
+use settings::Setting;
 use warp_cli::agent::{
     AgentCommand, Harness, HarnessTransport, OutputFormat, RepositoryForge, RepositoryHeadRef,
     RepositoryPreparationOverride, RunAgentArgs,
@@ -28,8 +29,9 @@ use warpui::{App, SingletonEntity, WindowId};
 
 use super::driver::agent_setup::configured_skills::selected_execution_skills;
 use super::{
-    AgentDriverRunner, CommandAuthentication, command_authentication, command_requires_auth,
-    command_to_telemetry_event, reconcile_task_harness, resolve_agent_driver_team_scope,
+    AgentDriverRunner, CommandAuthentication, agent_run_is_local_pi_only, command_authentication,
+    command_requires_auth, command_skips_auth, command_to_telemetry_event, reconcile_task_harness,
+    resolve_agent_driver_team_scope,
 };
 use crate::ai::agent_sdk::driver::environment::WorkspaceConfiguration;
 use crate::ai::agent_sdk::driver::harness::HarnessKind;
@@ -50,7 +52,9 @@ use crate::server::server_api::ai::{AIClient, AgentConfigSnapshot, MockAIClient}
 use crate::server::server_api::managed_secrets::AppManagedSecretManager;
 use crate::server::server_api::team::MockTeamClient;
 use crate::server::server_api::workspace::MockWorkspaceClient;
+use crate::settings::AISettings;
 use crate::settings::PrivacySettings;
+use crate::test_util::settings::initialize_settings_for_tests;
 use crate::workspaces::team::{Team, TeamVisibility};
 use crate::workspaces::team_tester::TeamTesterStatus;
 use crate::workspaces::update_manager::TeamUpdateManager;
@@ -400,6 +404,7 @@ fn deferred_capability_bootstrap_subprocess() {
             &ai_client,
             &events,
             Some(data),
+            false,
         )
         .await;
         if scenario == "missing" {
@@ -1257,6 +1262,124 @@ fn persisted_auth_is_refreshed_without_pending_api_key() {
 #[test]
 fn logged_out_command_has_no_authentication_source() {
     assert_eq!(command_authentication(None, false), None);
+}
+
+fn local_pi_run_command() -> CliCommand {
+    CliCommand::Agent(AgentCommand::Run(parse_run_agent_args(&[
+        "agent",
+        "run",
+        "--harness",
+        "pi",
+        "-p",
+        "hello",
+    ])))
+}
+
+#[test]
+fn local_pi_only_predicate_requires_pi_harness_and_no_server_features() {
+    let pi_run = || parse_run_agent_args(&["agent", "run", "--harness", "pi", "-p", "hello"]);
+    assert!(agent_run_is_local_pi_only(&pi_run()));
+
+    let mut args = pi_run();
+    args.task_id = Some(TASK_ID.to_string());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.execution_id = Some("execution-1".to_string());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.environment = Some("environment-1".to_string());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.conversation = Some("conversation-1".to_string());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.share.share = Some(Vec::new());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.prompt_arg.saved_prompt = Some("prompt-1".to_string());
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.sandboxed = true;
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    let mut args = pi_run();
+    args.gui = true;
+    assert!(!agent_run_is_local_pi_only(&args));
+
+    assert!(!agent_run_is_local_pi_only(&parse_run_agent_args(&[
+        "agent", "run", "-p", "hello"
+    ])));
+}
+
+#[test]
+fn logged_out_local_pi_run_skips_auth_only_with_opt_in() {
+    App::test((), |mut app| async move {
+        initialize_settings_for_tests(&mut app);
+        app.add_singleton_model(|_| AuthStateProvider::new_logged_out_for_test());
+        let command = local_pi_run_command();
+
+        app.read(|ctx| {
+            assert!(!command_skips_auth(&command, ctx));
+        });
+
+        AISettings::handle(&app).update(&mut app, |settings, ctx| {
+            settings
+                .local_pi_only_enabled
+                .set_value(true, ctx)
+                .expect("enable local pi-only runs");
+        });
+
+        app.read(|ctx| {
+            assert!(command_skips_auth(&command, ctx));
+        });
+    });
+}
+
+#[test]
+fn logged_in_local_pi_run_still_authenticates() {
+    App::test((), |mut app| async move {
+        initialize_settings_for_tests(&mut app);
+        app.add_singleton_model(|_| AuthStateProvider::new_for_test());
+        AISettings::handle(&app).update(&mut app, |settings, ctx| {
+            settings
+                .local_pi_only_enabled
+                .set_value(true, ctx)
+                .expect("enable local pi-only runs");
+        });
+
+        app.read(|ctx| {
+            assert!(!command_skips_auth(&local_pi_run_command(), ctx));
+        });
+    });
+}
+
+#[test]
+fn logged_out_oz_run_never_skips_auth() {
+    App::test((), |mut app| async move {
+        initialize_settings_for_tests(&mut app);
+        app.add_singleton_model(|_| AuthStateProvider::new_logged_out_for_test());
+        AISettings::handle(&app).update(&mut app, |settings, ctx| {
+            settings
+                .local_pi_only_enabled
+                .set_value(true, ctx)
+                .expect("enable local pi-only runs");
+        });
+
+        app.read(|ctx| {
+            assert!(!command_skips_auth(
+                &CliCommand::Agent(AgentCommand::Run(parse_run_agent_args(&[
+                    "agent", "run", "-p", "hello"
+                ]))),
+                ctx
+            ));
+        });
+    });
 }
 
 #[test]

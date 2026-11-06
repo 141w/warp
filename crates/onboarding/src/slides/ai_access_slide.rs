@@ -42,8 +42,8 @@ pub enum AiAccessSlideEvent {
     PasteAuthTokenFromClipboardRequested,
 }
 
-/// The "Choose how to access AI" slide (Warp Agent path). Forks between a paid
-/// subscription and a "Set up later" option that lets the user explore Warp's
+/// The warp_i18n::tr("onboarding.ai_access.choose") slide (Warp Agent path). Forks between a paid
+/// subscription and a warp_i18n::tr("onboarding.ai_access.setup_later") option that lets the user explore Warp's
 /// built-in AI before committing to a plan.
 pub struct AiAccessSlide {
     onboarding_state: ModelHandle<OnboardingStateModel>,
@@ -105,7 +105,7 @@ impl AiAccessSlide {
 
         let title = appearance
             .ui_builder()
-            .paragraph("Get AI access")
+            .paragraph(warp_i18n::tr("onboarding.ai_access.get"))
             .with_style(UiComponentStyles {
                 font_size: Some(36.),
                 font_weight: Some(Weight::Medium),
@@ -115,7 +115,7 @@ impl AiAccessSlide {
             .finish();
 
         let subtitle = FormattedTextElement::from_str(
-            "Save with a recurring plan, or explore Warp's AI before committing.",
+            warp_i18n::tr("onboarding.ai_access.save"),
             appearance.ui_font_family(),
             16.,
         )
@@ -215,7 +215,7 @@ impl AiAccessSlide {
 
         let label = appearance
             .ui_builder()
-            .paragraph("Subscription")
+            .paragraph(warp_i18n::tr("onboarding.ai_access.subscription"))
             .with_style(UiComponentStyles {
                 font_size: Some(16.),
                 font_weight: Some(Weight::Semibold),
@@ -229,7 +229,7 @@ impl AiAccessSlide {
             let green = theme.ansi_fg_green();
             let badge_text = appearance
                 .ui_builder()
-                .paragraph("Best value")
+                .paragraph(warp_i18n::tr("onboarding.ai_access.best_value"))
                 .with_style(UiComponentStyles {
                     font_size: Some(12.),
                     font_weight: Some(Weight::Normal),
@@ -298,7 +298,7 @@ impl AiAccessSlide {
 
         let label = appearance
             .ui_builder()
-            .paragraph("Set up later")
+            .paragraph(warp_i18n::tr("onboarding.ai_access.setup_later"))
             .with_style(UiComponentStyles {
                 font_size: Some(16.),
                 font_weight: Some(Weight::Semibold),
@@ -340,7 +340,7 @@ impl AiAccessSlide {
         let back_button = self.back_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Back".into()),
+                content: button::Content::Label(warp_i18n::tr("onboarding.ai_access.back").into()),
                 theme: &button::themes::Naked,
                 options: button::Options {
                     on_click: Some(Box::new(|ctx, _app, _pos| {
@@ -355,7 +355,7 @@ impl AiAccessSlide {
         let next_button = self.next_button.render(
             appearance,
             button::Params {
-                content: button::Content::Label("Next".into()),
+                content: button::Content::Label(warp_i18n::tr("onboarding.ai_access.next").into()),
                 theme: &button::themes::Primary,
                 options: button::Options {
                     keystroke: Some(enter),
@@ -449,7 +449,7 @@ impl AiAccessSlide {
         });
     }
 
-    /// Primary "Next" action. On the subscription path this advances when the
+    /// Primary warp_i18n::tr("onboarding.ai_access.next") action. On the subscription path this advances when the
     /// user already has a plan, otherwise it launches checkout in the browser
     /// (the slide auto-advances once billing flips to a paying plan). The "Set
     /// up later" path always advances.
