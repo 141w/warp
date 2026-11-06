@@ -167,4 +167,16 @@ impl Cache {
             .loaded_fallback_families
             .contains_key(family)
     }
+
+    /// Registers an already-loaded system font family as a fallback family, so
+    /// glyph lookups can find it without going through asset downloads.
+    pub(crate) fn register_loaded_fallback_family(
+        &mut self,
+        family: FontFamilyName,
+        family_id: FamilyId,
+    ) {
+        self.font_fallback_cache
+            .loaded_fallback_families
+            .insert(family, family_id);
+    }
 }

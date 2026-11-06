@@ -14,6 +14,78 @@ fn url_for_font(family_name: &str, font_file: &str) -> String {
     )
 }
 
+/// Builds a fallback family that resolves to a font already installed on the
+/// system. An empty URL list tells the font cache to load it by name rather
+/// than downloading assets.
+fn system_font_family(name: &'static str) -> ExternalFontFamily {
+    ExternalFontFamily {
+        name,
+        font_urls: Arc::new(vec![]),
+    }
+}
+
+/// The CJK face to use for each script. These fonts ship with the OS, so we
+/// resolve them by name instead of downloading Noto over the network.
+fn cjk_sc_font_name() -> &'static str {
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "macos")] {
+            "PingFang SC"
+        } else if #[cfg(target_os = "windows")] {
+            "Microsoft YaHei"
+        } else {
+            "Noto Sans CJK SC"
+        }
+    }
+}
+
+fn cjk_tc_font_name() -> &'static str {
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "macos")] {
+            "PingFang TC"
+        } else if #[cfg(target_os = "windows")] {
+            "Microsoft JhengHei"
+        } else {
+            "Noto Sans CJK TC"
+        }
+    }
+}
+
+fn cjk_hk_font_name() -> &'static str {
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "macos")] {
+            "PingFang HK"
+        } else if #[cfg(target_os = "windows")] {
+            "Microsoft JhengHei"
+        } else {
+            "Noto Sans CJK HK"
+        }
+    }
+}
+
+fn cjk_jp_font_name() -> &'static str {
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "macos")] {
+            "Hiragino Sans"
+        } else if #[cfg(target_os = "windows")] {
+            "MS Gothic"
+        } else {
+            "Noto Sans CJK JP"
+        }
+    }
+}
+
+fn cjk_kr_font_name() -> &'static str {
+    cfg_if::cfg_if! {
+        if #[cfg(target_os = "macos")] {
+            "Apple SD Gothic Neo"
+        } else if #[cfg(target_os = "windows")] {
+            "Malgun Gothic"
+        } else {
+            "Noto Sans CJK KR"
+        }
+    }
+}
+
 lazy_static! {
     static ref HACK_NERD_FONT: ExternalFontFamily = ExternalFontFamily {
         name: "Hack Nerd Font",
@@ -52,34 +124,10 @@ lazy_static! {
             url_for_font("noto-sans-devanagari", "NotoSansDevanagari-Regular.ttf"),
         ]),
     };
-    static ref NOTO_SANS_HK: ExternalFontFamily = ExternalFontFamily {
-        name: "Noto Sans HK",
-        font_urls: Arc::new(vec![
-            url_for_font("noto-sans-hk", "NotoSansHK-Bold.ttf"),
-            url_for_font("noto-sans-hk", "NotoSansHK-Regular.ttf"),
-        ]),
-    };
-    static ref NOTO_SANS_JP: ExternalFontFamily = ExternalFontFamily {
-        name: "Noto Sans JP",
-        font_urls: Arc::new(vec![
-            url_for_font("noto-sans-jp", "NotoSansJP-Bold.ttf"),
-            url_for_font("noto-sans-jp", "NotoSansJP-Regular.ttf"),
-        ]),
-    };
-    static ref NOTO_SANS_KR: ExternalFontFamily = ExternalFontFamily {
-        name: "Noto Sans KR",
-        font_urls: Arc::new(vec![
-            url_for_font("noto-sans-kr", "NotoSansKR-Bold.ttf"),
-            url_for_font("noto-sans-kr", "NotoSansKR-Regular.ttf"),
-        ]),
-    };
-    static ref NOTO_SANS_SC: ExternalFontFamily = ExternalFontFamily {
-        name: "Noto Sans SC",
-        font_urls: Arc::new(vec![
-            url_for_font("noto-sans-sc", "NotoSansSC-Bold.ttf"),
-            url_for_font("noto-sans-sc", "NotoSansSC-Regular.ttf"),
-        ]),
-    };
+    static ref CJK_HK: ExternalFontFamily = system_font_family(cjk_hk_font_name());
+    static ref CJK_JP: ExternalFontFamily = system_font_family(cjk_jp_font_name());
+    static ref CJK_KR: ExternalFontFamily = system_font_family(cjk_kr_font_name());
+    static ref CJK_SC: ExternalFontFamily = system_font_family(cjk_sc_font_name());
     static ref NOTO_SANS_SYMBOLS_2: ExternalFontFamily = ExternalFontFamily {
         name: "Noto Sans Symbols 2",
         font_urls: Arc::new(vec![url_for_font(
@@ -94,13 +142,7 @@ lazy_static! {
             url_for_font("noto-sans-symbols", "NotoSansSymbols-Regular.ttf"),
         ]),
     };
-    static ref NOTO_SANS_TC: ExternalFontFamily = ExternalFontFamily {
-        name: "Noto Sans TC",
-        font_urls: Arc::new(vec![
-            url_for_font("noto-sans-tc", "NotoSansTC-Bold.ttf"),
-            url_for_font("noto-sans-tc", "NotoSansTC-Regular.ttf"),
-        ]),
-    };
+    static ref CJK_TC: ExternalFontFamily = system_font_family(cjk_tc_font_name());
 }
 
 pub fn fallback_font_fn(ch: char) -> Option<ExternalFontFamily> {
@@ -516,7 +558,7 @@ pub fn fallback_font_fn(ch: char) -> Option<ExternalFontFamily> {
         | '\u{2C7FD}'..='\u{2D544}'
         | '\u{2F884}'..='\u{2F884}'
         | '\u{2F8B6}'..='\u{2F8B6}'
-        | '\u{30EDD}'..='\u{3106C}' => Some(NOTO_SANS_SC.clone()),
+        | '\u{30EDD}'..='\u{3106C}' => Some(CJK_SC.clone()),
         '\u{0237}'..='\u{0237}'
         | '\u{02C9}'..='\u{02C9}'
         | '\u{0302}'..='\u{0302}'
@@ -651,7 +693,7 @@ pub fn fallback_font_fn(ch: char) -> Option<ExternalFontFamily> {
         | '\u{2A664}'..='\u{2A664}'
         | '\u{2C115}'..='\u{2C115}'
         | '\u{2C7D3}'..='\u{2C7D3}'
-        | '\u{30729}'..='\u{30729}' => Some(NOTO_SANS_KR.clone()),
+        | '\u{30729}'..='\u{30729}' => Some(CJK_KR.clone()),
         '\u{200D}'..='\u{200D}'
         | '\u{20E3}'..='\u{20E3}'
         | '\u{2139}'..='\u{2139}'
@@ -1125,7 +1167,7 @@ pub fn fallback_font_fn(ch: char) -> Option<ExternalFontFamily> {
         | '\u{2F8D3}'..='\u{2F96C}'
         | '\u{2F995}'..='\u{2F995}'
         | '\u{2F9D0}'..='\u{2F9D0}'
-        | '\u{2F9DE}'..='\u{2F9F4}' => Some(NOTO_SANS_JP.clone()),
+        | '\u{2F9DE}'..='\u{2F9F4}' => Some(CJK_JP.clone()),
         '\u{20021}'..='\u{20086}'
         | '\u{20094}'..='\u{20094}'
         | '\u{200CA}'..='\u{200CB}'
@@ -1432,7 +1474,7 @@ pub fn fallback_font_fn(ch: char) -> Option<ExternalFontFamily> {
         | '\u{2F8CD}'..='\u{2F8CD}'
         | '\u{2F994}'..='\u{2F994}'
         | '\u{2F9B2}'..='\u{2F9BC}'
-        | '\u{2F9D4}'..='\u{2F9D4}' => Some(NOTO_SANS_HK.clone()),
+        | '\u{2F9D4}'..='\u{2F9D4}' => Some(CJK_HK.clone()),
         _ => None,
     }
 }

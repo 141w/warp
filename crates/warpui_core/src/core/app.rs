@@ -3798,7 +3798,93 @@ impl AppContext {
         self.update_windows();
     }
 
+    /// Resolves a fallback family that carries no asset URLs by loading the
+    /// named system font, then redraws the requesting sources. Falls through to
+    /// the platform font fallback when the system has no such font.
+    fn load_system_fallback_family_and_redraw(
+        &mut self,
+        window_id: WindowId,
+        fallback_family: ExternalFontFamily,
+        request_sources: Vec<RequestedFallbackFontSource>,
+    ) {
+        let family_id = fonts::Cache::handle(self).update(self, |cache, _| {
+            cache.get_or_load_system_font(fallback_family.name)
+        });
+
+        let Ok(family_id) = family_id else {
+            log::warn!(
+                "Unable to load system fallback font {}: {:?}",
+                fallback_family.name,
+                family_id.err()
+            );
+            return;
+        };
+
+        if !self
+            .font_cache()
+            .is_fallback_family_loaded(fallback_family.name)
+        {
+            fonts::Cache::handle(self).update(self, |cache, _| {
+                cache.register_loaded_fallback_family(fallback_family.name, family_id);
+            });
+
+            FallbackFontModel::handle(self).update(self, |model, ctx| {
+                model.loaded_fallback_font(ctx);
+            });
+        }
+
+        for source in request_sources {
+            match source {
+                RequestedFallbackFontSource::GlyphForChar(key) => {
+                    fonts::Cache::handle(self).update(self, |cache, _| {
+                        cache.remove_glyphs_by_char_entry(key);
+                    });
+                }
+                RequestedFallbackFontSource::Line(key) => {
+                    if let Some(presenter) = self.presenter(window_id) {
+                        presenter.borrow().text_layout_cache().remove_line(&key);
+                    }
+                }
+                RequestedFallbackFontSource::TextFrame(key) => {
+                    if let Some(presenter) = self.presenter(window_id) {
+                        presenter
+                            .borrow()
+                            .text_layout_cache()
+                            .remove_text_frame(&key);
+                    }
+                }
+                RequestedFallbackFontSource::UncachedText => {}
+            }
+        }
+
+        self.window_invalidations
+            .entry(window_id)
+            .or_default()
+            .redraw_requested = true;
+        self.update_windows();
+    }
+
     pub(crate) fn load_requested_fallback_families(&mut self, window_id: WindowId) {
+        let requested_fallback_families =
+            fonts::Cache::as_ref(self).take_requested_fallback_families();
+
+        // Families without asset URLs resolve to system fonts by name, so they
+        // need no asset source provider. Handle them before borrowing it.
+        let (system_families, downloadable_families): (Vec<_>, Vec<_>) =
+            requested_fallback_families.partition(|(family, _)| family.font_urls.is_empty());
+
+        for (fallback_family, request_sources) in system_families {
+            self.load_system_fallback_family_and_redraw(
+                window_id,
+                fallback_family,
+                request_sources,
+            );
+        }
+
+        if downloadable_families.is_empty() {
+            return;
+        }
+
         let Some(fallback_font_source_provider) = self.fallback_font_source_provider.as_ref()
         else {
             static ONCE: std::sync::Once = std::sync::Once::new();
@@ -3811,11 +3897,9 @@ impl AppContext {
             return;
         };
 
-        let requested_fallback_families =
-            fonts::Cache::as_ref(self).take_requested_fallback_families();
         let asset_cache = AssetCache::as_ref(self);
 
-        for (fallback_family, request_sources) in requested_fallback_families {
+        for (fallback_family, request_sources) in downloadable_families {
             let mut asset_sources = Vec::with_capacity(fallback_family.font_urls.len());
             let mut futures = Vec::with_capacity(fallback_family.font_urls.len());
             for fallback_font in fallback_family.font_urls.as_ref() {
