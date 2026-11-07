@@ -3278,3 +3278,7 @@ fn init_logging_for_unit_tests_glue() {
 #[cfg(test)]
 #[path = "lib_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "i18n_verify_tests.rs"]
+mod i18n_verify_tests;

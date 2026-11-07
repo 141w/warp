@@ -31,5 +31,9 @@ pub fn default_binding_for_command(name: &'static str) -> DefaultSlashCommandBin
 }
 
 pub fn binding_description(command: &StaticCommand) -> BindingDescription {
-    BindingDescription::new_preserve_case(format!("Slash command: {}", command.name))
+    // The command itself ("/agent") stays literal; only the prefix is translated.
+    BindingDescription::new_preserve_case(warp_i18n::t!(
+        "bindings.slash_command_prefix",
+        name = command.name
+    ))
 }
