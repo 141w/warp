@@ -286,17 +286,17 @@ impl ContextChipKind {
                 ),
             )),
             Self::Date => Some(ContextChip::builtin(
-                "Date",
+                warp_i18n::tr("chips.date"),
                 builtins::date,
                 DATE_REFRESH_CONFIG,
             )),
             Self::Time12 => Some(ContextChip::builtin(
-                "Time (12-hour format)",
+                warp_i18n::tr("chips.time_12h"),
                 builtins::time12,
                 TIME_REFRESH_CONFIG,
             )),
             Self::Time24 => Some(ContextChip::builtin(
-                "Time (24-hour format)",
+                warp_i18n::tr("chips.time_24h"),
                 builtins::time24,
                 TIME_REFRESH_CONFIG,
             )),
@@ -305,13 +305,13 @@ impl ContextChipKind {
                 None
             }
             Self::ShellGitBranch => Some(ContextChip::shell_builtin(
-                "Git Branch",
+                warp_i18n::tr("chips.git_branch"),
                 builtins::shell_git_branch(),
                 Some(builtins::shell_other_git_branches()),
                 GIT_REFRESH_CONFIG,
             )),
             Self::GitBranchStatus => Some(ContextChip::shell_builtin(
-                "Git Branch Status",
+                warp_i18n::tr("chips.git_branch_status"),
                 builtins::shell_git_branch_status(),
                 // Same branch list as ShellGitBranch, so clicking the chip
                 // opens the same branch-switcher menu.
@@ -320,7 +320,7 @@ impl ContextChipKind {
             )),
             Self::GitDiffStats => Some(
                 ContextChip::shell_builtin(
-                    "Git Diff Stats",
+                    warp_i18n::tr("chips.git_diff_stats"),
                     builtins::shell_git_line_changes(),
                     None,
                     GIT_REFRESH_CONFIG,
@@ -329,7 +329,7 @@ impl ContextChipKind {
             ),
             Self::GithubPullRequest if !FeatureFlag::GithubPrPromptChip.is_enabled() => None,
             Self::GithubPullRequest => Some(ContextChip::builtin(
-                "GitHub Pull Request",
+                warp_i18n::tr("chips.github_pull_request"),
                 |_| None,
                 RefreshConfig::OnDemandOnly,
             )),
