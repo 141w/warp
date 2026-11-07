@@ -60,14 +60,17 @@ impl PromptType {
                 if chip_result.value.is_some() && chip_result.kind.is_copyable() {
                     if let Some(chip) = chip_result.kind.to_chip() {
                         Some(
-                            MenuItemFields::new(format!("Copy {}", chip.title()))
-                                .with_on_select_action(TerminalAction::ContextMenu(
-                                    ContextMenuAction::CopyPrompt {
-                                        position,
-                                        part: PromptPart::ContextChip(chip_result.kind),
-                                    },
-                                ))
-                                .into_item(),
+                            MenuItemFields::new(warp_i18n::t!(
+                                "menu.copy_chip",
+                                name = chip.title()
+                            ))
+                            .with_on_select_action(TerminalAction::ContextMenu(
+                                ContextMenuAction::CopyPrompt {
+                                    position,
+                                    part: PromptPart::ContextChip(chip_result.kind),
+                                },
+                            ))
+                            .into_item(),
                         )
                     } else {
                         report_error!(

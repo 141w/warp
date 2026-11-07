@@ -714,11 +714,12 @@ impl<A: Action + Clone> MenuItemFields<A> {
     }
 
     pub fn toggle_pane_action(is_maximized: bool) -> Self {
-        Self::new(if is_maximized {
-            "Minimize pane"
+        let label = if is_maximized {
+            warp_i18n::tr("menu.minimize_pane")
         } else {
-            "Maximize pane"
-        })
+            warp_i18n::tr("menu.maximize_pane")
+        };
+        Self::new(label)
     }
 
     /// Creates a [`MenuItemFields`] where the `on_select_action` is of a

@@ -812,6 +812,7 @@ menu:
   menu.trash: "Trash"
   menu.upgrade_ai_usage: "Upgrade AI Usage"
   menu.use_file_picker_git: "Use file picker to select a git repository"
+  copy_chip: "Copy %{name}"
 chips:
   chips.date: "Date"
   chips.git_branch: "Git Branch"

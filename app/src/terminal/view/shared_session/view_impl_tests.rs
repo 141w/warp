@@ -81,9 +81,15 @@ fn test_prompt_context_menu_items_shared_session_viewer_no_edit_prompt() {
             // Copy prompt
             // ------------
             // Edit prompt (disabled for shared-session viewers)
-            assert_eq!(items[0].fields().unwrap().label(), "Copy prompt");
+            assert_eq!(
+                items[0].fields().unwrap().label(),
+                warp_i18n::tr("menu.copy_prompt")
+            );
             assert!(items[1].is_separator());
-            assert_eq!(items[2].fields().unwrap().label(), "Edit prompt");
+            assert_eq!(
+                items[2].fields().unwrap().label(),
+                warp_i18n::tr("menu.edit_prompt")
+            );
             assert!(items[2].fields().unwrap().is_disabled());
         });
     })

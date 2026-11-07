@@ -811,6 +811,7 @@ menu:
   menu.trash: "移到废纸篓"
   menu.upgrade_ai_usage: "升级 AI 用量"
   menu.use_file_picker_git: "使用文件选择器选择 Git 仓库"
+  copy_chip: "复制%{name}"
 chips:
   chips.date: "日期"
   chips.git_branch: "Git 分支"

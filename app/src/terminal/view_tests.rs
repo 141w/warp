@@ -5619,7 +5619,7 @@ fn test_context_menu_includes_clear_when_block_list_non_empty() {
                 .filter_map(|item| item.fields().map(|fields| fields.label()))
                 .collect();
             assert!(
-                labels.contains(&"Clear Blocks"),
+                labels.contains(&warp_i18n::tr("menu.clear_blocks").as_str()),
                 "Expected `Clear Blocks` menu item, got {labels:?}"
             );
         });
@@ -5647,7 +5647,7 @@ fn test_context_menu_omits_clear_when_block_list_empty() {
                 .filter_map(|item| item.fields().map(|fields| fields.label()))
                 .collect();
             assert!(
-                !labels.contains(&"Clear Blocks"),
+                !labels.contains(&warp_i18n::tr("menu.clear_blocks").as_str()),
                 "Did not expect `Clear Blocks` menu item when block list is empty, got {labels:?}"
             );
         });
@@ -5676,7 +5676,7 @@ fn test_context_menu_omits_clear_for_text_right_click() {
                 .filter_map(|item| item.fields().map(|fields| fields.label()))
                 .collect();
             assert!(
-                !labels.contains(&"Clear Blocks"),
+                !labels.contains(&warp_i18n::tr("menu.clear_blocks").as_str()),
                 "Did not expect `Clear Blocks` in text-selection right-click menu, got {labels:?}"
             );
         });
@@ -7053,9 +7053,15 @@ fn test_prompt_context_menu_items_for_ps1() {
             let items = view.prompt_context_menu_items(ctx);
             let len = items.len();
             assert_eq!(len, 3);
-            assert_eq!(items[0].fields().unwrap().label(), "Copy prompt");
+            assert_eq!(
+                items[0].fields().unwrap().label(),
+                warp_i18n::tr("menu.copy_prompt")
+            );
             assert!(items[1].is_separator());
-            assert_eq!(items[2].fields().unwrap().label(), "Edit prompt");
+            assert_eq!(
+                items[2].fields().unwrap().label(),
+                warp_i18n::tr("menu.edit_prompt")
+            );
             assert!(!items[2].fields().unwrap().is_disabled());
         });
     })
@@ -7109,14 +7115,20 @@ fn test_prompt_context_menu_items_for_context_chips() {
             // <context chip specific actions>
             // ------------
             // Edit prompt
-            assert_eq!(items[0].fields().unwrap().label(), "Copy prompt");
+            assert_eq!(
+                items[0].fields().unwrap().label(),
+                warp_i18n::tr("menu.copy_prompt")
+            );
             assert!(items[1].is_separator());
             assert_eq!(
                 items[2].fields().unwrap().label(),
-                "Copy Time (12-hour format)"
+                warp_i18n::t!("menu.copy_chip", name = warp_i18n::tr("chips.time_12h"))
             );
             assert!(items[3].is_separator());
-            assert_eq!(items[4].fields().unwrap().label(), "Edit prompt");
+            assert_eq!(
+                items[4].fields().unwrap().label(),
+                warp_i18n::tr("menu.edit_prompt")
+            );
             assert!(!items[4].fields().unwrap().is_disabled());
         });
     })
@@ -7153,9 +7165,15 @@ fn test_prompt_context_menu_items_for_no_context_chips() {
             // Copy prompt
             // ------------
             // Edit prompt
-            assert_eq!(items[0].fields().unwrap().label(), "Copy prompt");
+            assert_eq!(
+                items[0].fields().unwrap().label(),
+                warp_i18n::tr("menu.copy_prompt")
+            );
             assert!(items[1].is_separator());
-            assert_eq!(items[2].fields().unwrap().label(), "Edit prompt");
+            assert_eq!(
+                items[2].fields().unwrap().label(),
+                warp_i18n::tr("menu.edit_prompt")
+            );
             assert!(!items[2].fields().unwrap().is_disabled());
         });
     })
@@ -7191,8 +7209,8 @@ fn test_prompt_context_menu_items_for_agent_toolbelt_flag() {
                     .filter_map(|item| item.fields().map(|fields| fields.label()))
                     .collect::<Vec<_>>();
 
-                assert!(!labels.contains(&"Edit prompt"));
-                assert!(!labels.contains(&"Edit agent toolbelt"));
+                assert!(!labels.contains(&warp_i18n::tr("menu.edit_prompt").as_str()));
+                assert!(!labels.contains(&warp_i18n::tr("menu.edit_agent_toolbelt").as_str()));
             });
         }
 
@@ -7204,8 +7222,8 @@ fn test_prompt_context_menu_items_for_agent_toolbelt_flag() {
                     .iter()
                     .filter_map(|item| item.fields().map(|fields| fields.label()))
                     .collect::<Vec<_>>();
-                assert!(!labels.contains(&"Edit prompt"));
-                assert!(labels.contains(&"Edit agent toolbelt"));
+                assert!(!labels.contains(&warp_i18n::tr("menu.edit_prompt").as_str()));
+                assert!(labels.contains(&warp_i18n::tr("menu.edit_agent_toolbelt").as_str()));
             });
         }
     })

@@ -59,14 +59,14 @@ fn initialize_app(app: &mut App) {
 
 /// Builds a list of the standard notebook context-menu items by appending the set of split-pane
 /// items to the given state-specific ones.
-fn standard_menu_items<'a>(items: impl IntoIterator<Item = &'a str>) -> Vec<&'a str> {
+fn standard_menu_items(items: impl IntoIterator<Item = String>) -> Vec<String> {
     let mut items: Vec<_> = items.into_iter().collect();
     items.extend([
-        "----",
-        "Split pane right",
-        "Split pane left",
-        "Split pane down",
-        "Split pane up",
+        "----".to_string(),
+        warp_i18n::tr("menu.split_pane_right"),
+        warp_i18n::tr("menu.split_pane_left"),
+        warp_i18n::tr("menu.split_pane_down"),
+        warp_i18n::tr("menu.split_pane_up"),
     ]);
     items
 }
@@ -87,7 +87,7 @@ fn test_rich_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Paste"])
+                standard_menu_items([warp_i18n::tr("menu.paste")])
             );
         });
 
@@ -107,7 +107,11 @@ fn test_rich_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Cut", "Copy", "Paste"])
+                standard_menu_items([
+                    warp_i18n::tr("menu.cut"),
+                    warp_i18n::tr("menu.copy"),
+                    warp_i18n::tr("menu.paste")
+                ])
             );
         });
 
@@ -123,7 +127,7 @@ fn test_rich_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Copy"])
+                standard_menu_items([warp_i18n::tr("menu.copy")])
             );
         })
     });
@@ -145,7 +149,7 @@ fn test_plain_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Paste"]),
+                standard_menu_items([warp_i18n::tr("menu.paste")]),
             );
         });
 
@@ -163,7 +167,11 @@ fn test_plain_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Cut", "Copy", "Paste"]),
+                standard_menu_items([
+                    warp_i18n::tr("menu.cut"),
+                    warp_i18n::tr("menu.copy"),
+                    warp_i18n::tr("menu.paste")
+                ]),
             );
         });
 
@@ -179,7 +187,7 @@ fn test_plain_text_actions() {
             notebook.context_menu().show_context_menu(source, ctx);
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
-                standard_menu_items(["Copy"])
+                standard_menu_items([warp_i18n::tr("menu.copy")])
             );
         })
     });
@@ -216,14 +224,14 @@ fn test_split_pane_actions() {
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
                 vec![
-                    "Paste",
-                    "----",
-                    "Split pane right",
-                    "Split pane left",
-                    "Split pane down",
-                    "Split pane up",
-                    "Maximize pane",
-                    "Close pane"
+                    warp_i18n::tr("menu.paste"),
+                    "----".to_string(),
+                    warp_i18n::tr("menu.split_pane_right"),
+                    warp_i18n::tr("menu.split_pane_left"),
+                    warp_i18n::tr("menu.split_pane_down"),
+                    warp_i18n::tr("menu.split_pane_up"),
+                    warp_i18n::tr("menu.maximize_pane"),
+                    warp_i18n::tr("menu.close_pane")
                 ]
             );
         });
@@ -243,12 +251,12 @@ fn test_split_pane_actions() {
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
                 vec![
-                    "Paste",
-                    "----",
-                    "Split pane right",
-                    "Split pane left",
-                    "Split pane down",
-                    "Split pane up",
+                    warp_i18n::tr("menu.paste"),
+                    "----".to_string(),
+                    warp_i18n::tr("menu.split_pane_right"),
+                    warp_i18n::tr("menu.split_pane_left"),
+                    warp_i18n::tr("menu.split_pane_down"),
+                    warp_i18n::tr("menu.split_pane_up"),
                 ]
             );
         });
@@ -276,14 +284,14 @@ fn test_copy_file_path_action() {
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
                 vec![
-                    "Paste",
-                    "----",
-                    "Copy file path",
-                    "----",
-                    "Split pane right",
-                    "Split pane left",
-                    "Split pane down",
-                    "Split pane up",
+                    warp_i18n::tr("menu.paste"),
+                    "----".to_string(),
+                    warp_i18n::tr("menu.copy_file_path"),
+                    "----".to_string(),
+                    warp_i18n::tr("menu.split_pane_right"),
+                    warp_i18n::tr("menu.split_pane_left"),
+                    warp_i18n::tr("menu.split_pane_down"),
+                    warp_i18n::tr("menu.split_pane_up"),
                 ]
             );
         });
@@ -305,12 +313,12 @@ fn test_copy_file_path_action() {
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
                 vec![
-                    "Copy file path",
-                    "----",
-                    "Split pane right",
-                    "Split pane left",
-                    "Split pane down",
-                    "Split pane up",
+                    warp_i18n::tr("menu.copy_file_path"),
+                    "----".to_string(),
+                    warp_i18n::tr("menu.split_pane_right"),
+                    warp_i18n::tr("menu.split_pane_left"),
+                    warp_i18n::tr("menu.split_pane_down"),
+                    warp_i18n::tr("menu.split_pane_up"),
                 ]
             );
         });
@@ -327,10 +335,10 @@ fn test_copy_file_path_action() {
             assert_eq!(
                 notebook.context_menu().item_names(ctx),
                 vec![
-                    "Split pane right",
-                    "Split pane left",
-                    "Split pane down",
-                    "Split pane up",
+                    warp_i18n::tr("menu.split_pane_right"),
+                    warp_i18n::tr("menu.split_pane_left"),
+                    warp_i18n::tr("menu.split_pane_down"),
+                    warp_i18n::tr("menu.split_pane_up"),
                 ]
             );
         });

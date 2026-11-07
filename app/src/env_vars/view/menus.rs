@@ -159,12 +159,13 @@ impl EnvVarCollectionView {
             .focus_handle
             .as_ref()
             .is_some_and(|handle| handle.split_pane_state(ctx).is_maximized());
+        let maximize_label = if is_maximized {
+            warp_i18n::tr("menu.minimize_pane")
+        } else {
+            warp_i18n::tr("menu.maximize_pane")
+        };
         let toggle_maximize_pane = Self::item(
-            if is_maximized {
-                "Minimize pane"
-            } else {
-                "Maximize pane"
-            },
+            maximize_label,
             EnvVarCollectionAction::EmitPaneEvent(PaneEvent::ToggleMaximized),
             keybinding_name_to_display_string("pane_group:toggle_maximize_pane", ctx),
             None,
@@ -336,7 +337,7 @@ impl EnvVarCollectionView {
     }
 
     fn item(
-        name: &str,
+        name: impl Into<String>,
         action: EnvVarCollectionAction,
         key_shortcut: Option<String>,
         icon: Option<Icon>,
