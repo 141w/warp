@@ -751,6 +751,7 @@ bindings:
   "Close Workflow": "关闭工作流"
   slash_command_prefix: "斜杠命令：%{name}"
 menu:
+  attach_output_as_agent_context: "附加 `%{command}` 的输出为智能体上下文"
   attach_as_agent_context: "附加为智能体上下文"
   ask_ai_assistant: "询问 Warp AI"
   new_agent_pane: "新建智能体窗格"

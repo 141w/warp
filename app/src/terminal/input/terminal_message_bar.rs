@@ -192,8 +192,11 @@ impl MessageProvider<TerminalMessageArgs<'_>> for ErroredBlockMessageProducer {
         Some(Message::new(vec![
             MessageItem::keystroke(keystroke),
             MessageItem::text(format!(
-                " attach `{}` output as agent context",
-                truncated_command_for_block(&block.command_to_string())
+                " {}",
+                warp_i18n::t!(
+                    "menu.attach_output_as_agent_context",
+                    command = truncated_command_for_block(&block.command_to_string())
+                )
             )),
         ]))
     }
