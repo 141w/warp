@@ -2143,14 +2143,15 @@ impl TypedActionView for RequestedCommandView {
                     .as_deref()
                     .is_some_and(|t| !t.is_empty());
 
-                let copy_item: MenuItem<RequestedCommandViewAction> = MenuItemFields::new("Copy")
-                    .with_on_select_action(RequestedCommandViewAction::CopyMcpSelection)
-                    .with_disabled(!has_selection)
-                    .into_item();
+                let copy_item: MenuItem<RequestedCommandViewAction> =
+                    MenuItemFields::new(warp_i18n::tr("menu.copy"))
+                        .with_on_select_action(RequestedCommandViewAction::CopyMcpSelection)
+                        .with_disabled(!has_selection)
+                        .into_item();
 
                 let json_for_menu = json_text.clone();
                 let copy_json_item: MenuItem<RequestedCommandViewAction> =
-                    MenuItemFields::new("Copy JSON")
+                    MenuItemFields::new(warp_i18n::tr("menu.copy_json"))
                         .with_on_select_action(RequestedCommandViewAction::CopyJsonToClipboard {
                             text: json_for_menu,
                         })

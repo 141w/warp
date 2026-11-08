@@ -571,7 +571,7 @@ impl ModelSelector {
         let mut items: Vec<MenuItem<ModelSelectorAction>> = Vec::new();
         if query.is_empty() || "default".contains(query) {
             items.push(MenuItem::Item(
-                MenuItemFields::new("default")
+                MenuItemFields::new(warp_i18n::tr("menu.default"))
                     .with_icon(icon)
                     .with_icon_size_override(ITEM_ICON_SIZE)
                     .with_font_size_override(ITEM_FONT_SIZE)

@@ -181,7 +181,7 @@ impl CLIAgentsPageView {
                     }
 
                     items.push(
-                        MenuItemFields::new("Other")
+                        MenuItemFields::new(warp_i18n::tr("menu.other"))
                             .with_on_select_action(DropdownAction::select_action_and_close(
                                 CLIAgentsPageAction::SetCLIAgentForCommand {
                                     pattern: pattern_clone.clone(),

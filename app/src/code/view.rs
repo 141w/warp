@@ -2162,7 +2162,7 @@ impl CodeView {
             if active_location.is_some() {
                 items.push(MenuItem::Separator);
                 items.push(
-                    MenuItemFields::new("Copy file path")
+                    MenuItemFields::new(warp_i18n::tr("menu.copy_file_path"))
                         .with_on_select_action(CodeViewAction::CopyFilePath)
                         .into_item(),
                 );
@@ -2197,7 +2197,7 @@ impl CodeView {
                 });
             if renders_in_notebook_viewer {
                 items.push(
-                    MenuItemFields::new("View Markdown preview")
+                    MenuItemFields::new(warp_i18n::tr("menu.view_markdown_preview"))
                         .with_on_select_action(CodeViewAction::RenderMarkdown)
                         .into_item(),
                 );

@@ -1042,7 +1042,7 @@ impl TypedActionView for ConversationListView {
                         return;
                     };
 
-                    let mut delete_item = MenuItemFields::new("Delete")
+                    let mut delete_item = MenuItemFields::new(warp_i18n::tr("menu.delete"))
                         .with_override_text_color(Appearance::as_ref(ctx).theme().ansi_fg_red())
                         .with_on_select_action(ConversationListViewAction::DeleteFromOverflowMenu {
                             conversation_id,
@@ -1056,7 +1056,7 @@ impl TypedActionView for ConversationListView {
                     // Only show share item if the conversation is shareable
                     let share_item = if entry.capabilities.can_share {
                         Some(
-                            MenuItemFields::new("Share conversation")
+                            MenuItemFields::new(warp_i18n::tr("menu.share_conversation"))
                                 .with_on_select_action(
                                     ConversationListViewAction::OpenShareDialog { conversation_id },
                                 )
@@ -1070,7 +1070,7 @@ impl TypedActionView for ConversationListView {
                         // Forking from a closed ambient agent conversation is not supported at this point.
                         if entry.capabilities.can_fork_locally {
                             Some([
-                                MenuItemFields::new("Fork in new pane")
+                                MenuItemFields::new(warp_i18n::tr("menu.fork_in_new_pane"))
                                     .with_on_select_action(
                                         ConversationListViewAction::ForkConversation {
                                             conversation_id,
@@ -1078,7 +1078,7 @@ impl TypedActionView for ConversationListView {
                                         },
                                     )
                                     .into_item(),
-                                MenuItemFields::new("Fork in new tab")
+                                MenuItemFields::new(warp_i18n::tr("menu.fork_in_new_tab"))
                                     .with_on_select_action(
                                         ConversationListViewAction::ForkConversation {
                                             conversation_id,

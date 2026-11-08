@@ -553,7 +553,7 @@ impl TabData {
                     Manager::as_ref(ctx).has_session_link(&view.id(), status)
                 });
             menu_items.push(
-                MenuItemFields::new("Copy link")
+                MenuItemFields::new(warp_i18n::tr("menu.copy_link"))
                     .with_on_select_action(WorkspaceAction::CopySharedSessionLinkFromTab {
                         tab_index: index,
                     })

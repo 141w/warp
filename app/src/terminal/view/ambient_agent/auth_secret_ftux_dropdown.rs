@@ -387,7 +387,7 @@ impl AuthSecretFtuxDropdown {
                 }
                 if !matched {
                     items.push(MenuItem::Item(
-                        MenuItemFields::new("No secrets found")
+                        MenuItemFields::new(warp_i18n::tr("menu.no_secrets_found"))
                             .with_font_size_override(FONT_SIZE)
                             .with_padding_override(
                                 MENU_ITEM_VERTICAL_PADDING,
@@ -400,7 +400,7 @@ impl AuthSecretFtuxDropdown {
             }
             AuthSecretFetchState::NotFetched | AuthSecretFetchState::Loading => {
                 items.push(MenuItem::Item(
-                    MenuItemFields::new("Loading…")
+                    MenuItemFields::new(warp_i18n::tr("menu.loading"))
                         .with_font_size_override(FONT_SIZE)
                         .with_padding_override(MENU_ITEM_VERTICAL_PADDING, MENU_HORIZONTAL_PADDING)
                         .with_disabled(true)
@@ -409,7 +409,7 @@ impl AuthSecretFtuxDropdown {
             }
             AuthSecretFetchState::Failed(_) => {
                 items.push(MenuItem::Item(
-                    MenuItemFields::new("Unable to load secrets")
+                    MenuItemFields::new(warp_i18n::tr("menu.unable_to_load_secrets"))
                         .with_font_size_override(FONT_SIZE)
                         .with_padding_override(MENU_ITEM_VERTICAL_PADDING, MENU_HORIZONTAL_PADDING)
                         .with_disabled(true)

@@ -417,7 +417,7 @@ pub fn team_switcher_menu_items(
 ) -> Vec<MenuItem<WorkspaceAction>> {
     let mut items = vec![
         MenuItem::Header {
-            fields: MenuItemFields::new("Teams"),
+            fields: MenuItemFields::new(warp_i18n::tr("menu.teams")),
             clickable: false,
             right_side_fields: None,
         },

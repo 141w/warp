@@ -93,7 +93,7 @@ impl AcceptAutosuggestionKeybinding {
                     },
                 )
                 .into_item(),
-            MenuItemFields::new("Custom...")
+            MenuItemFields::new(warp_i18n::tr("menu.custom_ellipsis"))
                 .with_on_select_action(
                     AcceptAutosuggestionKeybindingAction::OpenSettingsForCustomKeybinding,
                 )

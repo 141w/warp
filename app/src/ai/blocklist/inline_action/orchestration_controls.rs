@@ -675,7 +675,7 @@ pub fn populate_auth_secret_picker_for_harness<A: OrchestrationControlAction, V:
             .collect();
         match snapshot.status {
             OptionSourceStatus::Loading => items.push(MenuItem::Item(
-                MenuItemFields::new("Loading…").with_disabled(true),
+                MenuItemFields::new(warp_i18n::tr("menu.loading")).with_disabled(true),
             )),
             OptionSourceStatus::Failed { message } => items.push(MenuItem::Item(
                 MenuItemFields::new(&message).with_disabled(true),

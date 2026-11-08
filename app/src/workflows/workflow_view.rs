@@ -3182,7 +3182,7 @@ impl BackingView for WorkflowView {
         // Add "Copy Link" to menu
         if let Some(link) = self.workflow_link(ctx) {
             menu_items.push(
-                MenuItemFields::new("Copy link")
+                MenuItemFields::new(warp_i18n::tr("menu.copy_link"))
                     .with_on_select_action(WorkflowAction::CopyLink(link))
                     .with_icon(Icon::Link)
                     .into_item(),
@@ -3194,7 +3194,7 @@ impl BackingView for WorkflowView {
             && let Ok(url) = Url::parse(&link)
         {
             menu_items.push(
-                MenuItemFields::new("Open on Desktop")
+                MenuItemFields::new(warp_i18n::tr("menu.open_on_desktop"))
                     .with_on_select_action(WorkflowAction::OpenLinkOnDesktop(url))
                     .with_icon(Icon::Laptop)
                     .into_item(),
@@ -3206,7 +3206,7 @@ impl BackingView for WorkflowView {
         // Add "Duplicate" to menu
         if space != Some(Space::Shared) {
             menu_items.push(
-                MenuItemFields::new("Duplicate")
+                MenuItemFields::new(warp_i18n::tr("menu.duplicate"))
                     .with_on_select_action(WorkflowAction::Duplicate)
                     .with_icon(Icon::Duplicate)
                     .into_item(),
@@ -3219,7 +3219,7 @@ impl BackingView for WorkflowView {
             && (!FeatureFlag::SharedWithMe.is_enabled() || access_level.can_trash())
         {
             menu_items.push(
-                MenuItemFields::new("Trash")
+                MenuItemFields::new(warp_i18n::tr("menu.trash"))
                     .with_on_select_action(WorkflowAction::Trash)
                     .with_icon(Icon::Trash)
                     .into_item(),
