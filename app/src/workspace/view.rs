@@ -24070,16 +24070,15 @@ impl Workspace {
         if cfg!(feature = "local_fs") && *CodeSettings::as_ref(ctx).show_project_explorer.value() {
             views.push(ToolPanelView::ProjectExplorer);
         }
-        // The OSS channel has no account services, so the drive and agent
-        // conversation panels would only ever render a dead-end sign-in prompt.
-        let oss_channel =
-            warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss;
         // A local pi-only run's conversation lives in its terminal block, not in the
         // cloud-synced history this panel renders, so the exemption hides the panel rather
-        // than offering an empty list — the same treatment the OSS channel already applies.
-        if !oss_channel
-            && FeatureFlag::AgentViewConversationListView.is_enabled()
+        // than offering an empty list. The OSS channel has no account services at all, so
+        // its panels would only ever render a dead-end sign-in prompt.
+        let oss_channel =
+            warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss;
+        if FeatureFlag::AgentViewConversationListView.is_enabled()
             && *AISettings::as_ref(ctx).show_conversation_history
+            && !oss_channel
             && !AISettings::as_ref(ctx).is_local_pi_only_exempt(ctx)
         {
             views.push(ToolPanelView::ConversationListView);

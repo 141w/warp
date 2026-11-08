@@ -752,6 +752,9 @@ bindings:
   "Close Workflow": "Close"
   slash_command_prefix: "Slash command: %{name}"
 menu:
+  attach_as_agent_context: "Attach as agent context"
+  ask_ai_assistant: "Ask Warp AI"
+  new_agent_pane: "New Agent Pane"
   delete: "Delete"
   edit: "Edit"
   new_file: "New file"

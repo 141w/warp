@@ -1,6 +1,7 @@
 //! AI Assistant has since been renamed to "Warp AI" in the product.
 use std::collections::HashSet;
 use std::sync::Arc;
+use std::sync::LazyLock;
 
 use itertools::Itertools;
 use lazy_static::lazy_static;
@@ -33,7 +34,8 @@ mod test_util;
 pub const PROMPT_CHARACTER_LIMIT: usize = 1000;
 
 pub const AI_ASSISTANT_FEATURE_NAME: &str = "Warp AI";
-pub const ASK_AI_ASSISTANT_TEXT: &str = "Ask Warp AI";
+pub static ASK_AI_ASSISTANT_TEXT: LazyLock<String> =
+    LazyLock::new(|| warp_i18n::tr("menu.ask_ai_assistant"));
 
 pub const AI_ASSISTANT_SVG_PATH: &str = "bundled/svg/ai-assistant.svg";
 

@@ -17709,9 +17709,9 @@ impl TerminalView {
                     fields.extend([
                         MenuItem::Separator,
                         MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
-                            *ATTACH_AS_AGENT_MODE_CONTEXT_TEXT
+                            ATTACH_AS_AGENT_MODE_CONTEXT_TEXT.clone()
                         } else {
-                            ASK_AI_ASSISTANT_TEXT
+                            ASK_AI_ASSISTANT_TEXT.clone()
                         })
                         .with_on_select_action(TerminalAction::ContextMenu(
                             ContextMenuAction::AskAI(if FeatureFlag::AgentMode.is_enabled() {
@@ -17928,7 +17928,7 @@ impl TerminalView {
                         if self.is_input_box_visible(&model, ctx) {
                             items.extend([
                                 MenuItem::Separator,
-                                MenuItemFields::new(*ATTACH_AS_AGENT_MODE_CONTEXT_TEXT)
+                                MenuItemFields::new(ATTACH_AS_AGENT_MODE_CONTEXT_TEXT.clone())
                                     .with_on_select_action(TerminalAction::ContextMenu(
                                         ContextMenuAction::AskAI(AskAISource::SelectedBlocks),
                                     ))
@@ -18783,9 +18783,9 @@ impl TerminalView {
                 menu_items.extend([
                     MenuItem::Separator,
                     MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
-                        *ATTACH_AS_AGENT_MODE_CONTEXT_TEXT
+                        ATTACH_AS_AGENT_MODE_CONTEXT_TEXT.clone()
                     } else {
-                        ASK_AI_ASSISTANT_TEXT
+                        ASK_AI_ASSISTANT_TEXT.clone()
                     })
                     .with_on_select_action(TerminalAction::ContextMenu(ContextMenuAction::AskAI(
                         AskAISource::SelectedTerminalText,

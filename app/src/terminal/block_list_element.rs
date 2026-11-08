@@ -1162,18 +1162,18 @@ impl BlockListElement {
                 if has_active_long_running_command && active_block.index() == block_index {
                     (
                         Some(TerminalAction::SetInputModeAgent),
-                        TAG_AGENT_FOR_ASSISTANCE_TEXT,
+                        TAG_AGENT_FOR_ASSISTANCE_TEXT.to_owned(),
                     )
                 } else {
                     (
                         Some(TerminalAction::AskAIAssistant { block_index }),
-                        *ATTACH_AS_AGENT_MODE_CONTEXT_TEXT,
+                        ATTACH_AS_AGENT_MODE_CONTEXT_TEXT.clone(),
                     )
                 }
             } else {
                 (
                     Some(TerminalAction::AskAIAssistant { block_index }),
-                    ASK_AI_ASSISTANT_TEXT,
+                    ASK_AI_ASSISTANT_TEXT.clone(),
                 )
             };
 
