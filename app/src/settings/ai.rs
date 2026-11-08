@@ -2306,6 +2306,28 @@ impl AISettings {
         *self.local_pi_only_enabled
     }
 
+    /// Whether the account-free local pi exemption applies: the opt-in is on and the user
+    /// is logged out. The pi-harness-only, no-server conditions are enforced by the run
+    /// path, so callers only need this auth-and-opt-in pair.
+    pub fn is_local_pi_only_exempt(&self, app: &AppContext) -> bool {
+        self.is_local_pi_only_enabled()
+            && AuthStateProvider::as_ref(app)
+                .get()
+                .is_anonymous_or_logged_out()
+    }
+
+    /// Context-flag key for agent entry availability. A plain key because the shared flags
+    /// module is not part of this change's editable surface.
+    pub const AGENT_ENTRY_AVAILABLE_FLAG: &str = "IS_AGENT_ENTRY_AVAILABLE";
+
+    /// Whether agent entry points (Agent Mode pane binding, input message bar, context-menu
+    /// attach items) are offered. Logged-in users keep the `is_any_ai_enabled` contract;
+    /// logged-out users gain entry only through the local pi-only opt-in, and the run path
+    /// still enforces the pi-harness-only, no-server conditions.
+    pub fn is_agent_entry_available(&self, app: &AppContext) -> bool {
+        self.is_any_ai_enabled(app) || self.is_local_pi_only_exempt(app)
+    }
+
     /// Returns whether conversation history is available for the current
     /// account and AI state.
     ///

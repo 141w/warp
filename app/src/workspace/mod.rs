@@ -747,7 +747,9 @@ pub fn init(app: &mut AppContext) {
         .with_group(bindings::BindingGroup::WarpAi.as_str())
         .with_custom_action(CustomAction::NewAgentTab)
         .with_context_predicate(
-            id!("Workspace") & id!(flags::IS_ANY_AI_ENABLED) & !id!("Workspace_PaneDragging"),
+            id!("Workspace")
+                & id!(crate::settings::AISettings::AGENT_ENTRY_AVAILABLE_FLAG)
+                & !id!("Workspace_PaneDragging"),
         ),
         EditableBinding::new(
             NEW_AMBIENT_AGENT_TAB_BINDING_NAME,
@@ -1337,7 +1339,9 @@ pub fn init(app: &mut AppContext) {
             },
         )
         .with_enabled(|| FeatureFlag::AgentMode.is_enabled())
-        .with_context_predicate(id!("Workspace") & id!(flags::IS_ANY_AI_ENABLED))
+        .with_context_predicate(
+            id!("Workspace") & id!(crate::settings::AISettings::AGENT_ENTRY_AVAILABLE_FLAG),
+        )
         .with_group(bindings::BindingGroup::WarpAi.as_str())
         .with_custom_action(CustomAction::NewAgentModePane),
         EditableBinding::new(

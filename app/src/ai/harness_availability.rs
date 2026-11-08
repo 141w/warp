@@ -22,6 +22,7 @@ use crate::server::retry_strategies::{
 use crate::server::server_api::ServerApiProvider;
 use crate::server::server_api::managed_secrets::AppManagedSecretManager as ManagedSecretManager;
 use crate::server::team_scope::RequestTeamScope;
+use crate::settings::AISettings;
 use crate::workspaces::user_workspaces::{TeamScope, UserWorkspaces, UserWorkspacesEvent};
 
 const CACHE_KEY: &str = "AvailableHarnesses";
@@ -158,13 +159,30 @@ impl HarnessAvailabilityModel {
             }
         });
 
-        let me = Self {
+        let mut me = Self {
             harnesses,
             auth_secrets: HashMap::new(),
             auth_secret_retry_after: HashMap::new(),
         };
+        me.apply_local_pi_exemption(ctx);
         me.refresh(ctx);
         me
+    }
+
+    /// The account-free local pi exemption replaces the harness list with Pi alone: Oz's
+    /// loop needs warp-server, which a logged-out user has no credentials for. The run
+    /// path still enforces the pi-only, no-server conditions, and logging back in refreshes
+    /// the server-provided list.
+    fn apply_local_pi_exemption(&mut self, ctx: &ModelContext<Self>) {
+        if !AISettings::as_ref(ctx).is_local_pi_only_exempt(ctx) {
+            return;
+        }
+        self.harnesses = vec![HarnessAvailability {
+            harness: Harness::Pi,
+            display_name: harness_display::display_name(Harness::Pi).to_string(),
+            enabled: true,
+            available_models: vec![],
+        }];
     }
 
     pub fn available_harnesses(&self) -> &[HarnessAvailability] {

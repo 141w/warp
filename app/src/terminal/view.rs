@@ -17705,7 +17705,7 @@ impl TerminalView {
                         ))
                         .into_item(),
                 ];
-                if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
+                if AISettings::as_ref(ctx).is_agent_entry_available(ctx) {
                     fields.extend([
                         MenuItem::Separator,
                         MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
@@ -17922,7 +17922,7 @@ impl TerminalView {
                     );
                 }
 
-                if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
+                if AISettings::as_ref(ctx).is_agent_entry_available(ctx) {
                     if FeatureFlag::AgentMode.is_enabled() {
                         // We can only attach selected blocks if the input box is visible.
                         if self.is_input_box_visible(&model, ctx) {
@@ -18779,7 +18779,7 @@ impl TerminalView {
                     .with_key_shortcut_label(Some("⌘-C"))
                     .into_item(),
             );
-            if AISettings::as_ref(ctx).is_any_ai_enabled(ctx) {
+            if AISettings::as_ref(ctx).is_agent_entry_available(ctx) {
                 menu_items.extend([
                     MenuItem::Separator,
                     MenuItemFields::new(if FeatureFlag::AgentMode.is_enabled() {
@@ -29789,6 +29789,10 @@ impl View for TerminalView {
 
         if AISettings::as_ref(app).is_any_ai_enabled(app) {
             context.set.insert(flags::IS_ANY_AI_ENABLED);
+        }
+
+        if AISettings::as_ref(app).is_agent_entry_available(app) {
+            context.set.insert(AISettings::AGENT_ENTRY_AVAILABLE_FLAG);
         }
 
         if self.current_repo_path.is_some() {

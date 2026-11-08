@@ -977,6 +977,58 @@ fn test_voice_input_languages_includes_common_languages() {
     }
 }
 #[test]
+fn agent_entry_available_for_logged_in_user_follows_ai_enablement() {
+    App::test((), |mut app| async move {
+        initialize_settings_for_tests(&mut app);
+        add_ai_enablement_dependencies_for_test(&mut app);
+
+        AISettings::handle(&app).read(&app, |settings, ctx| {
+            assert!(settings.is_agent_entry_available(ctx));
+        });
+
+        AISettings::handle(&app).update(&mut app, |settings, ctx| {
+            settings
+                .is_any_ai_enabled
+                .set_value(false, ctx)
+                .expect("disable AI");
+        });
+        AISettings::handle(&app).read(&app, |settings, ctx| {
+            assert!(!settings.is_agent_entry_available(ctx));
+        });
+    });
+}
+
+#[test]
+fn agent_entry_available_for_logged_out_user_only_with_pi_opt_in() {
+    App::test((), |mut app| async move {
+        initialize_settings_for_tests(&mut app);
+        add_ai_enablement_dependencies_for_test(&mut app);
+        app.update(|ctx| {
+            let auth_state = AuthStateProvider::as_ref(ctx).get();
+            auth_state.set_user(None);
+            auth_state.set_credentials(None);
+        });
+
+        // Logged out without the opt-in: agent entry stays behind the login wall.
+        AISettings::handle(&app).read(&app, |settings, ctx| {
+            assert!(!settings.is_local_pi_only_exempt(ctx));
+            assert!(!settings.is_agent_entry_available(ctx));
+        });
+
+        AISettings::handle(&app).update(&mut app, |settings, ctx| {
+            settings
+                .local_pi_only_enabled
+                .set_value(true, ctx)
+                .expect("enable local pi-only runs");
+        });
+        AISettings::handle(&app).read(&app, |settings, ctx| {
+            assert!(settings.is_local_pi_only_exempt(ctx));
+            assert!(settings.is_agent_entry_available(ctx));
+        });
+    });
+}
+
+#[test]
 fn ai_autodetection_defaults_to_opt_in() {
     App::test((), |mut app| async move {
         initialize_settings_for_tests(&mut app);

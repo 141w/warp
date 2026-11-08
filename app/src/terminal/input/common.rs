@@ -38,7 +38,7 @@ pub(super) fn should_show_terminal_input_message_bar(
     FeatureFlag::AgentView.is_enabled()
         && !FeatureFlag::AgentViewPromptChip.is_enabled()
         && InputSettings::as_ref(app).is_terminal_input_message_bar_enabled()
-        && AISettings::as_ref(app).is_any_ai_enabled(app)
+        && AISettings::as_ref(app).is_agent_entry_available(app)
         && !model.is_shared_ambient_agent_session()
 }
 
