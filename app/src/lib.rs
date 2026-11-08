@@ -3286,3 +3286,7 @@ mod i18n_verify_tests;
 #[cfg(test)]
 #[path = "i18n_key_coverage_tests.rs"]
 mod i18n_key_coverage_tests;
+
+#[cfg(test)]
+#[path = "i18n_runtime_tests.rs"]
+mod i18n_runtime_tests;
