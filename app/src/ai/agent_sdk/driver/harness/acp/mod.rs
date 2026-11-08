@@ -108,8 +108,10 @@ use crate::ai::blocklist::{
     ExternalHarnessTurn, QueuedQueryId, ResponseStreamId,
 };
 use crate::ai::mcp::JSONTransportType;
+use crate::auth::AuthStateProvider;
 use crate::server::server_api::ServerApi;
 use crate::server::server_api::harness_support::HarnessSupportClient;
+use crate::settings::AISettings;
 use crate::terminal::CLIAgent;
 
 /// Format slug sent to the server when creating the conversation: its history is stored as
@@ -500,6 +502,20 @@ pub(crate) struct AcpHarnessRunner {
     turn_state: Arc<TurnState>,
 }
 
+/// Whether this ACP run may skip binding a warp-server conversation: the account-free
+/// local pi exemption. The CLI gate already rejects every logged-out run that is not local
+/// pi-only, so logged-out + pi + opt-in is sufficient at this point.
+async fn local_pi_only_exempt(foreground: &ModelSpawner<AgentDriver>, harness: Harness) -> bool {
+    harness == Harness::Pi
+        && foreground
+            .spawn(|_, ctx| {
+                !AuthStateProvider::as_ref(ctx).get().is_logged_in()
+                    && AISettings::as_ref(ctx).is_local_pi_only_enabled()
+            })
+            .await
+            .unwrap_or(false)
+}
+
 impl AcpHarnessRunner {
     fn setup_failed(&self, reason: String) -> AgentDriverError {
         AgentDriverError::HarnessSetupFailed {
@@ -680,17 +696,23 @@ impl AcpHarnessRunner {
             None => {}
         }
 
-        let server_id = setup_events
-            .record_result(SetupStep::ThirdPartyHarnessExternalConversation, async {
-                self.client
-                    .create_external_conversation(MAA_FORMAT, self.harness)
-                    .await
-                    .map_err(|error| {
-                        report_error!(&error);
-                        AgentDriverError::ConfigBuildFailed(error)
-                    })
-            })
-            .await?;
+        let server_id = if local_pi_only_exempt(foreground, self.harness).await {
+            // An account-free run has no warp-server identity to bind. Synthesize a stable
+            // local token so the run's requests and history persistence stay on-device.
+            ServerConversationToken::new(format!("local-{local_id}"))
+        } else {
+            setup_events
+                .record_result(SetupStep::ThirdPartyHarnessExternalConversation, async {
+                    self.client
+                        .create_external_conversation(MAA_FORMAT, self.harness)
+                        .await
+                        .map_err(|error| {
+                            report_error!(&error);
+                            AgentDriverError::ConfigBuildFailed(error)
+                        })
+                })
+                .await?
+        };
         log::info!("Created ACP conversation {server_id}");
         let token = server_id.as_str().to_owned();
         foreground

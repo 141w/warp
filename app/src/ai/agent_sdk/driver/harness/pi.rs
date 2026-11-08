@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ffi::{OsStr, OsString};
 use std::fs;
 use std::io::Write as _;
@@ -105,19 +105,34 @@ fn valid_provider_id(provider: &str) -> bool {
         })
 }
 
+/// Provider API keys read from the run process environment when no secret references the
+/// provider. Local single-user only: the environment belongs to whoever started this Warp
+/// process — the headless `agent run` a scheduler wakes, or an interactive session on the
+/// same machine — and each value is written only into this run's isolated Pi agent
+/// directory, never synced or logged.
+const ENV_PROVIDER_API_KEYS: &[(&str, &str)] = &[
+    ("openrouter", "OPENROUTER_API_KEY"),
+    ("openai", "OPENAI_API_KEY"),
+    ("anthropic", "ANTHROPIC_API_KEY"),
+];
+
 fn prepare_pi_credentials(
     agent_dir: &Path,
     resolved_env_vars: &HashMap<OsString, OsString>,
     resolved_secrets: &HashMap<String, ManagedSecretValue>,
 ) -> Result<()> {
     let mut credentials = HashMap::new();
+    // Every provider a secret references, including legacy key types whose value reaches Pi
+    // only through the process environment. The env fallback below must not shadow them.
+    let mut secret_providers = HashSet::new();
     for secret in resolved_secrets.values() {
-        if !matches!(secret, ManagedSecretValue::LlmProviderApiKey { .. }) {
-            continue;
-        }
         let Some((provider, api_key, base_url)) = provider_credential(secret) else {
             continue;
         };
+        secret_providers.insert(provider);
+        if !matches!(secret, ManagedSecretValue::LlmProviderApiKey { .. }) {
+            continue;
+        }
         if !valid_provider_id(provider) || api_key.is_empty() {
             return Err(anyhow!("Invalid LLM provider API key credential"));
         }
@@ -156,6 +171,31 @@ fn prepare_pi_credentials(
         if active_key.as_deref() == Some(api_key) {
             credentials.insert(provider, (api_key, base_url));
         }
+    }
+    // Fall back to provider keys from the run process environment for providers no secret
+    // references. Secrets always win: `secret_providers` covers every provider any secret
+    // mentions, so an env value can only fill a gap. See ENV_PROVIDER_API_KEYS for scope.
+    let mut env_fallbacks: Vec<(&str, String, Option<String>)> = Vec::new();
+    for (provider, api_key_env) in ENV_PROVIDER_API_KEYS {
+        if secret_providers.contains(provider) {
+            continue;
+        }
+        let Some(api_key) = std::env::var(api_key_env)
+            .ok()
+            .filter(|value| !value.is_empty())
+        else {
+            continue;
+        };
+        let base_url = std::env::var(format!(
+            "{}_BASE_URL",
+            api_key_env.strip_suffix("_API_KEY").unwrap_or(api_key_env)
+        ))
+        .ok()
+        .filter(|value| !value.is_empty());
+        env_fallbacks.push((provider, api_key, base_url));
+    }
+    for (provider, api_key, base_url) in &env_fallbacks {
+        credentials.insert(provider, (api_key.as_str(), base_url.as_deref()));
     }
     let mut auth = Map::new();
     let mut providers = Map::new();

@@ -84,6 +84,7 @@ fn worker_env_overrides_legacy_credentials_without_their_endpoint() {
 }
 
 #[test]
+#[serial_test::serial]
 fn provider_credentials_are_private_literal_values_with_endpoint_overrides() {
     let (env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
     let dir = guard.unwrap();
@@ -183,6 +184,7 @@ fn default_model_keeps_pi_model_selection_implicit() {
 }
 
 #[test]
+#[serial_test::serial]
 fn generic_provider_binding_wins_over_legacy_auth_for_the_same_provider() {
     let (mut env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
     let dir = guard.unwrap();
@@ -284,6 +286,7 @@ fn conflicting_provider_credentials_fail_without_exposing_keys() {
 }
 
 #[test]
+#[serial_test::serial]
 fn identical_provider_credentials_coalesce() {
     let (env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
     let dir = guard.unwrap();
@@ -303,6 +306,85 @@ fn identical_provider_credentials_coalesce() {
     let auth: Value =
         serde_json::from_slice(&fs::read(dir.path().join("auth.json")).unwrap()).unwrap();
     assert_eq!(auth, json!({"google": {"type": "api_key", "key": "same"}}));
+}
+
+#[test]
+#[serial_test::serial]
+fn env_provider_key_fills_provider_without_secret() {
+    let _openrouter_key = EnvVarGuard::set("OPENROUTER_API_KEY", Some("env-openrouter"));
+    let _openrouter_url = EnvVarGuard::set("OPENROUTER_BASE_URL", Some("https://env.test/api"));
+    let (env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
+    let dir = guard.unwrap();
+
+    prepare_pi_environment_config(
+        dir.path(),
+        None,
+        &env,
+        &HashMap::new(),
+        &HashMap::new(),
+        None,
+    )
+    .unwrap();
+
+    let auth: Value =
+        serde_json::from_slice(&fs::read(dir.path().join("auth.json")).unwrap()).unwrap();
+    assert_eq!(
+        auth,
+        json!({"openrouter": {"type": "api_key", "key": "env-openrouter"}})
+    );
+    let models: Value =
+        serde_json::from_slice(&fs::read(dir.path().join("models.json")).unwrap()).unwrap();
+    assert_eq!(
+        models,
+        json!({"providers": {"openrouter": {"baseUrl": "https://env.test/api"}}})
+    );
+}
+
+#[test]
+#[serial_test::serial]
+fn secret_provider_credential_takes_precedence_over_env() {
+    let _openrouter_key = EnvVarGuard::set("OPENROUTER_API_KEY", Some("env-openrouter"));
+    let (env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
+    let dir = guard.unwrap();
+    let secrets = HashMap::from([(
+        "OPENROUTER".to_owned(),
+        ManagedSecretValue::llm_provider_api_key("openrouter", "secret-openrouter", None),
+    )]);
+
+    prepare_pi_environment_config(dir.path(), None, &env, &HashMap::new(), &secrets, None).unwrap();
+
+    let auth: Value =
+        serde_json::from_slice(&fs::read(dir.path().join("auth.json")).unwrap()).unwrap();
+    assert_eq!(
+        auth,
+        json!({"openrouter": {"type": "api_key", "key": "secret-openrouter"}})
+    );
+    assert!(!dir.path().join("models.json").exists());
+}
+
+#[test]
+#[serial_test::serial]
+fn env_fallback_fills_only_providers_without_secrets() {
+    let _openrouter_key = EnvVarGuard::set("OPENROUTER_API_KEY", Some("env-openrouter"));
+    let _anthropic_key = EnvVarGuard::set("ANTHROPIC_API_KEY", Some("env-anthropic"));
+    let (env, guard) = harness_env_vars(Harness::Pi, HarnessTransport::Acp, None).unwrap();
+    let dir = guard.unwrap();
+    let secrets = HashMap::from([(
+        "OPENROUTER".to_owned(),
+        ManagedSecretValue::llm_provider_api_key("openrouter", "secret-openrouter", None),
+    )]);
+
+    prepare_pi_environment_config(dir.path(), None, &env, &HashMap::new(), &secrets, None).unwrap();
+
+    let auth: Value =
+        serde_json::from_slice(&fs::read(dir.path().join("auth.json")).unwrap()).unwrap();
+    assert_eq!(
+        auth,
+        json!({
+            "openrouter": {"type": "api_key", "key": "secret-openrouter"},
+            "anthropic": {"type": "api_key", "key": "env-anthropic"},
+        })
+    );
 }
 
 #[test]
