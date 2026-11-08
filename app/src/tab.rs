@@ -336,11 +336,11 @@ pub enum NewSessionMenuItem {
     CreateNewTabGroup,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct PaneNameMenuTarget {
     pub locator: PaneViewLocator,
-    pub rename_label: &'static str,
-    pub reset_label: &'static str,
+    pub rename_label: String,
+    pub reset_label: String,
 }
 
 /// TabData struct holds the state of the given tab. It includes the pane group and mouse states
@@ -446,7 +446,7 @@ impl TabData {
         is_only_member_of_group: bool,
         can_move_left: bool,
         can_move_right: bool,
-        pane_name_target: Option<PaneNameMenuTarget>,
+        pane_name_target: Option<&PaneNameMenuTarget>,
         ctx: &AppContext,
     ) -> Vec<MenuItem<WorkspaceAction>> {
         let appearance = Appearance::as_ref(ctx);
@@ -503,7 +503,7 @@ impl TabData {
                     .is_active_sharer()
                 {
                     menu_items.push(
-                        MenuItemFields::new("Stop sharing")
+                        MenuItemFields::new(warp_i18n::tr("menu.stop_sharing"))
                             .with_on_select_action(WorkspaceAction::StopSharingSessionFromTabMenu {
                                 terminal_view_id: focused_session_view.id(),
                             })
@@ -511,7 +511,7 @@ impl TabData {
                     );
                 } else {
                     menu_items.push(
-                        MenuItemFields::new("Share session")
+                        MenuItemFields::new(warp_i18n::tr("menu.share_session"))
                             .with_on_select_action(WorkspaceAction::OpenShareSessionModal(index))
                             .into_item(),
                     );
@@ -521,7 +521,7 @@ impl TabData {
             // Always show an option to stop sharing all when there's at least 1 shared session in the tab.
             if !shared_session_view_ids.is_empty() {
                 menu_items.push(
-                    MenuItemFields::new("Stop sharing all")
+                    MenuItemFields::new(warp_i18n::tr("menu.stop_sharing_all"))
                         .with_on_select_action(WorkspaceAction::StopSharingAllSessionsInTab {
                             pane_group: self.pane_group.downgrade(),
                         })
@@ -582,14 +582,18 @@ impl TabData {
 
     fn copy_metadata_menu_items(
         &self,
-        pane_name_target: Option<PaneNameMenuTarget>,
+        pane_name_target: Option<&PaneNameMenuTarget>,
         ctx: &AppContext,
     ) -> Vec<MenuItem<WorkspaceAction>> {
         let pane_group = self.pane_group.as_ref(ctx);
         let mut menu_items = vec![];
         let tab_title = Self::copyable_metadata_value(Some(pane_group.display_title(ctx)));
         if !uses_vertical_tabs(ctx) {
-            Self::push_copy_metadata_menu_item(&mut menu_items, "Copy tab title", tab_title);
+            Self::push_copy_metadata_menu_item(
+                &mut menu_items,
+                &warp_i18n::tr("menu.copy_tab_title"),
+                tab_title,
+            );
             return menu_items;
         }
 
@@ -609,7 +613,7 @@ impl TabData {
                 })
                 .unwrap_or_else(|| pane_group.focused_pane_id(ctx));
             (
-                "Copy pane title",
+                warp_i18n::tr("menu.copy_pane_title"),
                 Self::copyable_pane_title(pane_group, pane_id, ctx),
                 pane_group.terminal_view_from_pane_id(pane_id, ctx),
             )
@@ -620,20 +624,24 @@ impl TabData {
                     pane_group.terminal_view_from_pane_id(target.locator.pane_id, ctx)
                 })
                 .or_else(|| pane_group.focused_session_view(ctx));
-            ("Copy tab title", tab_title, terminal_view)
+            (
+                warp_i18n::tr("menu.copy_tab_title"),
+                tab_title,
+                terminal_view,
+            )
         };
 
         if let Some(terminal_view) = terminal_view {
             let terminal_view = terminal_view.as_ref(ctx);
             Self::push_copy_metadata_menu_item(
                 &mut menu_items,
-                "Copy branch",
+                warp_i18n::tr("menu.copy_branch"),
                 Self::copyable_metadata_value(terminal_view.current_git_branch(ctx)),
             );
             Self::push_copy_metadata_menu_item(&mut menu_items, title_label, title);
             Self::push_copy_metadata_menu_item(
                 &mut menu_items,
-                "Copy working directory",
+                warp_i18n::tr("menu.copy_working_directory"),
                 Self::copyable_metadata_value(
                     terminal_view
                         .pwd()
@@ -654,7 +662,7 @@ impl TabData {
 
     fn push_copy_metadata_menu_item(
         menu_items: &mut Vec<MenuItem<WorkspaceAction>>,
-        label: &'static str,
+        label: impl Into<String>,
         value: Option<String>,
     ) {
         if let Some(value) = value {
@@ -675,7 +683,7 @@ impl TabData {
         index: usize,
         can_move_left: bool,
         can_move_right: bool,
-        pane_name_target: Option<PaneNameMenuTarget>,
+        pane_name_target: Option<&PaneNameMenuTarget>,
         ctx: &AppContext,
     ) -> Vec<MenuItem<WorkspaceAction>> {
         let mut menu_items = vec![];
@@ -688,7 +696,7 @@ impl TabData {
             // TODO add option to show the keybinding once we figure out a nice API to retrieve
             // the actual keybinding (based on the user's preferences etc.)
             menu_items.append(&mut vec![
-                MenuItemFields::new("Rename tab")
+                MenuItemFields::new(warp_i18n::tr("menu.rename_tab"))
                     .with_on_select_action(WorkspaceAction::RenameTab(index))
                     .into_item(),
             ]);
@@ -697,14 +705,14 @@ impl TabData {
             let title = self.pane_group.as_ref(ctx).custom_title(ctx);
             if title.is_some() {
                 menu_items.push(
-                    MenuItemFields::new("Reset tab name")
+                    MenuItemFields::new(warp_i18n::tr("menu.reset_tab_name"))
                         .with_on_select_action(WorkspaceAction::ResetTabName(index))
                         .into_item(),
                 );
             }
         }
         if let Some(pane_name_target) = pane_name_target {
-            menu_items.extend(self.pane_name_menu_items(pane_name_target, ctx));
+            menu_items.extend(self.pane_name_menu_items(pane_name_target.clone(), ctx));
         }
         // `can_move_left` / `can_move_right` come from `Workspace::can_move_tab`
         // and gate the "Move Tab Up/Down" entries so they disappear when the
@@ -712,9 +720,9 @@ impl TabData {
         if can_move_right {
             menu_items.push(
                 MenuItemFields::new(if uses_vertical_tabs {
-                    "Move Tab Down"
+                    warp_i18n::tr("menu.move_tab_down")
                 } else {
-                    "Move Tab Right"
+                    warp_i18n::tr("menu.move_tab_right")
                 })
                 .with_on_select_action(WorkspaceAction::MoveTabRight(index))
                 .into_item(),
@@ -723,9 +731,9 @@ impl TabData {
         if can_move_left {
             menu_items.push(
                 MenuItemFields::new(if uses_vertical_tabs {
-                    "Move Tab Up"
+                    warp_i18n::tr("menu.move_tab_up")
                 } else {
-                    "Move Tab Left"
+                    warp_i18n::tr("menu.move_tab_left")
                 })
                 .with_on_select_action(WorkspaceAction::MoveTabLeft(index))
                 .into_item(),
@@ -778,14 +786,14 @@ impl TabData {
 
         if ContextFlag::CloseWindow.is_enabled() || tabs_len != 1 {
             menu_items.push(
-                MenuItemFields::new("Close tab")
+                MenuItemFields::new(warp_i18n::tr("menu.close_tab"))
                     .with_on_select_action(WorkspaceAction::CloseTab(index))
                     .into_item(),
             );
         }
         if tabs_len > 1 {
             menu_items.push(
-                MenuItemFields::new("Close other tabs")
+                MenuItemFields::new(warp_i18n::tr("menu.close_other_tabs"))
                     .with_on_select_action(WorkspaceAction::CloseOtherTabs(index))
                     .into_item(),
             );
@@ -794,9 +802,9 @@ impl TabData {
         if not_last_tab {
             menu_items.push(
                 MenuItemFields::new(if uses_vertical_tabs {
-                    "Close Tabs Below"
+                    warp_i18n::tr("menu.close_tabs_below")
                 } else {
-                    "Close Tabs to the Right"
+                    warp_i18n::tr("menu.close_tabs_right")
                 })
                 .with_on_select_action(WorkspaceAction::CloseTabsRight(index))
                 .into_item(),
@@ -810,7 +818,7 @@ impl TabData {
             return vec![];
         }
         vec![
-            MenuItemFields::new("Save as new config")
+            MenuItemFields::new(warp_i18n::tr("menu.save_as_new_config"))
                 .with_on_select_action(WorkspaceAction::SaveCurrentTabAsNewConfig(index))
                 .into_item(),
         ]
@@ -823,9 +831,15 @@ impl TabData {
         }
 
         let (label, action) = if self.pinned {
-            ("Unpin tab", WorkspaceAction::UnpinTab(index))
+            (
+                warp_i18n::tr("menu.unpin_tab"),
+                WorkspaceAction::UnpinTab(index),
+            )
         } else {
-            ("Pin tab", WorkspaceAction::PinTab(index))
+            (
+                warp_i18n::tr("menu.pin_tab"),
+                WorkspaceAction::PinTab(index),
+            )
         };
         vec![
             MenuItemFields::new(label)
@@ -856,7 +870,7 @@ impl TabData {
         let mut menu_items = vec![];
         if show_new_group {
             menu_items.push(
-                MenuItemFields::new("New group with tab")
+                MenuItemFields::new(warp_i18n::tr("menu.new_group_with_tab"))
                     .with_on_select_action(WorkspaceAction::NewTabGroupFromTab(index))
                     .into_item(),
             );
@@ -866,7 +880,7 @@ impl TabData {
         }
         if show_remove_from_group {
             menu_items.push(
-                MenuItemFields::new("Remove from group")
+                MenuItemFields::new(warp_i18n::tr("menu.remove_from_group"))
                     .with_on_select_action(WorkspaceAction::RemoveTabFromGroup(index))
                     .into_item(),
             );

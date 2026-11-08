@@ -8195,13 +8195,13 @@ impl Workspace {
         let pane_name_target = match target {
             VerticalTabsPaneContextMenuTarget::ClickedPane(locator) => PaneNameMenuTarget {
                 locator,
-                rename_label: "Rename pane",
-                reset_label: "Reset pane name",
+                rename_label: warp_i18n::tr("menu.rename_pane"),
+                reset_label: warp_i18n::tr("menu.reset_pane_name"),
             },
             VerticalTabsPaneContextMenuTarget::ActivePane(locator) => PaneNameMenuTarget {
                 locator,
-                rename_label: "Rename active pane",
-                reset_label: "Reset active pane name",
+                rename_label: warp_i18n::tr("menu.rename_active_pane"),
+                reset_label: warp_i18n::tr("menu.reset_active_pane_name"),
             },
         };
         let can_move_left = self.can_move_tab(tab_index, TabMovement::Left);
@@ -8215,7 +8215,7 @@ impl Workspace {
             is_only_member_of_group,
             can_move_left,
             can_move_right,
-            Some(pane_name_target),
+            Some(&pane_name_target),
             ctx,
         );
 
@@ -10059,33 +10059,33 @@ impl Workspace {
         }
 
         items.extend([
-            MenuItemFields::new("What's new")
+            MenuItemFields::new(warp_i18n::tr("menu.whats_new"))
                 .with_on_select_action(WorkspaceAction::ViewLatestChangelog)
                 .into_item(),
-            MenuItemFields::new("Settings")
+            MenuItemFields::new(warp_i18n::tr("menu.settings"))
                 .with_on_select_action(WorkspaceAction::ShowSettings)
                 .into_item(),
-            MenuItemFields::new("Keyboard shortcuts")
+            MenuItemFields::new(warp_i18n::tr("menu.keyboard_shortcuts"))
                 .with_on_select_action(WorkspaceAction::ToggleKeybindingsPage)
                 .into_item(),
             MenuItem::Separator,
-            MenuItemFields::new("Documentation")
+            MenuItemFields::new(warp_i18n::tr("menu.documentation"))
                 .with_on_select_action(WorkspaceAction::ViewUserDocs)
                 .into_item(),
-            MenuItemFields::new("Feedback")
+            MenuItemFields::new(warp_i18n::tr("menu.feedback"))
                 .with_on_select_action(WorkspaceAction::SendFeedback)
                 .into_item(),
         ]);
 
         #[cfg(not(target_family = "wasm"))]
         items.push(
-            MenuItemFields::new("View Warp logs")
+            MenuItemFields::new(warp_i18n::tr("menu.view_logs"))
                 .with_on_select_action(WorkspaceAction::ViewLogs)
                 .into_item(),
         );
 
         items.extend([
-            MenuItemFields::new("Join our Slack community")
+            MenuItemFields::new(warp_i18n::tr("menu.join_slack"))
                 .with_on_select_action(WorkspaceAction::JoinSlack)
                 .into_item(),
             MenuItem::Separator,
@@ -10093,7 +10093,7 @@ impl Workspace {
 
         if self.auth_state.is_anonymous_or_logged_out() {
             items.push(
-                MenuItemFields::new("Sign up")
+                MenuItemFields::new(warp_i18n::tr("menu.sign_up"))
                     .with_on_select_action(WorkspaceAction::SignupAnonymousUser)
                     .into_item(),
             );
@@ -10107,7 +10107,7 @@ impl Workspace {
 
         if is_on_paid_plan {
             items.push(
-                MenuItemFields::new("Billing and usage")
+                MenuItemFields::new(warp_i18n::tr("menu.billing_and_usage"))
                     .with_on_select_action(WorkspaceAction::ShowSettingsPage(
                         SettingsSection::BillingAndUsage,
                     ))
@@ -10115,21 +10115,21 @@ impl Workspace {
             );
         } else {
             items.push(
-                MenuItemFields::new("Upgrade")
+                MenuItemFields::new(warp_i18n::tr("menu.upgrade"))
                     .with_on_select_action(WorkspaceAction::ShowUpgrade)
                     .into_item(),
             );
         }
 
         items.push(
-            MenuItemFields::new("Invite a friend")
+            MenuItemFields::new(warp_i18n::tr("menu.invite_friend"))
                 .with_on_select_action(WorkspaceAction::ShowReferralSettingsPage)
                 .into_item(),
         );
 
         if !self.auth_state.is_anonymous_or_logged_out() {
             items.push(
-                MenuItemFields::new("Log out")
+                MenuItemFields::new(warp_i18n::tr("menu.log_out"))
                     .with_on_select_action(WorkspaceAction::LogOut)
                     .into_item(),
             );
@@ -24070,8 +24070,17 @@ impl Workspace {
         if cfg!(feature = "local_fs") && *CodeSettings::as_ref(ctx).show_project_explorer.value() {
             views.push(ToolPanelView::ProjectExplorer);
         }
-        if FeatureFlag::AgentViewConversationListView.is_enabled()
+        // The OSS channel has no account services, so the drive and agent
+        // conversation panels would only ever render a dead-end sign-in prompt.
+        let oss_channel =
+            warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss;
+        // A local pi-only run's conversation lives in its terminal block, not in the
+        // cloud-synced history this panel renders, so the exemption hides the panel rather
+        // than offering an empty list — the same treatment the OSS channel already applies.
+        if !oss_channel
+            && FeatureFlag::AgentViewConversationListView.is_enabled()
             && *AISettings::as_ref(ctx).show_conversation_history
+            && !AISettings::as_ref(ctx).is_local_pi_only_exempt(ctx)
         {
             views.push(ToolPanelView::ConversationListView);
         }
@@ -24083,7 +24092,7 @@ impl Workspace {
                 entry_focus: GlobalSearchEntryFocus::Results,
             });
         }
-        if *WarpDriveSettings::as_ref(ctx).enable_warp_drive {
+        if !oss_channel && *WarpDriveSettings::as_ref(ctx).enable_warp_drive {
             views.push(ToolPanelView::WarpDrive);
         }
         views

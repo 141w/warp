@@ -256,16 +256,16 @@ impl LeftPanelView {
     ) -> Box<dyn Element> {
         let (title, description) = match (view, availability) {
             (ToolPanelView::WarpDrive, ToolPanelAvailability::RequiresAccount) => (
-                "Sign in to access Warp Drive",
-                "Create an account to save and share workflows, notebooks, prompts, and more.",
+                warp_i18n::tr("panel.sign_in_warp_drive"),
+                warp_i18n::tr("panel.sign_in_warp_drive_desc"),
             ),
             (ToolPanelView::ConversationListView, ToolPanelAvailability::RequiresAccount) => (
-                "Sign in to access Agent conversations",
-                "Create an account and enable AI to access your conversation history.",
+                warp_i18n::tr("panel.sign_in_conversations"),
+                warp_i18n::tr("panel.sign_in_conversations_desc"),
             ),
             (ToolPanelView::ConversationListView, ToolPanelAvailability::RequiresAi) => (
-                "Turn on AI to access Agent conversations",
-                "Enable Warp AI to access your conversation history.",
+                warp_i18n::tr("panel.enable_ai_conversations"),
+                warp_i18n::tr("panel.enable_ai_conversations_desc"),
             ),
             (
                 ToolPanelView::ProjectExplorer
@@ -280,8 +280,8 @@ impl LeftPanelView {
             | (_, ToolPanelAvailability::Available) => {
                 debug_assert!(false, "unexpected locked tool-panel state");
                 (
-                    "Feature unavailable",
-                    "This feature is currently unavailable.",
+                    warp_i18n::tr("panel.feature_unavailable"),
+                    warp_i18n::tr("panel.feature_unavailable_desc"),
                 )
             }
         };
@@ -321,7 +321,7 @@ impl LeftPanelView {
                     ButtonVariant::Accent,
                     self.mouse_state_handles.sign_in_button.clone(),
                 )
-                .with_text_label("Sign in".to_string())
+                .with_text_label(warp_i18n::tr("menu.sign_in"))
                 .build()
                 .on_click(|ctx, _, _| {
                     ctx.dispatch_typed_action(LeftPanelAction::SignIn);
@@ -569,7 +569,7 @@ impl LeftPanelView {
                 ToolbeltButtonConfig {
                     icon: Icon::Search,
                     active_icon: None,
-                    tooltip_text: "Global search".to_string(),
+                    tooltip_text: warp_i18n::tr("menu.global_search_tooltip"),
                     action: LeftPanelAction::GlobalSearch {
                         entry_focus: GlobalSearchEntryFocus::QueryEditor,
                     },
@@ -587,7 +587,7 @@ impl LeftPanelView {
                 ToolbeltButtonConfig {
                     icon: Icon::WarpDrive,
                     active_icon: None,
-                    tooltip_text: "Warp Drive".to_string(),
+                    tooltip_text: warp_i18n::tr("menu.warp_drive_tooltip"),
                     action: LeftPanelAction::WarpDrive,
                     render_with_active_state: false,
                     tooltip_keybinding: toolbelt_tooltip_keybinding(&tooltip_keybinding_names, ctx),
@@ -603,7 +603,7 @@ impl LeftPanelView {
                 ToolbeltButtonConfig {
                     icon: Icon::Conversation,
                     active_icon: Some(Icon::Conversation),
-                    tooltip_text: "Agent conversations".to_string(),
+                    tooltip_text: warp_i18n::tr("menu.agent_conversations_tooltip"),
                     action: LeftPanelAction::ConversationListView,
                     render_with_active_state: false,
                     tooltip_keybinding: toolbelt_tooltip_keybinding(&tooltip_keybinding_names, ctx),

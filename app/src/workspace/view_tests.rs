@@ -590,6 +590,10 @@ fn test_theme_chooser_does_not_suppress_tab_bar_traffic_light_padding() {
 /// toggle.
 #[test]
 fn test_tools_panel_preferences_activate_after_signup_and_ai_enablement() {
+    if warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss {
+        // The OSS channel hides the Warp Drive and conversation panels.
+        return;
+    }
     let _skip_anon_guard = FeatureFlag::SkipFirebaseAnonymousUser.override_enabled(true);
     let _conversation_list_guard =
         FeatureFlag::AgentViewConversationListView.override_enabled(true);
@@ -5413,6 +5417,10 @@ fn test_pin_tab_on_grouped_tab_extracts_then_pins() {
 /// the tools panel with no way back).
 #[test]
 fn test_tools_panel_warp_drive_toggle_updates_available_views() {
+    if warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss {
+        // The OSS channel hides the Warp Drive panel entirely.
+        return;
+    }
     // Force the non-anonymous path so `is_warp_drive_enabled` follows the
     // `enable_warp_drive` setting rather than the auth state.
     let _skip_anon_guard = FeatureFlag::SkipFirebaseAnonymousUser.override_enabled(false);

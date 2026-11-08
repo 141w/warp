@@ -697,7 +697,7 @@ impl BackingView for TerminalView {
             && ContextFlag::CreateSharedSession.is_enabled()
         {
             items.push(
-                MenuItemFields::new("Share session")
+                MenuItemFields::new(warp_i18n::tr("menu.share_session"))
                     .with_on_select_action(TerminalAction::OpenShareSessionModal { source })
                     .into_item(),
             );
