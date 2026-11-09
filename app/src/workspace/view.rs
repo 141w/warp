@@ -10091,7 +10091,9 @@ impl Workspace {
             MenuItem::Separator,
         ]);
 
-        if self.auth_state.is_anonymous_or_logged_out() {
+        let oss_channel =
+            warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss;
+        if !oss_channel && self.auth_state.is_anonymous_or_logged_out() {
             items.push(
                 MenuItemFields::new(warp_i18n::tr("menu.sign_up"))
                     .with_on_select_action(WorkspaceAction::SignupAnonymousUser)
@@ -10105,27 +10107,31 @@ impl Workspace {
             .map(|workspace| workspace.billing_metadata.is_user_on_paid_plan())
             .unwrap_or(false);
 
-        if is_on_paid_plan {
+        if !oss_channel {
+            if is_on_paid_plan {
+                items.push(
+                    MenuItemFields::new(warp_i18n::tr("menu.billing_and_usage"))
+                        .with_on_select_action(WorkspaceAction::ShowSettingsPage(
+                            SettingsSection::BillingAndUsage,
+                        ))
+                        .into_item(),
+                );
+            } else {
+                items.push(
+                    MenuItemFields::new(warp_i18n::tr("menu.upgrade"))
+                        .with_on_select_action(WorkspaceAction::ShowUpgrade)
+                        .into_item(),
+                );
+            }
+        }
+
+        if !oss_channel {
             items.push(
-                MenuItemFields::new(warp_i18n::tr("menu.billing_and_usage"))
-                    .with_on_select_action(WorkspaceAction::ShowSettingsPage(
-                        SettingsSection::BillingAndUsage,
-                    ))
-                    .into_item(),
-            );
-        } else {
-            items.push(
-                MenuItemFields::new(warp_i18n::tr("menu.upgrade"))
-                    .with_on_select_action(WorkspaceAction::ShowUpgrade)
+                MenuItemFields::new(warp_i18n::tr("menu.invite_friend"))
+                    .with_on_select_action(WorkspaceAction::ShowReferralSettingsPage)
                     .into_item(),
             );
         }
-
-        items.push(
-            MenuItemFields::new(warp_i18n::tr("menu.invite_friend"))
-                .with_on_select_action(WorkspaceAction::ShowReferralSettingsPage)
-                .into_item(),
-        );
 
         if !self.auth_state.is_anonymous_or_logged_out() {
             items.push(
@@ -24078,8 +24084,6 @@ impl Workspace {
             warp_core::channel::ChannelState::channel() == warp_core::channel::Channel::Oss;
         if FeatureFlag::AgentViewConversationListView.is_enabled()
             && *AISettings::as_ref(ctx).show_conversation_history
-            && !oss_channel
-            && !AISettings::as_ref(ctx).is_local_pi_only_exempt(ctx)
         {
             views.push(ToolPanelView::ConversationListView);
         }
