@@ -85,18 +85,23 @@ const AI_ASSIST_BUTTON_SIZE: f32 = 96.;
 const SCROLLBAR_WIDTH: ScrollbarWidth = ScrollbarWidth::Auto;
 
 const TITLE_PLACEHOLDER_TEXT: &str = "Untitled workflow";
-const DESCRIPTION_PLACEHOLDER_TEXT: &str = "Add a description";
+static DESCRIPTION_PLACEHOLDER_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.add_description"));
 const COMMAND_EDITOR_PLACEHOLDER_TEXT: &str = "echo \"Hello {{your_name}}\" # insert arguments with curly braces\n# enter a single-line command or an entire shell script";
 const ARGUMENT_BUTTON_TEXT: &str = "New argument";
 const ARGUMENT_DESCRIPTION_PLACEHOLDER_TEXT: &str = "Description";
-const ARGUMENT_DEFAULT_VALUE_PLACEHOLDER_TEXT: &str = "Default value (optional)";
+static ARGUMENT_DEFAULT_VALUE_PLACEHOLDER_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.default_value_opt"));
 const SAVE_BUTTON_TEXT: &str = "Save workflow";
 const AI_ASSIST_BUTTON_TEXT: &str = "Autofill";
 const AI_ASSIST_LOADING_TEXT: &str = "Loading";
 const DEFAULT_ARGUMENT_PREFIX: &str = "argument";
-const UNSAVED_CHANGES_TEXT: &str = "You have unsaved changes.";
-const KEEP_EDITING_TEXT: &str = "Keep editing";
-const DISCARD_CHANGES_TEXT: &str = "Discard changes";
+static UNSAVED_CHANGES_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.unsaved_changes"));
+static KEEP_EDITING_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.keep_editing"));
+static DISCARD_CHANGES_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.discard_changes"));
 
 #[derive(Default)]
 struct MouseStateHandles {
@@ -230,7 +235,7 @@ impl WorkflowModal {
             ctx,
             Some(DESCRIPTION_FONT_SIZE),
             Some(ui_font_family),
-            Some(DESCRIPTION_PLACEHOLDER_TEXT),
+            Some(DESCRIPTION_PLACEHOLDER_TEXT.as_str()),
             false, /* vim_keybindings */
             false, /* single_line */
         );
@@ -1215,7 +1220,7 @@ impl WorkflowModal {
                                 ctx,
                                 Some(ARGUMENT_EDITOR_FONT_SIZE),
                                 Some(ui_font_family),
-                                Some(ARGUMENT_DEFAULT_VALUE_PLACEHOLDER_TEXT),
+                                Some(ARGUMENT_DEFAULT_VALUE_PLACEHOLDER_TEXT.as_str()),
                                 false, /* vim_keybindings */
                                 false,
                             );
@@ -1770,7 +1775,7 @@ impl WorkflowModal {
                 padding: Some(Coords::uniform(BUTTON_PADDING)),
                 ..Default::default()
             })
-            .with_text_label(KEEP_EDITING_TEXT.into())
+            .with_text_label(KEEP_EDITING_TEXT.clone().into())
             .build()
             .with_cursor(Cursor::PointingHand)
             .on_click(move |ctx, _, _| {
@@ -1790,7 +1795,7 @@ impl WorkflowModal {
                 padding: Some(Coords::uniform(BUTTON_PADDING)),
                 ..Default::default()
             })
-            .with_text_label(DISCARD_CHANGES_TEXT.into())
+            .with_text_label(DISCARD_CHANGES_TEXT.clone().into())
             .build()
             .with_cursor(Cursor::PointingHand)
             .on_click(move |ctx, _, _| ctx.dispatch_typed_action(WorkflowModalAction::ForceClose))
@@ -1798,7 +1803,7 @@ impl WorkflowModal {
 
         Container::new(
             Dialog::new(
-                UNSAVED_CHANGES_TEXT.to_string(),
+                UNSAVED_CHANGES_TEXT.clone().to_string(),
                 None,
                 dialog_styles(appearance),
             )

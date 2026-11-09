@@ -2393,11 +2393,11 @@ impl FileTreeView {
             };
 
             let open_text = if cfg!(target_os = "macos") {
-                "Reveal in Finder"
+                warp_i18n::tr("menu.reveal_finder")
             } else if cfg!(target_os = "windows") {
-                "Reveal in Explorer"
+                warp_i18n::tr("menu.reveal_explorer")
             } else {
-                "Reveal in file manager"
+                warp_i18n::tr("menu.reveal_file_manager")
             };
             items.push(
                 MenuItemFields::new(open_text)

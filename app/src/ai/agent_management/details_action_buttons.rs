@@ -132,7 +132,7 @@ impl ConversationActionButtonsRow {
         let fork_conversation_button = ctx.add_typed_action_view(|_| {
             Self::make_action_button(
                 Icon::ArrowSplit,
-                "Fork conversation",
+                warp_i18n::tr("menu.fork_conversation"),
                 None,
                 AgentDetailsAction::ForkConversation,
             )
@@ -179,14 +179,14 @@ impl ConversationActionButtonsRow {
 
     fn make_action_button(
         icon: Icon,
-        tooltip: &str,
+        tooltip: impl Into<String>,
         icon_color: Option<AnsiColorIdentifier>,
         action: AgentDetailsAction,
     ) -> ActionButton {
         let mut button = ActionButton::new("", SecondaryTheme)
             .with_icon(icon)
             .with_size(ButtonSize::Small)
-            .with_tooltip(tooltip)
+            .with_tooltip(tooltip.into())
             .on_click(move |ctx| {
                 ctx.dispatch_typed_action(action.clone());
             });

@@ -64,12 +64,10 @@ pub enum GeneratedCommandMetadataError {
 impl GeneratedCommandMetadataError {
     pub fn user_facing_message(&self) -> String {
         match self {
-            Self::BadCommand => {
-                "Failed to generate metadata. Please try again with a different command."
-            }
-            Self::AiProviderError => "Something went wrong. Please try again.",
-            Self::RateLimited => "Looks like you're out of AI credits. Please try again later.",
-            Self::Other => "Something went wrong. Please try again.",
+            Self::BadCommand => warp_i18n::tr("menu.failed_generate_metadata"),
+            Self::AiProviderError => warp_i18n::tr("menu.something_wrong"),
+            Self::RateLimited => warp_i18n::tr("menu.rate_limited"),
+            Self::Other => warp_i18n::tr("menu.something_wrong"),
         }
         .to_string()
     }

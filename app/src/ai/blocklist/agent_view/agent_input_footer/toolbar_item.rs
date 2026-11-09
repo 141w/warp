@@ -121,21 +121,21 @@ impl AgentToolbarItemKind {
         }
     }
 
-    pub fn display_label(&self) -> &'static str {
+    pub fn display_label(&self) -> String {
         match self {
-            Self::ContextChip(_) => "Context Chip",
-            Self::ModelSelector => "Model Selector",
-            Self::NLDToggle => "Autodetection",
-            Self::VoiceInput => "Voice Input",
-            Self::FileAttach => "Attach File",
-            Self::ContextWindowUsage => "Context Usage",
-            Self::UsageSummary => "Conversation Usage",
-            Self::FileExplorer => "File Explorer",
-            Self::RichInput => "Rich Input",
-            Self::ShareSession => "/remote-control",
-            Self::Settings => "Settings",
-            Self::FastForwardToggle => "Fast Forward",
-            Self::HandoffToCloud => "Hand off to cloud",
+            Self::ContextChip(_) => warp_i18n::tr("menu.context_chip"),
+            Self::ModelSelector => warp_i18n::tr("menu.model_selector"),
+            Self::NLDToggle => warp_i18n::tr("menu.autodetection"),
+            Self::VoiceInput => warp_i18n::tr("menu.voice_input"),
+            Self::FileAttach => warp_i18n::tr("menu.attach_file"),
+            Self::ContextWindowUsage => warp_i18n::tr("menu.context_usage"),
+            Self::UsageSummary => warp_i18n::tr("menu.conversation_usage"),
+            Self::FileExplorer => warp_i18n::tr("menu.file_explorer"),
+            Self::RichInput => warp_i18n::tr("menu.rich_input"),
+            Self::ShareSession => warp_i18n::tr("menu.remote_control"),
+            Self::Settings => warp_i18n::tr("menu.settings"),
+            Self::FastForwardToggle => warp_i18n::tr("menu.fast_forward"),
+            Self::HandoffToCloud => warp_i18n::tr("menu.handoff_cloud"),
         }
     }
 

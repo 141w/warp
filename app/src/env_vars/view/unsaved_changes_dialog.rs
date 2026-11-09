@@ -9,9 +9,12 @@ use warpui::ui_components::components::{Coords, UiComponent, UiComponentStyles};
 use super::env_var_collection::{EnvVarCollectionAction, EnvVarCollectionView};
 use crate::ui_components::dialog::{Dialog, dialog_styles};
 
-const UNSAVED_CHANGES_TEXT: &str = "You have unsaved changes.";
-const KEEP_EDITING_TEXT: &str = "Keep editing";
-const DISCARD_CHANGES_TEXT: &str = "Discard changes";
+static UNSAVED_CHANGES_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.unsaved_changes"));
+static KEEP_EDITING_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.keep_editing"));
+static DISCARD_CHANGES_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.discard_changes"));
 const BUTTON_FONT_SIZE: f32 = 14.;
 const BUTTON_PADDING: f32 = 12.;
 const MODAL_HORIZONTAL_MARGIN: f32 = 28.;
@@ -23,7 +26,7 @@ impl EnvVarCollectionView {
         appearance: &Appearance,
         button_mouse_state: MouseStateHandle,
         action: EnvVarCollectionAction,
-        text: &str,
+        text: impl Into<String>,
     ) -> Box<dyn Element> {
         appearance
             .ui_builder()
@@ -46,19 +49,19 @@ impl EnvVarCollectionView {
             appearance,
             self.button_mouse_states.keep_editing_state.clone(),
             EnvVarCollectionAction::CloseUnsavedChangesDialog,
-            KEEP_EDITING_TEXT,
+            KEEP_EDITING_TEXT.clone(),
         );
 
         let discard_changes_button = self.render_unsaved_changes_dialog_button(
             appearance,
             self.button_mouse_states.discard_changes_state.clone(),
             EnvVarCollectionAction::ForceClose,
-            DISCARD_CHANGES_TEXT,
+            DISCARD_CHANGES_TEXT.clone(),
         );
 
         Container::new(
             Dialog::new(
-                UNSAVED_CHANGES_TEXT.to_string(),
+                UNSAVED_CHANGES_TEXT.clone().to_string(),
                 None,
                 dialog_styles(appearance),
             )

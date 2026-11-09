@@ -196,13 +196,13 @@ impl ControlItemRenderer {
             .finish()
     }
 
-    pub(crate) fn display_label(&self) -> &str {
+    pub(crate) fn display_label(&self) -> String {
         if let Some(label) = &self.custom_label {
-            label
+            label.clone()
         } else if let Some(kind) = &self.kind {
             kind.display_label()
         } else {
-            "Unknown"
+            warp_i18n::tr("menu.unknown")
         }
     }
 

@@ -1065,7 +1065,7 @@ impl DisplayChipMenu {
         let appearance = Appearance::as_ref(ctx);
         let theme = appearance.theme();
         if self.filtered_items.is_empty() {
-            // Show "No results" if search is active but no matches.
+            // Show warp_i18n::tr("menu.no_results") if search is active but no matches.
             if !self.search_query.is_empty() {
                 // Match the model selector dropdown's no-results row exactly
                 // for the environments menu (label, font size, paddings, and
@@ -1073,7 +1073,7 @@ impl DisplayChipMenu {
                 let (label, font_size, horizontal_padding, vertical_padding, text_color) =
                     match self.chip_menu_type {
                         ChipMenuType::Environments => (
-                            "No results",
+                            warp_i18n::tr("menu.no_results"),
                             ENV_MENU_ITEM_FONT_SIZE,
                             ENV_MENU_ITEM_HORIZONTAL_PADDING,
                             ENV_MENU_ITEM_VERTICAL_PADDING,
@@ -1082,7 +1082,7 @@ impl DisplayChipMenu {
                         ChipMenuType::Directories
                         | ChipMenuType::Branches
                         | ChipMenuType::CodeReview => (
-                            "No results found",
+                            warp_i18n::tr("menu.no_results_found"),
                             appearance.ui_font_size(),
                             LABEL_HORIZONTAL_PADDING,
                             LABEL_VERTICAL_PADDING * 2.0,

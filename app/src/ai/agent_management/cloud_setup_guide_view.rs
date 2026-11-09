@@ -293,8 +293,8 @@ impl CloudSetupGuideView {
     /// Render a description that includes a link at the end
     /// (e.g. "Use warp's environment setup command to have an agent help you through it. LINK[Visit docs]")
     fn render_description_with_link(
-        prefix: &'static str,
-        link_text: &'static str,
+        prefix: impl Into<String>,
+        link_text: impl Into<String>,
         link_mouse_state: MouseStateHandle,
         telemetry_url: SetupGuideDocs,
         appearance: &Appearance,
@@ -303,7 +303,7 @@ impl CloudSetupGuideView {
         let link = appearance
             .ui_builder()
             .link(
-                link_text.to_string(),
+                link_text.into(),
                 None,
                 Some(Box::new(move |ctx| {
                     ctx.dispatch_typed_action(CloudSetupGuideAction::OpenDocs {
@@ -321,9 +321,13 @@ impl CloudSetupGuideView {
 
         Flex::row()
             .with_child(
-                Text::new_inline(prefix, appearance.ui_font_family(), step_desc_font_size)
-                    .with_color(appearance.theme().nonactive_ui_text_color().into_solid())
-                    .finish(),
+                Text::new_inline(
+                    prefix.into(),
+                    appearance.ui_font_family(),
+                    step_desc_font_size,
+                )
+                .with_color(appearance.theme().nonactive_ui_text_color().into_solid())
+                .finish(),
             )
             .with_child(link)
             .finish()
@@ -460,7 +464,7 @@ impl CloudSetupGuideView {
 
         let sub_description = Container::new(Self::render_description_with_link(
             "Use Warp's environment setup command to have an agent help you through it. ",
-            "Visit docs",
+            warp_i18n::tr("menu.visit_docs"),
             self.env_docs_link_mouse_state.clone(),
             SetupGuideDocs::Environment,
             appearance,
@@ -533,7 +537,7 @@ impl CloudSetupGuideView {
 
         let sub_description = Container::new(Self::render_description_with_link(
             "Integrate Slack or Linear to assign Warp's Agent tasks with @Warp. ",
-            "Visit docs",
+            warp_i18n::tr("menu.visit_docs"),
             self.integration_docs_link_mouse_state.clone(),
             SetupGuideDocs::Integration,
             appearance,

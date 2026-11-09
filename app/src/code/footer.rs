@@ -1097,7 +1097,7 @@ impl CodeFooterView {
         appearance: &Appearance,
         mouse_state: MouseStateHandle,
         icon_creator: F,
-        label: &'static str,
+        label: impl Into<String>,
         action: CodeFooterViewAction,
     ) -> Box<dyn Element> {
         let theme = appearance.theme().clone();
@@ -1115,7 +1115,7 @@ impl CodeFooterView {
                 .finish();
 
             let label_element = ui_builder
-                .span(label)
+                .span(label.into())
                 .with_style(UiComponentStyles {
                     font_color: Some(text_color),
                     ..Default::default()
@@ -1194,7 +1194,7 @@ impl CodeFooterView {
                     .to_warpui_icon(ThemeFill::Solid(text_color))
                     .finish()
             },
-            "Restart server",
+            warp_i18n::tr("menu.restart_server"),
             CodeFooterViewAction::RestartServer,
         )
     }
@@ -1217,7 +1217,7 @@ impl CodeFooterView {
                     .with_uniform_padding(2.)
                     .finish()
             },
-            "Stop server",
+            warp_i18n::tr("menu.stop_server"),
             CodeFooterViewAction::StopServer,
         )
     }
@@ -1239,7 +1239,7 @@ impl CodeFooterView {
                     .to_warpui_icon(ThemeFill::Solid(text_color))
                     .finish()
             },
-            "Start server",
+            warp_i18n::tr("menu.start_server"),
             CodeFooterViewAction::StartServer,
         )
     }
@@ -1285,9 +1285,9 @@ impl CodeFooterView {
                     .finish()
             },
             if is_plural {
-                "Restart all servers"
+                warp_i18n::tr("menu.restart_all_servers")
             } else {
-                "Restart server"
+                warp_i18n::tr("menu.restart_server")
             },
             CodeFooterViewAction::RestartAllServers,
         )
@@ -1313,9 +1313,9 @@ impl CodeFooterView {
                     .finish()
             },
             if is_plural {
-                "Stop all servers"
+                warp_i18n::tr("menu.stop_all_servers")
             } else {
-                "Stop server"
+                warp_i18n::tr("menu.stop_server")
             },
             CodeFooterViewAction::StopAllServers,
         )
@@ -1341,11 +1341,11 @@ impl CodeFooterView {
                     .finish()
             },
             if !is_plural {
-                "Start server"
+                warp_i18n::tr("menu.start_server")
             } else if has_running {
-                "Start all stopped servers"
+                warp_i18n::tr("menu.start_all_stopped_servers")
             } else {
-                "Start all servers"
+                warp_i18n::tr("menu.start_all_servers")
             },
             CodeFooterViewAction::StartAllServers,
         )

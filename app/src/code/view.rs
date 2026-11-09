@@ -2170,11 +2170,11 @@ impl CodeView {
 
             if local_path.is_some() {
                 let reveal_label = if cfg!(target_os = "macos") {
-                    "Reveal in Finder"
+                    warp_i18n::tr("menu.reveal_finder")
                 } else if cfg!(target_os = "windows") {
-                    "Reveal in Explorer"
+                    warp_i18n::tr("menu.reveal_explorer")
                 } else {
-                    "Reveal in file manager"
+                    warp_i18n::tr("menu.reveal_file_manager")
                 };
                 items.push(
                     MenuItemFields::new(reveal_label)

@@ -11519,7 +11519,7 @@ impl Workspace {
 
                 self.toast_stack.update(ctx, |view, ctx| {
                     let new_toast =
-                        DismissibleToast::error("Looks like you're out of AI credits.".into())
+                        DismissibleToast::error(warp_i18n::tr("menu.out_of_credits").into())
                             .with_link(
                                 ToastLink::new("Upgrade for more credits.".into())
                                     .with_href(upgrade_link),
@@ -13694,7 +13694,8 @@ impl Workspace {
                     ctx.notify();
                 });
                 WorkspaceToastStack::handle(ctx).update(ctx, |toast_stack, ctx| {
-                    let toast = DismissibleToast::error("Failed to load conversation.".to_owned());
+                    let toast =
+                        DismissibleToast::error(warp_i18n::tr("menu.failed_load_conv").to_owned());
                     toast_stack.add_ephemeral_toast(toast, window_id, ctx);
                 });
                 return;
@@ -13755,7 +13756,8 @@ impl Workspace {
             let Some(conversation) = conversation else {
                 log::warn!("Failed to load conversation {conversation_id}");
                 WorkspaceToastStack::handle(ctx).update(ctx, |toast_stack, ctx| {
-                    let toast = DismissibleToast::error("Failed to load conversation.".to_owned());
+                    let toast =
+                        DismissibleToast::error(warp_i18n::tr("menu.failed_load_conv").to_owned());
                     toast_stack.add_ephemeral_toast(toast, window_id, ctx);
                 });
                 // Close the loading pane
@@ -13824,7 +13826,8 @@ impl Workspace {
             let Some(conversation) = conversation else {
                 log::warn!("Failed to load conversation {conversation_id}");
                 WorkspaceToastStack::handle(ctx).update(ctx, |toast_stack, ctx| {
-                    let toast = DismissibleToast::error("Failed to load conversation.".to_owned());
+                    let toast =
+                        DismissibleToast::error(warp_i18n::tr("menu.failed_load_conv").to_owned());
                     toast_stack.add_ephemeral_toast(toast, window_id, ctx);
                 });
                 // Close the loading tab
@@ -15336,8 +15339,9 @@ impl Workspace {
                                 .find(|binding| binding.name == "workspace:view_changelog")
                                 .and_then(|binding| trigger_to_keystroke(binding.trigger));
 
-                            let mut link = ToastLink::new("View changelog".to_owned())
-                                .with_onclick_action(WorkspaceAction::ViewLatestChangelog);
+                            let mut link =
+                                ToastLink::new(warp_i18n::tr("menu.view_changelog").to_owned())
+                                    .with_onclick_action(WorkspaceAction::ViewLatestChangelog);
                             if let Some(keystroke) = keystroke {
                                 link = link.with_keystroke(keystroke);
                             }
@@ -18650,8 +18654,7 @@ impl Workspace {
                                 DismissibleToast::error(message)
                                     .with_link(
                                         ToastLink::new(
-                                            "Check out the latest version and try again."
-                                                .to_string(),
+                                            warp_i18n::tr("menu.check_latest").to_string(),
                                         )
                                         .with_onclick_action(
                                             WorkspaceAction::HandleConflictingWorkflow(workflow.id),
@@ -18662,8 +18665,7 @@ impl Workspace {
                                 DismissibleToast::error(message)
                                     .with_link(
                                         ToastLink::new(
-                                            "Check out the latest version and try again."
-                                                .to_string(),
+                                            warp_i18n::tr("menu.check_latest").to_string(),
                                         )
                                         .with_onclick_action(
                                             WorkspaceAction::HandleConflictingEnvVarCollection(

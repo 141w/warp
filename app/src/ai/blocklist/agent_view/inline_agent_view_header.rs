@@ -19,12 +19,18 @@ use crate::terminal::model::session::Sessions;
 use crate::ui_components::blended_colors;
 use crate::ui_components::icons::Icon;
 
-const AGENT_PROMPT_TO_INTERACT_MESSAGE: &str = "Prompt agent to interact with";
-const AGENT_WAITING_ON_INSTRUCTIONS_MESSAGE: &str = "Agent is waiting on instructions";
-const AGENT_WAITING_FOR_COMMAND_TO_EXIT_MESSAGE: &str = "Agent is waiting for command to exit";
-const AGENT_BLOCKED_MESSAGE: &str = "Agent needs your permission to continue";
-const AGENT_IN_CONTROL_MESSAGE: &str = "Agent is in control";
-const USER_IN_CONTROL_MESSAGE: &str = "User is in control";
+static AGENT_PROMPT_TO_INTERACT_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.prompt_agent_interact"));
+static AGENT_WAITING_ON_INSTRUCTIONS_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.agent_waiting_instructions"));
+static AGENT_WAITING_FOR_COMMAND_TO_EXIT_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.agent_waiting_exit"));
+static AGENT_BLOCKED_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.agent_needs_permission"));
+static AGENT_IN_CONTROL_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.agent_in_control"));
+static USER_IN_CONTROL_MESSAGE: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.user_in_control"));
 
 /// A header rendered as rich content above the active block when Agent View is in inline mode.
 pub struct InlineAgentViewHeader {
@@ -123,9 +129,9 @@ impl View for InlineAgentViewHeader {
                 blended_colors::text_main(appearance.theme(), header_background).into(),
             );
             let message = if let Some(command) = top_level_command.as_deref() {
-                format!("{AGENT_PROMPT_TO_INTERACT_MESSAGE} `{command}`")
+                format!("{} `{command}`", *AGENT_PROMPT_TO_INTERACT_MESSAGE)
             } else {
-                format!("{AGENT_PROMPT_TO_INTERACT_MESSAGE} the running command")
+                format!("{} the running command", *AGENT_PROMPT_TO_INTERACT_MESSAGE)
             };
             return HeaderConfig::new(message, app)
                 .with_icon(icon)

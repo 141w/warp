@@ -1657,7 +1657,7 @@ pub(crate) fn conversation_is_cloud_oz_for_slash_command(
 /// callers rendering the button and callers inserting the command always agree.
 #[cfg(not(target_family = "wasm"))]
 pub(crate) struct ForkButtonAction {
-    pub tooltip: &'static str,
+    pub tooltip: String,
     pub command_name: &'static str,
 }
 
@@ -1674,12 +1674,12 @@ pub(crate) fn fork_button_action(
         && conversation_id.is_some_and(|id| conversation_is_cloud_oz_for_slash_command(id, ctx))
     {
         ForkButtonAction {
-            tooltip: "Continue locally",
+            tooltip: warp_i18n::tr("menu.continue_locally"),
             command_name: commands::CONTINUE_LOCALLY.name,
         }
     } else {
         ForkButtonAction {
-            tooltip: "Fork conversation",
+            tooltip: warp_i18n::tr("menu.fork_conversation"),
             command_name: commands::FORK.name,
         }
     }

@@ -3975,7 +3975,10 @@ impl TerminalView {
                     FormattedTextFragment::plain_text(
                         "Seems like your shell is taking a while to start...  ",
                     ),
-                    FormattedTextFragment::hyperlink("More info", KNOWN_ISSUES_URL),
+                    FormattedTextFragment::hyperlink(
+                        warp_i18n::tr("menu.more_info"),
+                        KNOWN_ISSUES_URL,
+                    ),
                 ]),
                 vec![BannerTextButton::new(
                     "Show initialization block".to_string(),
@@ -4018,7 +4021,7 @@ impl TerminalView {
                 FormattedTextFragment::plain_text(
                     "Your shell configuration is incompatible with Warp...  ",
                 ),
-                FormattedTextFragment::hyperlink("More info", KNOWN_ISSUES_URL),
+                FormattedTextFragment::hyperlink(warp_i18n::tr("menu.more_info"), KNOWN_ISSUES_URL),
             ]))
         });
 

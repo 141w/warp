@@ -164,12 +164,18 @@ const FOLDER_LABEL: &str = "Folder";
 const NOTEBOOK_LABEL: &str = "Notebook";
 const WORKFLOW_LABEL: &str = "Workflow";
 const AGENT_MODE_WORKFLOW_LABEL: &str = "Prompt";
-const ENV_VAR_COLLECTION_LABEL: &str = "Environment variables";
+fn env_var_collection_title() -> String {
+    warp_i18n::tr("menu.env_vars_title")
+}
+
+static ENV_VAR_COLLECTION_LABEL: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.env_vars_item"));
 const INDEX_FOLDER_LABEL: &str = "New folder";
 const INDEX_NOTEBOOK_LABEL: &str = "New notebook";
 const INDEX_WORKFLOW_LABEL: &str = "New workflow";
 const INDEX_AGENT_MODE_WORKFLOW_LABEL: &str = "New prompt";
-const INDEX_ENV_VAR_COLLECTION_LABEL: &str = "New environment variables";
+static INDEX_ENV_VAR_COLLECTION_LABEL: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.new_env_vars"));
 
 const IMPORT_LABEL: &str = "Import";
 const REMOVE_LABEL: &str = "Remove";
@@ -3783,7 +3789,7 @@ impl DriveIndex {
             );
 
             menu_items.push(
-                MenuItemFields::new(ENV_VAR_COLLECTION_LABEL)
+                MenuItemFields::new(ENV_VAR_COLLECTION_LABEL.clone())
                     .with_on_select_action(DriveIndexAction::create_object(
                         DriveObjectType::EnvVarCollection,
                         *space,
@@ -4187,15 +4193,15 @@ impl DriveIndex {
         };
 
         let name = match object_type {
-            DriveObjectType::Notebook { .. } => "Notebooks",
-            DriveObjectType::Workflow => "Workflows",
-            DriveObjectType::EnvVarCollection => "Environment Variables",
-            DriveObjectType::Folder => "Folders",
-            DriveObjectType::AgentModeWorkflow => "Agent Workflows",
-            DriveObjectType::AIFact => "AI Fact",
-            DriveObjectType::AIFactCollection => "Rules",
-            DriveObjectType::MCPServer => "MCP Server",
-            DriveObjectType::MCPServerCollection => "MCP Servers",
+            DriveObjectType::Notebook { .. } => warp_i18n::tr("menu.notebooks"),
+            DriveObjectType::Workflow => warp_i18n::tr("menu.workflows"),
+            DriveObjectType::EnvVarCollection => env_var_collection_title(),
+            DriveObjectType::Folder => warp_i18n::tr("menu.folders"),
+            DriveObjectType::AgentModeWorkflow => warp_i18n::tr("menu.agent_workflows"),
+            DriveObjectType::AIFact => warp_i18n::tr("menu.ai_fact"),
+            DriveObjectType::AIFactCollection => warp_i18n::tr("menu.rules"),
+            DriveObjectType::MCPServer => warp_i18n::tr("menu.mcp_server"),
+            DriveObjectType::MCPServerCollection => warp_i18n::tr("menu.mcp_servers"),
         };
         let name_styles = UiComponentStyles {
             font_family_id: Some(appearance.ui_font_family()),
@@ -4535,7 +4541,7 @@ impl DriveIndex {
                         );
 
                         menu_items.push(
-                            MenuItemFields::new(INDEX_ENV_VAR_COLLECTION_LABEL)
+                            MenuItemFields::new(INDEX_ENV_VAR_COLLECTION_LABEL.clone())
                                 .with_on_select_action(DriveIndexAction::create_object(
                                     DriveObjectType::EnvVarCollection,
                                     *space,

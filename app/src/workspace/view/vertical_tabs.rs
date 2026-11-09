@@ -3691,21 +3691,21 @@ impl TypedPane<'_> {
         matches!(self, TypedPane::Terminal(_) | TypedPane::Code(_))
             || self.warp_drive_object_type().is_some()
     }
-    fn kind_label(&self) -> &'static str {
+    fn kind_label(&self) -> String {
         match self {
-            TypedPane::Terminal(_) => "Terminal",
-            TypedPane::Code(_) => "Code",
-            TypedPane::CodeDiff => "Code Diff",
-            TypedPane::File => "File",
-            TypedPane::Notebook { .. } => "Notebook",
-            TypedPane::Workflow { .. } => "Workflow",
-            TypedPane::Settings => "Settings",
-            TypedPane::EnvVarCollection => "Environment Variables",
-            TypedPane::EnvironmentManagement => "Environments",
-            TypedPane::AIFact => "Rules",
-            TypedPane::AIDocument => "Plan",
-            TypedPane::ExecutionProfileEditor => "Execution Profile",
-            TypedPane::Other => "Other",
+            TypedPane::Terminal(_) => warp_i18n::tr("menu.terminal"),
+            TypedPane::Code(_) => warp_i18n::tr("menu.code"),
+            TypedPane::CodeDiff => warp_i18n::tr("menu.code_diff"),
+            TypedPane::File => warp_i18n::tr("menu.file"),
+            TypedPane::Notebook { .. } => warp_i18n::tr("menu.notebook"),
+            TypedPane::Workflow { .. } => warp_i18n::tr("menu.workflow"),
+            TypedPane::Settings => warp_i18n::tr("menu.settings"),
+            TypedPane::EnvVarCollection => warp_i18n::tr("menu.env_vars_title"),
+            TypedPane::EnvironmentManagement => warp_i18n::tr("menu.environments"),
+            TypedPane::AIFact => warp_i18n::tr("menu.rules"),
+            TypedPane::AIDocument => warp_i18n::tr("menu.plan"),
+            TypedPane::ExecutionProfileEditor => warp_i18n::tr("menu.execution_profile"),
+            TypedPane::Other => warp_i18n::tr("menu.other"),
         }
     }
 

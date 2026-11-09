@@ -81,8 +81,10 @@ const VARIABLE_DESCRIPTION_PLACEHOLDER_TEXT: &str = "Description";
 const VARIABLE_NAME_PLACEHOLDER_TEXT: &str = "Variable";
 
 // Text input fields
-const TITLE_PLACEHOLDER_TEXT: &str = "Add a title";
-const DESCRIPTION_PLACEHOLDER_TEXT: &str = "Add a description";
+static TITLE_PLACEHOLDER_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.add_title"));
+static DESCRIPTION_PLACEHOLDER_TEXT: std::sync::LazyLock<String> =
+    std::sync::LazyLock::new(|| warp_i18n::tr("menu.add_description"));
 
 // Button spacing
 const BUTTON_CONTAINER_HORIZONTAL_MARGIN: f32 = 36.;
@@ -508,14 +510,14 @@ impl EnvVarCollectionView {
             ctx,
             Some(PLACEHOLDER_FONT_SIZE),
             Some(ui_font_family),
-            Some(TITLE_PLACEHOLDER_TEXT),
+            Some(TITLE_PLACEHOLDER_TEXT.as_str()),
             true,
         );
         let description_editor = Self::create_editor_handle(
             ctx,
             Some(PLACEHOLDER_FONT_SIZE),
             Some(ui_font_family),
-            Some(DESCRIPTION_PLACEHOLDER_TEXT),
+            Some(DESCRIPTION_PLACEHOLDER_TEXT.as_str()),
             false,
         );
         ctx.subscribe_to_view(&title_editor, |me, _, event, ctx| {
