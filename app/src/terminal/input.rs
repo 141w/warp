@@ -2303,7 +2303,7 @@ pub fn init(app: &mut AppContext) {
         .with_custom_action(CustomAction::AISearch),
         EditableBinding::new(
             START_NEW_CONVERSATION_KEYBINDING_NAME,
-            "New agent conversation",
+            warp_i18n::tr("menu.new_agent_conversation_tab"),
             InputAction::StartNewAgentConversation {
                 origin: AgentViewEntryOrigin::Input {
                     was_prompt_autodetected: false,

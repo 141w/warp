@@ -752,6 +752,11 @@ bindings:
   "Close Workflow": "Close"
   slash_command_prefix: "Slash command: %{name}"
 menu:
+  back_to_terminal: "for terminal"
+  back_to_orchestrator: "for Orchestrator"
+  back_to_parent_agent: "for parent agent"
+  new_cloud_agent: "New cloud agent"
+  new_agent_conversation_tab: "New agent conversation"
   attach_file: "Attach File"
   autodetection: "Autodetection"
   context_chip: "Context Chip"

@@ -4333,7 +4333,7 @@ impl TerminalView {
         ctx.subscribe_to_view(&orchestration_pill_bar, |_, _, _, ctx| ctx.notify());
 
         let agent_view_back_button = ctx.add_typed_action_view(|ctx| {
-            ActionButton::new("for terminal", AgentViewHeaderTheme)
+            ActionButton::new(warp_i18n::tr("menu.back_to_terminal"), AgentViewHeaderTheme)
                 .with_icon(icons::Icon::ArrowLeft)
                 .with_size(ButtonSize::Small)
                 .with_max_label_width(BACK_BUTTON_LABEL_MAX_WIDTH)
@@ -12254,7 +12254,7 @@ impl TerminalView {
         let label = agent_view_back_button_label(history, active_conv_id);
         // The label is "for terminal" exactly when no parent resolved, so
         // it doubles as the child-agent signal.
-        let is_child_agent = label != "for terminal";
+        let is_child_agent = label != warp_i18n::tr("menu.back_to_terminal");
 
         // Never disable for child agents: the swap-back path can't be blocked.
         let disabled_reason = if is_child_agent {
@@ -30281,7 +30281,7 @@ fn agent_view_back_button_label(
         .and_then(|id| history.conversation(&id))
         .and_then(|c| history.resolved_parent_conversation_id_for_conversation(c));
     let Some(parent_id) = parent_id else {
-        return Cow::Borrowed("for terminal");
+        return Cow::Owned(warp_i18n::tr("menu.back_to_terminal"));
     };
     let parent = history.conversation(&parent_id);
     // An unloaded parent can't be classified; keep the classic wording.
@@ -30291,14 +30291,14 @@ fn agent_view_back_button_label(
             .is_none()
     });
     if parent_is_root {
-        return Cow::Borrowed("for Orchestrator");
+        return Cow::Owned(warp_i18n::tr("menu.back_to_orchestrator"));
     }
     match parent
         .and_then(|parent| parent.agent_name())
         .filter(|name| !name.is_empty())
     {
         Some(name) => Cow::Owned(format!("for {name}")),
-        None => Cow::Borrowed("for parent agent"),
+        None => Cow::Owned(warp_i18n::tr("menu.back_to_parent_agent")),
     }
 }
 

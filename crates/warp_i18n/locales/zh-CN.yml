@@ -751,6 +751,11 @@ bindings:
   "Close Workflow": "关闭工作流"
   slash_command_prefix: "斜杠命令：%{name}"
 menu:
+  back_to_terminal: "返回终端"
+  back_to_orchestrator: "返回编排器"
+  back_to_parent_agent: "返回父智能体"
+  new_cloud_agent: "新建云端智能体"
+  new_agent_conversation_tab: "新建智能体对话"
   attach_file: "附加文件"
   autodetection: "舌动检测"
   context_chip: "上下文片段"

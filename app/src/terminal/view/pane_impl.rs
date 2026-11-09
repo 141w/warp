@@ -1170,8 +1170,8 @@ impl TerminalView {
 
 fn default_agent_conversation_title(is_ambient_agent: bool) -> String {
     if is_ambient_agent {
-        "New cloud agent".to_owned()
+        warp_i18n::tr("menu.new_cloud_agent")
     } else {
-        "New agent conversation".to_owned()
+        warp_i18n::tr("menu.new_agent_conversation_tab")
     }
 }

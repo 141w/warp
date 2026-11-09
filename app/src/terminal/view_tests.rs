@@ -10900,14 +10900,17 @@ fn back_button_label_names_the_direct_parent_at_depth() {
             });
 
         history_model.read(&app, |history, _| {
-            assert_eq!(agent_view_back_button_label(history, None), "for terminal");
+            assert_eq!(
+                agent_view_back_button_label(history, None),
+                warp_i18n::tr("menu.back_to_terminal")
+            );
             assert_eq!(
                 agent_view_back_button_label(history, Some(root_id)),
-                "for terminal",
+                warp_i18n::tr("menu.back_to_terminal"),
             );
             assert_eq!(
                 agent_view_back_button_label(history, Some(mid_id)),
-                "for Orchestrator",
+                warp_i18n::tr("menu.back_to_orchestrator"),
             );
             assert_eq!(
                 agent_view_back_button_label(history, Some(grandchild_id)),
@@ -10915,11 +10918,11 @@ fn back_button_label_names_the_direct_parent_at_depth() {
             );
             assert_eq!(
                 agent_view_back_button_label(history, Some(unnamed_mid_id)),
-                "for Orchestrator",
+                warp_i18n::tr("menu.back_to_orchestrator"),
             );
             assert_eq!(
                 agent_view_back_button_label(history, Some(nested_under_unnamed_id)),
-                "for parent agent",
+                warp_i18n::tr("menu.back_to_parent_agent"),
             );
         });
     });
@@ -10952,7 +10955,7 @@ fn back_button_label_resolves_token_only_parent_linkage() {
         history_model.read(&app, |history, _| {
             assert_eq!(
                 agent_view_back_button_label(history, Some(child_id)),
-                "for Orchestrator",
+                warp_i18n::tr("menu.back_to_orchestrator"),
             );
         });
     });
