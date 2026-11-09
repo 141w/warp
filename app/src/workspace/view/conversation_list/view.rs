@@ -54,7 +54,9 @@ use crate::workspace::view::conversation_list::item::{
 use crate::workspace::{ToastStack, WorkspaceAction};
 use crate::workspaces::user_workspaces::UserWorkspaces;
 
-const VIEW_ALL_LABEL: &str = "View all";
+fn view_all_label() -> String {
+    warp_i18n::tr("menu.conv_view_all")
+}
 /// Maximum number of past items to show before the user toggles "view all".
 const INITIAL_MAX_PAST_ITEMS: usize = 10;
 
@@ -277,7 +279,7 @@ impl ConversationListView {
         // We use this as both the "view all" and "show less" button
         // (switching out the text on-toggle).
         let toggle_view_all_button = ctx.add_typed_action_view(|_| {
-            ActionButton::new(VIEW_ALL_LABEL, SecondaryTheme)
+            ActionButton::new(view_all_label(), SecondaryTheme)
                 .with_size(ButtonSize::Small)
                 .on_click(|ctx| {
                     ctx.dispatch_typed_action(ConversationListViewAction::ToggleViewAll);
@@ -797,15 +799,19 @@ fn render_zero_state(
         .with_cross_axis_alignment(CrossAxisAlignment::Center)
         .with_spacing(4.)
         .with_child(
-            Text::new("No conversations yet", appearance.ui_font_family(), 14.)
-                .with_color(theme.sub_text_color(theme.background()).into_solid())
-                .with_style(Properties::default().weight(Weight::Semibold))
-                .finish(),
+            Text::new(
+                warp_i18n::tr("menu.conv_empty_title"),
+                appearance.ui_font_family(),
+                14.,
+            )
+            .with_color(theme.sub_text_color(theme.background()).into_solid())
+            .with_style(Properties::default().weight(Weight::Semibold))
+            .finish(),
         )
         .with_child(
             ConstrainedBox::new(
                 FormattedTextElement::from_str(
-                    "Your active and past conversations with local and ambient agents will appear here.",
+                    warp_i18n::tr("menu.conv_empty_desc"),
                     appearance.ui_font_family(),
                     14.,
                 )
@@ -820,9 +826,13 @@ fn render_zero_state(
 
     let new_conversation_button =
         Hoverable::new(zero_state_button_mouse_state, move |mouse_state| {
-            let label = Text::new_inline("New conversation", appearance.ui_font_family(), 12.)
-                .with_color(theme.main_text_color(theme.background()).into_solid())
-                .finish();
+            let label = Text::new_inline(
+                warp_i18n::tr("menu.conv_new"),
+                appearance.ui_font_family(),
+                12.,
+            )
+            .with_color(theme.main_text_color(theme.background()).into_solid())
+            .finish();
 
             let button_content = Flex::row()
                 .with_cross_axis_alignment(CrossAxisAlignment::Center)
@@ -1227,9 +1237,9 @@ impl TypedActionView for ConversationListView {
                 self.view_all = !self.view_all;
 
                 let label = if self.view_all {
-                    "Show less"
+                    warp_i18n::tr("menu.conv_show_less")
                 } else {
-                    VIEW_ALL_LABEL
+                    view_all_label()
                 };
                 self.toggle_view_all_button
                     .update(ctx, |button, ctx| button.set_label(label, ctx));

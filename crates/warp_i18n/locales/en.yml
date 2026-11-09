@@ -752,6 +752,11 @@ bindings:
   "Close Workflow": "Close"
   slash_command_prefix: "Slash command: %{name}"
 menu:
+  conv_empty_title: "No conversations yet"
+  conv_empty_desc: "Your active and past conversations with local and ambient agents will appear here."
+  conv_new: "New conversation"
+  conv_view_all: "View all"
+  conv_show_less: "Show less"
   new_agent_conversation: "new /agent conversation"
   vtabs_view_as: "View as"
   vtabs_panes: "Panes"

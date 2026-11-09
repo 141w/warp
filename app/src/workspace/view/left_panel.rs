@@ -109,13 +109,16 @@ impl ToolPanelView {
                     ToolPanelAvailability::RequiresAccount
                 }
             }
+            // Logged-out users still get the panel: local conversations are
+            // backed by the local history DB, not the cloud, and open/delete work
+            // without an account. An empty list renders an empty state instead of
+            // a sign-in wall.
             ToolPanelView::ConversationListView => {
-                if AuthStateProvider::as_ref(app)
-                    .get()
-                    .is_anonymous_or_logged_out()
+                if AISettings::as_ref(app).is_conversation_history_available(app)
+                    || AuthStateProvider::as_ref(app)
+                        .get()
+                        .is_anonymous_or_logged_out()
                 {
-                    ToolPanelAvailability::RequiresAccount
-                } else if AISettings::as_ref(app).is_conversation_history_available(app) {
                     ToolPanelAvailability::Available
                 } else {
                     ToolPanelAvailability::RequiresAi

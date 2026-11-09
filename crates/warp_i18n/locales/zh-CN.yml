@@ -751,6 +751,11 @@ bindings:
   "Close Workflow": "关闭工作流"
   slash_command_prefix: "斜杠命令：%{name}"
 menu:
+  conv_empty_title: "还没有对话"
+  conv_empty_desc: "你与本地和后台智能体的进行中及过去对话会显示在这里。"
+  conv_new: "新建对话"
+  conv_view_all: "查看全部"
+  conv_show_less: "收起"
   new_agent_conversation: "新建 /agent 对话"
   vtabs_view_as: "查看方式"
   vtabs_panes: "窗格"
