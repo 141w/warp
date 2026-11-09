@@ -931,8 +931,8 @@ fn render_section_header(
 
     let title_text = Text::new_inline(
         match section {
-            ConversationSection::Active => "ACTIVE",
-            ConversationSection::Past => "PAST",
+            ConversationSection::Active => warp_i18n::tr("menu.agent_active"),
+            ConversationSection::Past => warp_i18n::tr("menu.agent_past"),
         },
         appearance.ui_font_family(),
         11.,

@@ -415,8 +415,7 @@ impl View for AgentViewZeroStateBlock {
                 },
             }
         } else {
-            let mut local_description =
-                "Send a prompt below to start a new conversation".to_owned();
+            let mut local_description = warp_i18n::tr("menu.agent_new_conv_desc");
             let active_session = self.active_session(app);
             let location_label = active_session.as_deref().and_then(|session| {
                 format_session_location(session, self.current_working_directory.as_deref())
@@ -426,7 +425,7 @@ impl View for AgentViewZeroStateBlock {
             }
 
             HeaderProps {
-                title: "New Warp Agent conversation".into(),
+                title: warp_i18n::tr("menu.agent_new_conv_title").into(),
                 description: AgentViewDescription::PlainText(vec![local_description.into()]),
                 icon: IconWithStatusVariant::OzAgent {
                     status: None,
@@ -741,7 +740,7 @@ fn render_body(props: ZeroStateBodyProps<'_>, app: &AppContext) -> Vec<Box<dyn E
                             MessageItem::keystroke(
                                 ENTER_AGENT_VIEW_NEW_CONVERSATION_KEYSTROKE.clone(),
                             ),
-                            MessageItem::text("start a new agent conversation"),
+                            MessageItem::text(warp_i18n::tr("menu.agent_start_new")),
                         ],
                         |ctx| {
                             ctx.dispatch_typed_action(TerminalAction::StartNewAgentConversation {
@@ -776,7 +775,7 @@ fn render_body(props: ZeroStateBodyProps<'_>, app: &AppContext) -> Vec<Box<dyn E
                                 key: "/model".to_owned(),
                                 ..Default::default()
                             }),
-                            MessageItem::text("switch model"),
+                            MessageItem::text(warp_i18n::tr("menu.agent_switch_model")),
                         ],
                         |ctx| {
                             ctx.dispatch_typed_action(TerminalAction::OpenModelSelector);
@@ -796,7 +795,7 @@ fn render_body(props: ZeroStateBodyProps<'_>, app: &AppContext) -> Vec<Box<dyn E
                                 key: "escape".to_owned(),
                                 ..Default::default()
                             }),
-                            MessageItem::text("go back to terminal"),
+                            MessageItem::text(warp_i18n::tr("menu.agent_back_terminal")),
                         ],
                         |ctx| {
                             ctx.dispatch_typed_action(TerminalAction::ExitAgentView);

@@ -239,7 +239,7 @@ pub fn render_agent_shortcuts_view(
                 key: "escape".to_owned(),
                 ..Default::default()
             },
-            text: "go back to terminal".into(),
+            text: warp_i18n::tr("menu.agent_back_terminal").into(),
             ..Default::default()
         },
         app,

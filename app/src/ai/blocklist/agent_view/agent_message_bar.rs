@@ -1068,7 +1068,7 @@ impl MessageProvider<AgentMessageArgs<'_>> for ExitBashModeMessageProducer {
                     color: None,
                     background_color: None,
                 },
-                MessageItem::text("to exit shell mode"),
+                MessageItem::text(warp_i18n::tr("menu.agent_exit_shell")),
             ])
             .with_text_color(text_color),
         )
