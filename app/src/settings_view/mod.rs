@@ -798,10 +798,10 @@ pub struct SettingActionPairDescriptions {
 }
 
 impl SettingActionPairDescriptions {
-    pub fn new(enable: &str, disable: &str) -> Self {
+    pub fn new(enable: impl Into<String>, disable: impl Into<String>) -> Self {
         Self {
-            enable: enable.to_owned(),
-            disable: disable.to_owned(),
+            enable: enable.into(),
+            disable: disable.into(),
         }
     }
 }

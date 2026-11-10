@@ -265,7 +265,10 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
     ToggleSettingActionPair::add_toggle_setting_action_pairs_as_bindings(
         vec![
             ToggleSettingActionPair::custom(
-                SettingActionPairDescriptions::new("Show agent tips", "Hide agent tips"),
+                SettingActionPairDescriptions::new(
+                    t!("settings.wa_show_agent_tips"),
+                    t!("settings.wa_hide_agent_tips"),
+                ),
                 builder(SettingsAction::WarpAgent(
                     WarpAgentPageAction::ToggleShowAgentTips,
                 )),
@@ -482,7 +485,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
         vec![
             ToggleSettingActionPair::custom(
                 SettingActionPairDescriptions::new(
-                    "Show \"Use Agent\" footer",
+                    t!("settings.wa_use_agent_footer"),
                     "Hide \"Use Agent\" footer",
                 ),
                 builder(SettingsAction::WarpAgent(
@@ -515,7 +518,7 @@ pub fn init_actions_from_parent_view<T: Action + Clone>(
             .with_group(bindings::BindingGroup::WarpAi),
             ToggleSettingActionPair::custom(
                 SettingActionPairDescriptions::new(
-                    "Allow auto-approve to bypass command denylist",
+                    t!("settings.wa_auto_approve_bypass"),
                     "Require approval for denylisted commands in auto-approve",
                 ),
                 builder(SettingsAction::WarpAgent(
@@ -842,7 +845,7 @@ impl WarpAgentPageView {
             };
             let mut editor = EditorView::new(options, ctx);
 
-            editor.set_placeholder_text("Commands, comma separated", ctx);
+            editor.set_placeholder_text(t!("settings.wa_nl_denylist_placeholder"), ctx);
 
             let current_value = AISettings::as_ref(ctx)
                 .autodetection_command_denylist
@@ -3732,7 +3735,7 @@ impl SettingsWidget for ShowInputHintTextWidget {
     ) -> Box<dyn Element> {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_ai_setting_toggle::<ShowHintText>(
-            "Show input hint text",
+            t!("settings.wa_show_input_hint"),
             WarpAgentPageAction::ToggleShowInputHintText,
             *InputSettings::as_ref(app).show_hint_text,
             is_any_ai_enabled,
@@ -3763,7 +3766,7 @@ impl SettingsWidget for AiCommandSearchHashTriggerWidget {
     ) -> Box<dyn Element> {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_ai_setting_toggle::<EnableAiCommandSearchHashTrigger>(
-            "Enable '#' trigger for AI Command Search",
+            t!("settings.wa_hash_trigger"),
             WarpAgentPageAction::ToggleAiCommandSearchHashTrigger,
             *InputSettings::as_ref(app).enable_ai_command_search_hash_trigger,
             is_any_ai_enabled,
@@ -3798,7 +3801,7 @@ impl SettingsWidget for ShowAgentTipsWidget {
     ) -> Box<dyn Element> {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_ai_setting_toggle::<ShowAgentTips>(
-            "Show agent tips",
+            t!("settings.wa_show_agent_tips"),
             WarpAgentPageAction::ToggleShowAgentTips,
             *InputSettings::as_ref(app).show_agent_tips,
             is_any_ai_enabled,
@@ -3830,7 +3833,7 @@ impl SettingsWidget for IncludeAgentCommandsInHistoryWidget {
         let ai_settings = AISettings::as_ref(app);
         let is_any_ai_enabled = ai_settings.is_any_ai_enabled(app);
         render_ai_setting_toggle::<IncludeAgentCommandsInHistory>(
-            "Include agent-executed commands in history",
+            t!("settings.wa_include_agent_commands"),
             WarpAgentPageAction::ToggleIncludeAgentCommandsInHistory,
             *ai_settings.include_agent_commands_in_history,
             is_any_ai_enabled,
@@ -3862,17 +3865,19 @@ impl SettingsWidget for AutoApproveBypassesCommandDenylistWidget {
         let ai_settings = AISettings::as_ref(app);
         let is_any_ai_enabled = ai_settings.is_any_ai_enabled(app);
         Flex::column()
-            .with_child(render_ai_setting_toggle::<AutoApproveBypassesCommandDenylist>(
-                "Allow auto-approve to bypass command denylist",
-                WarpAgentPageAction::ToggleAutoApproveBypassesCommandDenylist,
-                *ai_settings.auto_approve_bypasses_command_denylist,
-                is_any_ai_enabled,
-                self.toggle.clone(),
-                &view.local_only_icon_tooltip_states,
-                app,
-            ))
+            .with_child(
+                render_ai_setting_toggle::<AutoApproveBypassesCommandDenylist>(
+                    t!("settings.wa_auto_approve_bypass"),
+                    WarpAgentPageAction::ToggleAutoApproveBypassesCommandDenylist,
+                    *ai_settings.auto_approve_bypasses_command_denylist,
+                    is_any_ai_enabled,
+                    self.toggle.clone(),
+                    &view.local_only_icon_tooltip_states,
+                    app,
+                ),
+            )
             .with_child(render_ai_setting_description(
-                "When enabled, fast forward and auto-approve run denylisted commands without asking for confirmation.",
+                t!("settings.wa_auto_approve_bypass_desc"),
                 is_any_ai_enabled,
                 app,
             ))
@@ -3905,7 +3910,7 @@ impl SettingsWidget for PromptSubmissionModeWidget {
 
         let mut column = Flex::column().with_child(render_dropdown_item(
             appearance,
-            "Default prompt submission mode",
+            t!("settings.wa_default_prompt_submission"),
             Some(
                 "What happens when you submit a new prompt while the agent is still \
                  responding. You can override this per conversation using the auto-queue \
@@ -3928,7 +3933,7 @@ impl SettingsWidget for PromptSubmissionModeWidget {
             column.add_child(
                 Container::new(render_dropdown_item(
                     appearance,
-                    "Default long-running command submission mode",
+                    t!("settings.wa_default_long_running_submission"),
                     Some(
                         "What happens when you submit a prompt while an agent is driving an \
                          agent-requested long-running command. Queued prompts are sent to the \
@@ -3989,9 +3994,9 @@ impl NaturalLanguageDetectionWidget {
             static AUTODETECTION_DESCRIPTION_FRAGMENTS: LazyLock<Vec<FormattedTextFragment>> =
                 LazyLock::new(|| {
                     vec![
-                        FormattedTextFragment::plain_text("Encountered an incorrect detection? "),
+                        FormattedTextFragment::plain_text(t!("settings.wa_incorrect_detection")),
                         FormattedTextFragment::hyperlink(
-                            "Let us know",
+                            t!("settings.wa_let_us_know"),
                             "https://warpdotdev.typeform.com/to/offrTIpq",
                         ),
                     ]
@@ -3999,7 +4004,7 @@ impl NaturalLanguageDetectionWidget {
 
             section.add_children([
                 render_ai_setting_toggle::<NLDInTerminalEnabled>(
-                    "Autodetect agent prompts in terminal input",
+                    t!("settings.wa_autodetect_agent_prompts"),
                     WarpAgentPageAction::ToggleNLDInTerminal,
                     ai_settings.is_nld_in_terminal_enabled(app),
                     is_toggleable,
@@ -4008,7 +4013,7 @@ impl NaturalLanguageDetectionWidget {
                     app,
                 ),
                 render_ai_setting_toggle::<AIAutoDetectionEnabled>(
-                    "Autodetect terminal commands in agent input",
+                    t!("settings.wa_autodetect_terminal_commands"),
                     WarpAgentPageAction::ToggleAIInputAutoDetection,
                     is_nld_enabled,
                     is_toggleable,
@@ -4043,14 +4048,12 @@ impl NaturalLanguageDetectionWidget {
                 Vec<FormattedTextFragment>,
             > = LazyLock::new(|| {
                 vec![
-                    FormattedTextFragment::plain_text(
-                        "Enabling natural language detection will detect when natural language is written in the terminal input, and then automatically switch to Agent Mode for AI queries.",
-                    ),
+                    FormattedTextFragment::plain_text(t!("settings.wa_nld_description")),
                     FormattedTextFragment::plain_text(
                         " Encountered an incorrect input detection? ",
                     ),
                     FormattedTextFragment::hyperlink(
-                        "Let us know",
+                        t!("settings.wa_let_us_know"),
                         "https://warpdotdev.typeform.com/to/offrTIpq",
                     ),
                 ]
@@ -4058,7 +4061,7 @@ impl NaturalLanguageDetectionWidget {
 
             section.add_children([
                 render_ai_setting_toggle::<AIAutoDetectionEnabled>(
-                    "Natural language detection",
+                    t!("settings.wa_natural_language_detection"),
                     WarpAgentPageAction::ToggleAIInputAutoDetection,
                     is_nld_enabled,
                     is_toggleable,
@@ -4092,13 +4095,13 @@ impl NaturalLanguageDetectionWidget {
 
         section
             .with_child(render_ai_setting_label::<AICommandDenylist>(
-                "Natural language denylist".to_owned(),
+                t!("settings.wa_nl_denylist").to_owned(),
                 is_toggleable,
                 &view.local_only_icon_tooltip_states,
                 app,
             ))
             .with_child(render_ai_setting_description(
-                "Commands listed here will never trigger natural language detection.",
+                t!("settings.wa_nl_denylist_desc"),
                 is_toggleable,
                 app,
             ))
@@ -4459,7 +4462,7 @@ impl SettingsWidget for ShowOzUpdatesInZeroStateWidget {
         let ai_settings = AISettings::as_ref(app);
         let is_toggleable = ai_settings.is_any_ai_enabled(app);
         render_ai_setting_toggle::<ShouldShowOzUpdatesInZeroState>(
-            "Show Warp Agent changelog in new conversation view",
+            t!("settings.wa_show_changelog"),
             WarpAgentPageAction::ToggleShowOzUpdatesInZeroState,
             *ai_settings.should_show_oz_updates_in_zero_state,
             is_toggleable,
@@ -4499,7 +4502,7 @@ impl SettingsWidget for UseAgentFooterWidget {
             .with_child(render_ai_setting_toggle::<
                 ShouldRenderUseAgentToolbarForUserCommands,
             >(
-                "Show \"Use Agent\" footer",
+                t!("settings.wa_use_agent_footer"),
                 WarpAgentPageAction::ToggleUseAgentToolbar,
                 *ai_settings.should_render_use_agent_footer_for_user_commands,
                 is_toggleable,
@@ -4508,7 +4511,7 @@ impl SettingsWidget for UseAgentFooterWidget {
                 app,
             ))
             .with_child(render_ai_setting_description(
-                "Shows hint to use the \"Full Terminal Use\"-enabled agent in long running commands.",
+                t!("settings.wa_use_agent_footer_desc"),
                 is_toggleable,
                 app,
             ))
@@ -4563,7 +4566,7 @@ impl SettingsWidget for ShowConversationHistoryWidget {
         let ai_settings = AISettings::as_ref(app);
         let is_toggleable = ai_settings.is_any_ai_enabled(app);
         render_ai_setting_toggle::<ShowConversationHistory>(
-            "Show conversation history in tools panel",
+            t!("settings.wa_show_conversation_history"),
             WarpAgentPageAction::ToggleShowConversationHistory,
             *ai_settings.show_conversation_history,
             is_toggleable,
@@ -4593,8 +4596,8 @@ impl SettingsWidget for ThinkingDisplayModeWidget {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_dropdown_item(
             appearance,
-            "Agent thinking display",
-            Some("Controls how reasoning/thinking traces are displayed."),
+            t!("settings.wa_thinking_display"),
+            Some(&t!("settings.wa_thinking_display_desc")),
             None,
             LocalOnlyIconState::for_setting(
                 ThinkingDisplayMode::storage_key(),
@@ -4627,8 +4630,8 @@ impl SettingsWidget for OrchestrationMessageDisplayModeWidget {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_dropdown_item(
             appearance,
-            "Orchestration message display",
-            Some("Controls whether orchestration messages stay expanded."),
+            t!("settings.wa_orchestration_display"),
+            Some(&t!("settings.wa_orchestration_display_desc")),
             None,
             LocalOnlyIconState::for_setting(
                 OrchestrationMessageDisplayMode::storage_key(),
@@ -4668,7 +4671,7 @@ impl SettingsWidget for ConversationLayoutPreferenceWidget {
         let is_any_ai_enabled = AISettings::as_ref(app).is_any_ai_enabled(app);
         render_dropdown_item(
             appearance,
-            "Preferred layout when opening existing agent conversations",
+            t!("settings.wa_preferred_layout"),
             None,
             None,
             LocalOnlyIconState::for_setting(
@@ -4755,7 +4758,7 @@ impl SettingsWidget for AgentAttributionWidget {
                 .switch(self.toggle.clone())
                 .check(state.is_enabled)
                 .with_tooltip(TooltipConfig {
-                    text: "This option is enforced by your organization's settings and cannot be customized.".to_string(),
+                    text: t!("settings.wa_org_enforced").to_string(),
                     styles: ui_builder.default_tool_tip_styles(),
                 })
                 .disable()
@@ -4781,7 +4784,7 @@ impl SettingsWidget for AgentAttributionWidget {
 
         let toggle_row = build_toggle_element(
             render_body_item_label::<WarpAgentPageAction>(
-                "Enable agent attribution".to_string(),
+                t!("settings.wa_enable_attribution").to_string(),
                 Some(styles::header_font_color(!state.is_disabled, app)),
                 None,
                 LocalOnlyIconState::Hidden,
@@ -4796,7 +4799,7 @@ impl SettingsWidget for AgentAttributionWidget {
         Flex::column()
             .with_child(toggle_row)
             .with_child(render_ai_setting_description(
-                "Warp Agent can add attribution to commit messages and pull requests it creates",
+                t!("settings.wa_attribution_desc"),
                 !state.is_disabled,
                 app,
             ))
@@ -4851,7 +4854,7 @@ impl SettingsWidget for CloudAgentComputerUseWidget {
                 .switch(self.toggle.clone())
                 .check(is_checked)
                 .with_tooltip(TooltipConfig {
-                    text: "This option is enforced by your organization's settings and cannot be customized.".to_string(),
+                    text: t!("settings.wa_org_enforced").to_string(),
                     styles: ui_builder.default_tool_tip_styles(),
                 })
                 .disable()
