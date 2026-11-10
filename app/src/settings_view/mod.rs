@@ -1499,7 +1499,11 @@ impl SettingsView {
         };
         // Sections hidden in this channel (e.g. the account page in OSS) must
         // not become the landing page, or the window would render blank.
-        let initial_page = if oss_gating::is_hidden(initial_page) {
+        let initial_page = if !oss_gating::is_visible_for_channel(
+            initial_page,
+            warp_core::channel::ChannelState::channel(),
+            AISettings::as_ref(ctx).is_local_pi_only_enabled(),
+        ) {
             SettingsSection::Appearance
         } else {
             initial_page
@@ -2153,7 +2157,11 @@ impl SettingsView {
     }
 
     fn should_render_page(&self, settings_page: &SettingsPage, app: &AppContext) -> bool {
-        if oss_gating::is_hidden(settings_page.section) {
+        if !oss_gating::is_visible_for_channel(
+            settings_page.section,
+            warp_core::channel::ChannelState::channel(),
+            AISettings::as_ref(app).is_local_pi_only_enabled(),
+        ) {
             return false;
         }
         match &settings_page.view_handle {

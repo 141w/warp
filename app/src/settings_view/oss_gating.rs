@@ -36,6 +36,24 @@ pub(crate) fn is_hidden(section: SettingsSection) -> bool {
     is_hidden_for_channel(section, warp_core::channel::ChannelState::channel())
 }
 
+/// Whether `section` should be shown, given the channel and whether the
+/// account-free local pi opt-in is on.
+///
+/// The opt-in keeps the Warp Agent page reachable in the OSS channel even though
+/// the page is login-gated: it is where the pi model override lives, and a user
+/// running without an account has no other way to reach it. Everything else that
+/// is login-gated stays hidden, so the exemption is scoped to this one section.
+pub(crate) fn is_visible_for_channel(
+    section: SettingsSection,
+    channel: Channel,
+    local_pi_only_enabled: bool,
+) -> bool {
+    if local_pi_only_enabled && section == SettingsSection::WarpAgent {
+        return true;
+    }
+    !is_hidden_for_channel(section, channel)
+}
+
 #[cfg(test)]
 #[path = "oss_gating_tests.rs"]
 mod tests;
