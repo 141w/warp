@@ -7,6 +7,9 @@ common:
   done: "Done"
   back: "Back"
 settings:
+  local_pi_model: "Local pi model"
+  local_pi_model_description: "Model used for account-free local pi runs. Leave empty to let the pi harness choose."
+  local_pi_model_placeholder: "provider/model"
   nav:
     about: "About"
     account: "Account"

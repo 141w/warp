@@ -14,6 +14,7 @@ use std::sync::LazyLock;
 use std::time::Duration;
 use warp_i18n::t;
 
+use crate::settings::ai::LocalPiModel;
 use ::ai::api_keys::{
     ApiKeyManager, ApiKeyManagerEvent, ApiKeys, ChatGPTConnectFailure, CustomEndpointParams,
 };
@@ -2287,29 +2288,30 @@ impl WarpAgentPageView {
     }
 
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
-        let ai_settings = AISettings::as_ref(ctx);
-
         let mut categories: Vec<Category<Self>> = Vec::new();
 
-        if ai_settings
-            .intelligent_autosuggestions_enabled_internal
-            .is_supported_on_current_platform()
-            || ai_settings
-                .prompt_suggestions_enabled_internal
+        let has_active_ai_widgets = {
+            let ai_settings = AISettings::as_ref(ctx);
+            ai_settings
+                .intelligent_autosuggestions_enabled_internal
                 .is_supported_on_current_platform()
-            || (FeatureFlag::PredictAMQueries.is_enabled()
-                && ai_settings
-                    .natural_language_autosuggestions_enabled_internal
-                    .is_supported_on_current_platform())
-            || (FeatureFlag::SharedBlockTitleGeneration.is_enabled()
-                && ai_settings
-                    .shared_block_title_generation_enabled_internal
-                    .is_supported_on_current_platform())
-            || (FeatureFlag::GitOperationsInCodeReview.is_enabled()
-                && ai_settings
-                    .git_operations_autogen_enabled_internal
-                    .is_supported_on_current_platform())
-        {
+                || ai_settings
+                    .prompt_suggestions_enabled_internal
+                    .is_supported_on_current_platform()
+                || (FeatureFlag::PredictAMQueries.is_enabled()
+                    && ai_settings
+                        .natural_language_autosuggestions_enabled_internal
+                        .is_supported_on_current_platform())
+                || (FeatureFlag::SharedBlockTitleGeneration.is_enabled()
+                    && ai_settings
+                        .shared_block_title_generation_enabled_internal
+                        .is_supported_on_current_platform())
+                || (FeatureFlag::GitOperationsInCodeReview.is_enabled()
+                    && ai_settings
+                        .git_operations_autogen_enabled_internal
+                        .is_supported_on_current_platform())
+        };
+        if has_active_ai_widgets {
             let active_ai_widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = vec![
                 Box::new(NextCommandWidget::default()),
                 Box::new(PromptSuggestionsWidget::default()),
@@ -2336,12 +2338,13 @@ impl WarpAgentPageView {
                 Box::new(ShowAgentTipsWidget::default()),
                 Box::new(IncludeAgentCommandsInHistoryWidget::default()),
                 Box::new(AutoApproveBypassesCommandDenylistWidget::default()),
+                Box::new(LocalPiModelWidget::new(ctx)),
                 Box::new(PromptSubmissionModeWidget),
             ],
         ));
 
         let voice_supported = cfg!(feature = "voice_input")
-            && ai_settings
+            && AISettings::as_ref(ctx)
                 .voice_input_enabled_internal
                 .is_supported_on_current_platform();
         if voice_supported {
@@ -4105,6 +4108,124 @@ impl NaturalLanguageDetectionWidget {
                     .finish(),
             )
             .finish()
+    }
+}
+
+/// Model override for account-free local pi runs.
+///
+/// Only rendered when the local pi opt-in is on, because the setting has no effect
+/// otherwise. The editor commits on blur or Enter, matching the other text fields on
+/// this page.
+struct LocalPiModelWidget {
+    editor: ViewHandle<EditorView>,
+}
+
+impl LocalPiModelWidget {
+    fn new(ctx: &mut ViewContext<WarpAgentPageView>) -> Self {
+        let initial = AISettings::as_ref(ctx).local_pi_model().to_string();
+        let editor = ctx.add_typed_action_view(move |ctx| {
+            let appearance = Appearance::handle(ctx).as_ref(ctx);
+            let options = SingleLineEditorOptions {
+                propagate_and_no_op_vertical_navigation_keys:
+                    PropagateAndNoOpNavigationKeys::Always,
+                text: TextOptions {
+                    font_size_override: Some(appearance.ui_font_size()),
+                    font_family_override: Some(appearance.monospace_font_family()),
+                    text_colors_override: Some(TextColors {
+                        default_color: appearance.theme().active_ui_text_color(),
+                        disabled_color: appearance.theme().disabled_ui_text_color(),
+                        hint_color: appearance.theme().disabled_ui_text_color(),
+                    }),
+                    ..Default::default()
+                },
+                ..Default::default()
+            };
+            let mut editor = EditorView::single_line(options, ctx);
+            editor.set_placeholder_text(t!("settings.local_pi_model_placeholder"), ctx);
+            editor.set_buffer_text(&initial, ctx);
+            editor
+        });
+
+        let editor_for_events = editor.clone();
+        ctx.subscribe_to_view(&editor, move |_, _, event, ctx| {
+            if !matches!(event, EditorEvent::Blurred | EditorEvent::Enter) {
+                return;
+            }
+            let buffer_text = editor_for_events.as_ref(ctx).buffer_text(ctx);
+            AISettings::handle(ctx).update(ctx, |settings, ctx| {
+                if let Err(e) = settings.local_pi_model.set_value(buffer_text, ctx) {
+                    log::warn!("Failed to set the local pi model override: {e:?}");
+                }
+            });
+        });
+
+        Self { editor }
+    }
+
+    fn render_local_pi_model_section(
+        &self,
+        view: &WarpAgentPageView,
+        appearance: &Appearance,
+        app: &AppContext,
+    ) -> Box<dyn Element> {
+        let is_toggleable = AISettings::as_ref(app).is_any_ai_enabled(app);
+
+        let input_field = appearance
+            .ui_builder()
+            .text_input(self.editor.clone())
+            .with_style(UiComponentStyles {
+                width: Some(280.),
+                padding: Some(Coords {
+                    top: 4.,
+                    bottom: 4.,
+                    left: 6.,
+                    right: 6.,
+                }),
+                background: Some(appearance.theme().surface_2().into()),
+                ..Default::default()
+            })
+            .build()
+            .finish();
+
+        Flex::column()
+            .with_child(render_ai_setting_label::<LocalPiModel>(
+                t!("settings.local_pi_model"),
+                is_toggleable,
+                &view.local_only_icon_tooltip_states,
+                app,
+            ))
+            .with_child(render_ai_setting_description(
+                t!("settings.local_pi_model_description"),
+                is_toggleable,
+                app,
+            ))
+            .with_child(
+                Container::new(input_field)
+                    .with_margin_bottom(styles::DESCRIPTION_MARGIN_BOTTOM)
+                    .finish(),
+            )
+            .finish()
+    }
+}
+
+impl SettingsWidget for LocalPiModelWidget {
+    type View = WarpAgentPageView;
+
+    fn search_terms(&self) -> String {
+        "oz agent local pi harness model provider override offline account-free".to_string()
+    }
+
+    fn should_render(&self, app: &AppContext) -> bool {
+        AISettings::as_ref(app).is_local_pi_only_enabled()
+    }
+
+    fn render(
+        &self,
+        view: &Self::View,
+        appearance: &Appearance,
+        app: &AppContext,
+    ) -> Box<dyn Element> {
+        Self::render_local_pi_model_section(self, view, appearance, app)
     }
 }
 

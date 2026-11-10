@@ -1246,6 +1246,20 @@ define_settings_group!(AISettings, settings: [
         toml_path: "agents.warp_agent.local_pi_only_enabled",
         description: "Allow local pi-harness agent runs without a Warp account.",
     },
+    // Model override for account-free local pi runs. Empty means "let the pi harness
+    // decide", which is what a run without an explicit --model does. A value must be
+    // `provider/model`: the pi harness rejects anything else, and the run path validates
+    // the same shape before launching.
+    local_pi_model: LocalPiModel {
+        type: String,
+        default: String::new(),
+        supported_platforms: SupportedPlatforms::ALL,
+        sync_to_cloud: SyncToCloud::Never,
+        surface: settings::SettingSurfaces::GUI,
+        private: false,
+        toml_path: "agents.warp_agent.local_pi_model",
+        description: "Model used for account-free local pi runs, as provider/model.",
+    },
     // This field should not be referenced directly to lookup active AI enablement -- use the
     // `is_active_ai_enabled()` getter.
     is_active_ai_enabled_internal: IsActiveAIEnabled {
@@ -2304,6 +2318,12 @@ impl AISettings {
     /// run path separately enforces the pi-only, no-server conditions.
     pub fn is_local_pi_only_enabled(&self) -> bool {
         *self.local_pi_only_enabled
+    }
+
+    /// Model override for account-free local pi runs, trimmed. Empty when unset, which
+    /// leaves the choice to the pi harness.
+    pub fn local_pi_model(&self) -> &str {
+        self.local_pi_model.trim()
     }
 
     /// Whether the account-free local pi exemption applies: the opt-in is on and the user

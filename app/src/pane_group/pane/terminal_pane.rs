@@ -59,6 +59,7 @@ use crate::server::server_api::ServerApiProvider;
 use crate::server::team_scope::RequestTeamScope;
 use crate::server::telemetry::CloudAgentShellRecoveryFailureClass;
 use crate::session_management::SessionNavigationData;
+use crate::settings::ai::AISettings;
 use crate::terminal::cli_agent_sessions::CLIAgentSessionsModel;
 use crate::terminal::general_settings::GeneralSettings;
 #[cfg(not(target_family = "wasm"))]
@@ -1580,6 +1581,11 @@ fn dispatch_start_agent_conversation(
         );
         return;
     }
+    // An unset model_id falls back to the configured account-free local pi override.
+    // The harness rejects anything that is not provider/model, so the value is passed
+    // through untouched and validated downstream.
+    let request = apply_local_pi_model_fallback(request, ctx);
+
     match request.execution_mode.clone() {
         #[cfg(not(target_family = "wasm"))]
         StartAgentExecutionMode::Local {
@@ -1667,6 +1673,29 @@ fn dispatch_start_agent_conversation(
             );
         }
     }
+}
+
+/// Fills an unset local model_id from the account-free pi override.
+///
+/// The model that issued the run_agents call usually names a model itself; when it
+/// does not, a user running without an account has no other way to choose one. The
+/// override only applies to local execution, and only when the request left the field
+/// empty, so an explicit choice always wins.
+fn apply_local_pi_model_fallback(
+    mut request: StartAgentRequest,
+    ctx: &mut ViewContext<PaneGroup>,
+) -> StartAgentRequest {
+    let StartAgentExecutionMode::Local { model_id, .. } = &mut request.execution_mode else {
+        return request;
+    };
+    if model_id.as_deref().is_some_and(|id| !id.trim().is_empty()) {
+        return request;
+    }
+    let override_model = AISettings::as_ref(ctx).local_pi_model();
+    if !override_model.is_empty() {
+        *model_id = Some(override_model.to_string());
+    }
+    request
 }
 
 /// Sets up a hidden child pane for a Local-no-harness (Oz) agent and

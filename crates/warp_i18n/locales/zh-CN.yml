@@ -6,6 +6,9 @@ common:
   done: "完成"
   back: "返回"
 settings:
+  local_pi_model: "本地 pi 模型"
+  local_pi_model_description: "免登录本地 pi 运行所用的模型。留空则由 pi 自行选择。"
+  local_pi_model_placeholder: "提供商/模型"
   nav:
     about: "关于"
     account: "账户"
