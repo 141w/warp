@@ -38,8 +38,8 @@ use warpui::{
 use crate::ai::agent::conversation::{AIConversationId, ConversationStatus};
 use crate::ai::agent::{
     AIAgentActionResultType, AIAgentExchange, AIAgentInput, AIAgentOutput, AIAgentOutputStatus,
-    CancellationReason, FinishedAIAgentOutput, RenderableAIError, RequestFileEditsResult,
-    TransientNetworkErrorKind,
+    BaseUserQuery, CancellationReason, FinishedAIAgentOutput, RenderableAIError,
+    RequestFileEditsResult, TransientNetworkErrorKind,
 };
 use crate::ai::agent_sdk::driver::harness::exit_escalation::{
     ExitEscalation, ExitEscalationAction, ExitEscalationEvent, driver_result_after_harness_run,
@@ -121,6 +121,7 @@ pub(crate) mod mcp_startup;
 pub(super) mod output;
 mod preview_retention;
 mod prewarmed;
+mod restored_children;
 mod skill_references;
 mod snapshot;
 pub(crate) mod terminal;
@@ -196,6 +197,8 @@ const HARNESS_EXIT_FORCE_KILL_DELAY: Duration = Duration::from_secs(14);
 const TASK_STATUS_FLUSH_TIMEOUT: Duration = Duration::from_secs(5);
 /// Timeout for individual harness auth preflight commands.
 const PREFLIGHT_CHECK_TIMEOUT: Duration = Duration::from_secs(30);
+/// How long the echo that shows the transport fallback notice may take before setup moves on.
+const TRANSPORT_FALLBACK_NOTICE_TIMEOUT: Duration = Duration::from_secs(10);
 /// Last-resort bound for draining `PendingCliHarnessPromptQueue` when the CLI-harness plugin
 /// never reports `CLIAgentSessionsModelEvent::StatusChanged` with `CLIAgentSessionStatus::InProgress`
 /// — the normal drain signal. Finding anything still queued once this window elapses is not a
@@ -723,6 +726,9 @@ pub struct AgentDriverOptions {
     pub selected_harness: Harness,
     /// How the selected harness is driven. Only used for non-Oz harnesses.
     pub harness_transport: HarnessTransport,
+    /// Why the run is driven over a PTY although it was requested over ACP, when the sandbox
+    /// had no ACP adapter. The session shows a notice saying so before the harness starts.
+    pub harness_transport_fallback: Option<harness::TransportFallbackReason>,
     /// Model config for the selected harness. Only used for non-Oz harnesses.
     pub third_party_harness_model_config: Option<HarnessModelConfig>,
     /// Stable team scope assigned to this run and its headless window.
@@ -787,6 +793,7 @@ struct RunConfiguration {
     skip_initial_turn: bool,
     strict_mcp_startup: bool,
     mcp_startup_timeout: Duration,
+    harness_transport_fallback: Option<harness::TransportFallbackReason>,
 }
 
 /// Resolves run options into terminal inputs and driver configuration.
@@ -815,6 +822,7 @@ fn split_run_options(
         computer_use_config,
         selected_harness,
         harness_transport,
+        harness_transport_fallback,
         third_party_harness_model_config,
         team_scope,
         bedrock_oidc_credentials,
@@ -877,6 +885,15 @@ fn split_run_options(
         error,
     })?;
     env_vars.extend(harness_env);
+    if git_credentials::restricted_github_mode().map_err(AgentDriverError::ConfigBuildFailed)? {
+        let task_id = task_id.ok_or(AgentDriverError::InvalidRuntimeState)?;
+        git_credentials::validate_restricted_child_environment(&env_vars)
+            .map_err(AgentDriverError::ConfigBuildFailed)?;
+        env_vars.extend(
+            git_credentials::restricted_child_environment(&task_id.to_string())
+                .map_err(AgentDriverError::ConfigBuildFailed)?,
+        );
+    }
     let preparation_file = environment_preparation::launch_environment(
         workspace.preparation_policy.as_ref(),
         task_id.map(|id| id.to_string()).as_deref(),
@@ -953,6 +970,7 @@ fn split_run_options(
             skip_initial_turn,
             strict_mcp_startup,
             mcp_startup_timeout: mcp_startup_timeout.unwrap_or(MCP_SERVER_STARTUP_TIMEOUT),
+            harness_transport_fallback,
         },
     ))
 }
@@ -1090,6 +1108,9 @@ pub struct AgentDriver {
     /// How long to wait for MCP servers to start before degrading (or failing,
     /// in strict mode).
     mcp_startup_timeout: Duration,
+    /// Why a run requested over ACP is driven over a PTY; see
+    /// `AgentDriverOptions::harness_transport_fallback`.
+    harness_transport_fallback: Option<harness::TransportFallbackReason>,
     sandbox_deadline: Option<SystemTime>,
 }
 
@@ -1147,6 +1168,37 @@ pub enum AgentRunPrompt {
         /// Directory where task attachments were downloaded.
         attachments_dir: Option<String>,
     },
+}
+
+/// The stage of bringing up a third-party harness over ACP at which setup failed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HarnessSetupStage {
+    Manifest,
+    Validate,
+    BridgeSpawn,
+    BridgeAccept,
+    Initialize,
+    SessionOpen,
+    ModelConfig,
+    ExternalConversation,
+    BeginTurn,
+}
+
+impl HarnessSetupStage {
+    /// The stage's snake_case label, as recorded on failure metrics.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Manifest => "manifest",
+            Self::Validate => "validate",
+            Self::BridgeSpawn => "bridge_spawn",
+            Self::BridgeAccept => "bridge_accept",
+            Self::Initialize => "initialize",
+            Self::SessionOpen => "session_open",
+            Self::ModelConfig => "model_config",
+            Self::ExternalConversation => "external_conversation",
+            Self::BeginTurn => "begin_turn",
+        }
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -1282,7 +1334,13 @@ pub enum AgentDriverError {
         output: Option<String>,
     },
     #[error("Harness '{harness}' setup failed: {reason}")]
-    HarnessSetupFailed { harness: String, reason: String },
+    HarnessSetupFailed {
+        harness: String,
+        /// Set when the failure belongs to one stage of ACP setup; `None` for failures of
+        /// harness setup that is not stage-specific.
+        stage: Option<HarnessSetupStage>,
+        reason: String,
+    },
     #[error("Harness '{harness}' config setup failed")]
     HarnessConfigSetupFailed {
         harness: String,
@@ -1566,6 +1624,7 @@ impl AgentDriver {
             skip_initial_turn: false,
             strict_mcp_startup: false,
             mcp_startup_timeout: MCP_SERVER_STARTUP_TIMEOUT,
+            harness_transport_fallback: None,
             sandbox_deadline: sandbox_deadline(),
         }
     }
@@ -1607,6 +1666,7 @@ impl AgentDriver {
             skip_initial_turn,
             strict_mcp_startup,
             mcp_startup_timeout,
+            harness_transport_fallback,
         } = config;
         self.working_dir = working_dir;
         self.resolved_env_vars = resolved_env_vars;
@@ -1642,6 +1702,7 @@ impl AgentDriver {
         self.skip_initial_turn = skip_initial_turn;
         self.strict_mcp_startup = strict_mcp_startup;
         self.mcp_startup_timeout = mcp_startup_timeout;
+        self.harness_transport_fallback = harness_transport_fallback;
 
         self.computer_use_configured = computer_use_config.is_some();
         if let Some((enabled, model_id)) = computer_use_config {
@@ -1936,6 +1997,11 @@ impl AgentDriver {
                     match Self::run_until_end(task, &foreground, &background).await {
                         Ok(outcome) => outcome,
                         Err(error) => {
+                            if let Some(task_id) = task_id {
+                                report_if_error!(git_credentials::close_restricted_credentials(
+                                    &task_id.to_string()
+                                ));
+                            }
                             let _ = foreground.spawn(|me, _| me.harness_config_dir.take()).await;
                             if tx.send(Err(error)).is_err() {
                                 report_error!("Caller did not wait for agent driver to finish");
@@ -1943,6 +2009,11 @@ impl AgentDriver {
                             return;
                         }
                     };
+                if let Some(task_id) = task_id {
+                    report_if_error!(git_credentials::close_restricted_credentials(
+                        &task_id.to_string()
+                    ));
+                }
                 match cause {
                     RunEndCause::SandboxDeadline => {
                         tracing::info!(tags.cloud_agent = true, "sandbox deadline approaching");
@@ -2002,6 +2073,10 @@ impl AgentDriver {
                             .await;
                         }
                         let result = finished.unwrap_or(Err(AgentDriverError::InvalidRuntimeState));
+                        if let Err(AgentDriverError::HarnessExitTimedOut { harness }) = &result {
+                            Self::send_harness_exit_telemetry(harness, "timed_out", &foreground)
+                                .await;
+                        }
                         let result = driver_result_after_harness_run(result);
                         let _ = foreground.spawn(|me, _| me.harness_config_dir.take()).await;
                         if tx.send(result).is_err() {
@@ -2451,7 +2526,9 @@ impl AgentDriver {
                 bedrock_config_for_refresh,
             ) = foreground
                 .spawn(|me, ctx| {
-                    let task_id = if FeatureFlag::GitCredentialRefresh.is_enabled() {
+                    let task_id = if FeatureFlag::GitCredentialRefresh.is_enabled()
+                        || git_credentials::restricted_github_mode().unwrap_or(true)
+                    {
                         me.task_id.map(|id| id.to_string())
                     } else {
                         None
@@ -2508,6 +2585,7 @@ impl AgentDriver {
                 )
                 .await?;
 
+                Self::prepare_local_subtree(&foreground).await?;
                 let status_rx = foreground
                     .spawn(move |me, ctx| me.execute_run(task.prompt, ctx))
                     .await?;
@@ -2542,6 +2620,14 @@ impl AgentDriver {
                 conversation_status.into_result()
             }
             HarnessKind::ThirdParty(harness) => {
+                // Harnesses that render through the native conversation are driven over ACP;
+                // the rest run their interactive CLI in the terminal.
+                let transport = if harness.drives_cli_agent_session() {
+                    HarnessTransport::Pty
+                } else {
+                    HarnessTransport::Acp
+                };
+                let setup_events = setup_events.with_transport(transport);
                 let harness_setup_events = setup_events.clone();
                 let (harness_exit_rx, runner) = setup_events
                     .record_result(SetupStep::ThirdPartyHarnessPreparation, async {
@@ -2559,7 +2645,13 @@ impl AgentDriver {
                         )
                         .await?;
 
-                        Self::run_preflight_checks(harness.as_ref(), &foreground).await?;
+                        Self::run_preflight_checks(
+                            harness.as_ref(),
+                            &foreground,
+                            &harness_setup_events,
+                        )
+                        .await?;
+                        Self::show_transport_fallback_notice(harness.harness(), &foreground).await;
                         Ok::<_, AgentDriverError>((harness_exit_rx, runner))
                     })
                     .await?;
@@ -2585,6 +2677,7 @@ impl AgentDriver {
             }
             HarnessKind::Unsupported(harness) => Err(AgentDriverError::HarnessSetupFailed {
                 harness: harness.to_string(),
+                stage: None,
                 reason: format!(
                     "The {harness} harness is only supported for local child agent launches."
                 ),
@@ -2871,15 +2964,63 @@ impl AgentDriver {
     async fn run_preflight_checks(
         harness: &dyn ThirdPartyHarness,
         foreground: &ModelSpawner<Self>,
+        events: &SetupClientEventReporter,
     ) -> Result<(), AgentDriverError> {
         let harness_name = harness.cli_agent().command_prefix().to_owned();
 
         if let Some(cmd) = harness.auth_check_command() {
             log::info!("Running auth check for {harness_name}: {cmd}");
-            Self::run_single_preflight(&cmd, &harness_name, foreground).await?;
+            if harness.drives_cli_agent_session() {
+                Self::run_single_preflight(&cmd, &harness_name, foreground).await?;
+            } else {
+                events
+                    .record_result(
+                        SetupStep::AcpAuthPreflight,
+                        Self::run_single_preflight(&cmd, &harness_name, foreground),
+                    )
+                    .await?;
+            }
         }
 
         Ok(())
+    }
+
+    /// Tells whoever watches the session why a run requested over ACP runs in the terminal, with
+    /// a setup block that echoes [`harness::transport_fallback_notice`]. It runs right before the
+    /// harness starts, as its own block: prefixing the harness command would stop the viewer from
+    /// recognising the harness's block. Best effort, so it never fails the run.
+    async fn show_transport_fallback_notice(
+        selected_harness: Harness,
+        foreground: &ModelSpawner<Self>,
+    ) {
+        let Ok(Some(reason)) = foreground
+            .spawn(|me, _| me.harness_transport_fallback)
+            .await
+        else {
+            return;
+        };
+        let command = harness::transport_fallback_notice_command(selected_harness, reason);
+        let shown: Result<(), AgentDriverError> = async {
+            let start_future = foreground
+                .spawn(move |me, ctx| {
+                    me.terminal_driver
+                        .update(ctx, |driver, ctx| driver.execute_command(&command, ctx))
+                })
+                .await??;
+            let command_handle = start_future.await?;
+            if command_handle
+                .with_timeout(TRANSPORT_FALLBACK_NOTICE_TIMEOUT)
+                .await
+                .is_err()
+            {
+                log::warn!("The transport fallback notice did not finish in time");
+            }
+            Ok(())
+        }
+        .await;
+        if let Err(error) = shown {
+            log::warn!("Failed to show the transport fallback notice: {error}");
+        }
     }
 
     /// Run a single preflight check command and return an error if it fails.
@@ -3146,6 +3287,7 @@ impl AgentDriver {
     ) -> AgentDriverError {
         AgentDriverError::HarnessSetupFailed {
             harness: harness.to_owned(),
+            stage: None,
             reason: reason.into(),
         }
     }
@@ -3191,40 +3333,50 @@ impl AgentDriver {
             .map_err(|_| AgentDriverError::InvalidRuntimeState)
             .flatten()?;
 
-        let (prompt_text, system_prompt, resumption_prompt, server_context, usage_context) =
-            match prompt {
-                AgentRunPrompt::Local(text) => {
-                    (Cow::Borrowed(text.as_str()), None, None, None, None)
-                }
-                AgentRunPrompt::ServerSide {
+        let (
+            prompt_text,
+            system_prompt,
+            resumption_prompt,
+            server_context,
+            usage_context,
+            prompt_attribution,
+        ) = match prompt {
+            AgentRunPrompt::Local(text) => {
+                (Cow::Borrowed(text.as_str()), None, None, None, None, None)
+            }
+            AgentRunPrompt::ServerSide {
+                skill,
+                attachments_dir,
+            } => {
+                let skill = skill
+                    .as_ref()
+                    .map(|parsed_skill| ResolvePromptAttachedSkill {
+                        name: parsed_skill.name.clone(),
+                        content: parsed_skill.content.clone(),
+                        path: Some(parsed_skill.path.display_path()),
+                    });
+                let request = ResolvePromptRequest {
                     skill,
-                    attachments_dir,
-                } => {
-                    let skill = skill
-                        .as_ref()
-                        .map(|parsed_skill| ResolvePromptAttachedSkill {
-                            name: parsed_skill.name.clone(),
-                            content: parsed_skill.content.clone(),
-                            path: Some(parsed_skill.path.display_path()),
-                        });
-                    let request = ResolvePromptRequest {
-                        skill,
-                        attachments_dir: attachments_dir.clone(),
-                    };
-                    let resolved = match task_id.as_ref() {
-                        Some(task_id) => server_api.resolve_prompt_for_task(task_id, request).await,
-                        None => server_api.resolve_prompt(request).await,
-                    }
-                    .map_err(AgentDriverError::PromptResolutionFailed)?;
-                    (
-                        Cow::Owned(resolved.prompt),
-                        resolved.system_prompt,
-                        resolved.resumption_prompt,
-                        resolved.context,
-                        resolved.harness_usage,
-                    )
+                    attachments_dir: attachments_dir.clone(),
+                };
+                let resolved = match task_id.as_ref() {
+                    Some(task_id) => server_api.resolve_prompt_for_task(task_id, request).await,
+                    None => server_api.resolve_prompt(request).await,
                 }
-            };
+                .map_err(AgentDriverError::PromptResolutionFailed)?;
+                (
+                    Cow::Owned(resolved.prompt),
+                    resolved.system_prompt,
+                    resolved.resumption_prompt,
+                    resolved.context,
+                    resolved.harness_usage,
+                    resolved
+                        .user_query_b64
+                        .as_deref()
+                        .and_then(BaseUserQuery::decode_b64),
+                )
+            }
+        };
 
         let (secrets, third_party_harness_model_config) = foreground
             .spawn(|me, _| {
@@ -3267,6 +3419,7 @@ impl AgentDriver {
                 system_prompt.as_deref(),
                 resumption_prompt.as_deref(),
                 server_context.as_deref(),
+                prompt_attribution.as_ref(),
                 &workspace_root,
                 &harness_working_dir,
                 task_id,
@@ -3682,9 +3835,9 @@ impl AgentDriver {
 
     /// Emits a telemetry event for one attempt in the harness exit
     /// escalation ladder (`method` is `"exit"`, `"exit_followup"`, or
-    /// `"force_kill"`), so how often graceful exit succeeds vs. requires
-    /// escalation is measurable in production instead of only
-    /// reconstructable from logs.
+    /// `"force_kill"`), or for the ladder running out (`"timed_out"`), so
+    /// how often graceful exit succeeds vs. requires escalation is
+    /// measurable in production instead of only reconstructable from logs.
     async fn send_harness_exit_telemetry(
         harness_name: &str,
         method: &'static str,
@@ -3989,6 +4142,12 @@ impl AgentDriver {
                         return;
                     }
                     let history_model = BlocklistAIHistoryModel::as_ref(ctx);
+                    let bound_conversation_id = me.run_conversation_id
+                        .or(restored_conversation_id)
+                        .or_else(|| history_model.active_conversation_id(terminal_id));
+                    if bound_conversation_id != Some(*conversation_id) {
+                        return;
+                    }
                     let Some(conversation) = history_model.conversation(conversation_id) else {
                         log::warn!("No active conversation for terminal view {conversation_terminal_id} with id {conversation_id}");
                         return;
@@ -4254,26 +4413,6 @@ impl AgentDriver {
                     }
                 })
             });
-
-            // Dispatch any shared-session startup follow-up that arrived while the initial
-            // prompt was being prepared. Must run after the update above returns, since
-            // `dispatch_queued_warp_agent_prompt` targets this terminal surface's *active*
-            // conversation, which the initial send just set. If more than one row accumulated,
-            // the rest are picked up one at a time by `Steering`'s piggyback-on-next-request
-            // mechanism or the idle-triggered drain, not flushed here all at once.
-            if let Some(conversation_id) = prepared_conversation_id {
-                self.terminal_driver.update(ctx, |td, ctx| {
-                    td.with_terminal_view(ctx, |terminal, ctx| {
-                        terminal.ai_controller().update(ctx, |controller, ctx| {
-                            controller.dispatch_queued_warp_agent_prompt(
-                                conversation_id,
-                                None,
-                                ctx,
-                            );
-                        });
-                    });
-                });
-            }
         }
 
         if self.skip_initial_turn

@@ -22,6 +22,7 @@ mod connection;
 mod launch;
 mod manifest;
 mod mapping;
+mod mcp_projection;
 mod model_config;
 mod policy;
 mod protocol;
@@ -44,14 +45,14 @@ use prost::Message as _;
 use serde_json::Value;
 use session_sharing_protocol::common::ParticipantId;
 use uuid::Uuid;
-use warp_cli::agent::Harness;
+use warp_cli::agent::{Harness, HarnessTransport};
 use warp_core::channel::ChannelState;
 use warp_core::safe_warn;
 use warp_errors::report_error;
 use warp_managed_secrets::ManagedSecretValue;
 use warp_multi_agent_api::response_event::StreamFinished;
-use warp_multi_agent_api::{ClientAction, McpServerIdentity, ResponseEvent, response_event};
-use warp_util::path::{EscapeChar, ShellFamily};
+use warp_multi_agent_api::{ClientAction, ResponseEvent, response_event};
+use warp_util::path::{EscapeChar, ShellFamily, resolve_executable};
 use warpui::r#async::Timer;
 use warpui::r#async::executor::Background;
 use warpui::{ModelContext, ModelHandle, ModelSpawner, SingletonEntity};
@@ -63,6 +64,7 @@ use self::connection::{AcpConnection, RpcError};
 use self::launch::AcpLaunchSpec;
 use self::manifest::HarnessManifest;
 use self::mapping::AcpTurnMapper;
+use self::mcp_projection::KnownMcpServers;
 use self::model_config::configure_model_and_thinking_through_acp;
 use self::policy::{PolicyDecision, PolicyRequest};
 use self::protocol::{
@@ -80,7 +82,7 @@ use self::turn_driver::{
     TurnDriver, TurnHost, TurnState, cancel_deadline,
 };
 use super::super::terminal::{CommandHandle, TerminalDriver};
-use super::super::{AgentDriver, AgentDriverError};
+use super::super::{AgentDriver, AgentDriverError, HarnessSetupStage};
 use super::claude_code::prepare_claude_environment_config;
 use super::codex::{prepare_codex_environment_config, publish_skills_for_codex};
 use super::gemini::{prepare_gemini_environment_config, publish_skills_for_gemini};
@@ -93,12 +95,13 @@ use super::transcript_persistence::{
     UploadedTranscriptUsage, capture_transcript_with_retry, upload_captured_transcript,
 };
 use super::{
-    HarnessCleanupDisposition, HarnessRunner, JSONMCPServer, ResolvedMCPServers, ResumePayload,
-    SavePoint, ThirdPartyHarness, install_docs_url, validate_cli_installed,
+    AcpAdapter, HarnessCleanupDisposition, HarnessRunner, JSONMCPServer, ResolvedMCPServers,
+    ResumePayload, SavePoint, ThirdPartyHarness, TransportFallbackReason, install_docs_url,
+    validate_cli_installed,
 };
-use crate::ai::agent::CancellationReason;
-use crate::ai::agent::api::{ServerConversationToken, mcp_server_identity};
+use crate::ai::agent::api::ServerConversationToken;
 use crate::ai::agent::conversation::{AIConversation, AIConversationId};
+use crate::ai::agent::{BaseUserQuery, CancellationReason};
 use crate::ai::agent_sdk::setup_observability::{SetupClientEventReporter, SetupStep};
 use crate::ai::ambient_agents::AmbientAgentTaskId;
 use crate::ai::ambient_agents::task::HarnessModelConfig;
@@ -217,7 +220,11 @@ impl AcpHarness {
                 )
             }
             Harness::Gemini => {
-                prepare_gemini_environment_config(harness_working_dir, system_prompt)?;
+                prepare_gemini_environment_config(
+                    harness_working_dir,
+                    system_prompt,
+                    &HashMap::new(),
+                )?;
                 publish_skills_for_gemini(
                     workspace_root,
                     harness_working_dir,
@@ -268,11 +275,50 @@ impl ThirdPartyHarness for AcpHarness {
     }
 
     fn validate(&self) -> Result<(), AgentDriverError> {
-        if self.manifest.is_sidecar {
-            Ok(())
-        } else {
-            validate_cli_installed(&self.manifest.launch.program, self.install_docs_url())
+        // A sidecar's program was verified when its manifest was read.
+        let Some(adapter) = &self.manifest.default else {
+            return Ok(());
+        };
+        let docs_url = self.install_docs_url();
+        // Checked against this process's `PATH`, like the terminal transports do. The bridge
+        // picks the name again on the session shell's `PATH`, which is the one that counts.
+        if !adapter
+            .programs()
+            .any(|program| resolve_executable(program).is_some())
+        {
+            return Err(AgentDriverError::HarnessSetupFailed {
+                harness: self.harness.to_string(),
+                stage: Some(HarnessSetupStage::Validate),
+                reason: adapter.missing_reason(docs_url),
+            });
         }
+        // The adapter only drives the CLI; without it the run would fail at the auth
+        // preflight and read as a login problem.
+        if let Some(cli) = adapter.wraps_cli {
+            validate_cli_installed(cli, docs_url, Some(HarnessSetupStage::Validate))?;
+        }
+        Ok(())
+    }
+
+    fn acp_adapter(&self) -> Option<AcpAdapter> {
+        // A sidecar's program was verified when its manifest was read. Without one, any of the
+        // default adapter's names will do, the same lookup `validate` makes.
+        let Some(adapter) = &self.manifest.default else {
+            return Some(AcpAdapter::Available);
+        };
+        if adapter
+            .programs()
+            .any(|program| resolve_executable(program).is_some())
+        {
+            return Some(AcpAdapter::Available);
+        }
+        Some(AcpAdapter::Missing(
+            if self.manifest.sidecar_without_manifest {
+                TransportFallbackReason::SidecarWithoutAdapter
+            } else {
+                TransportFallbackReason::NoSidecar
+            },
+        ))
     }
 
     fn auth_check_command(&self) -> Option<String> {
@@ -297,6 +343,7 @@ impl ThirdPartyHarness for AcpHarness {
         system_prompt: Option<&str>,
         resumption_prompt: Option<&str>,
         context: Option<&str>,
+        prompt_attribution: Option<&BaseUserQuery>,
         workspace_root: &Path,
         harness_working_dir: &Path,
         task_id: Option<AmbientAgentTaskId>,
@@ -369,7 +416,9 @@ impl ThirdPartyHarness for AcpHarness {
         Ok(Box::new(AcpHarnessRunner {
             harness: self.harness,
             launch: self.manifest.launch.clone(),
+            program_candidates: self.manifest.program_candidates(),
             user_prompt: prompt.to_owned(),
+            opening_base: prompt_attribution.cloned(),
             prompt_text,
             resumed_prompt_text,
             initial_attachments: self.initial_attachments.clone(),
@@ -385,14 +434,7 @@ impl ThirdPartyHarness for AcpHarness {
                 .filter(|_| self.harness != Harness::Pi)
                 .map(|(name, server)| mcp_server_for_acp(name, server))
                 .collect(),
-            mcp_server_identities: resolved_mcp_servers
-                .configs
-                .keys()
-                .map(|name| {
-                    let warp_id = resolved_mcp_servers.warp_ids.get(name).map(String::as_str);
-                    (name.clone(), tool_call_server_identity(name, warp_id))
-                })
-                .collect(),
+            known_mcp_servers: KnownMcpServers::from_resolved(resolved_mcp_servers),
             conversation: OnceLock::new(),
             boundary_snapshot: Arc::default(),
             cli_session,
@@ -441,6 +483,16 @@ enum HandshakeError {
     TimedOut(&'static str),
 }
 
+impl std::fmt::Display for HandshakeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Protocol(error) => write!(f, "{error:#}"),
+            Self::Rehydration(error) => write!(f, "{error}"),
+            Self::TimedOut(phase) => write!(f, "the agent did not finish {phase}"),
+        }
+    }
+}
+
 impl From<anyhow::Error> for HandshakeError {
     fn from(error: anyhow::Error) -> Self {
         Self::Protocol(error)
@@ -467,8 +519,13 @@ struct CliSession {
 pub(crate) struct AcpHarnessRunner {
     harness: Harness,
     launch: AcpLaunchSpec,
-    /// The prompt as the user wrote it, echoed into the conversation.
+    /// Names the bridge may launch `launch.program` under, preferred first.
+    program_candidates: Vec<String>,
+    /// The prompt the server resolved for this execution, echoed into the conversation.
     user_prompt: String,
+    /// Who sent the query that opens this execution, carried onto the echo of `user_prompt` so
+    /// live viewers see it attributed as the stored snapshot later is.
+    opening_base: Option<BaseUserQuery>,
     /// The full text sent to the agent, including server-composed context.
     prompt_text: String,
     /// `prompt_text` for a run that resumed its agent session, without what the session's
@@ -484,8 +541,9 @@ pub(crate) struct AcpHarnessRunner {
     terminal_driver: ModelHandle<TerminalDriver>,
     attachments: Arc<AttachmentResolver>,
     mcp_servers: Vec<McpServer>,
-    /// Stamped on the agent's MCP tool calls, keyed by server name.
-    mcp_server_identities: HashMap<String, McpServerIdentity>,
+    /// Every MCP server configured for the run, including ones the harness is given through
+    /// its own config files rather than `session/new`.
+    known_mcp_servers: KnownMcpServers,
     /// Set before the first turn.
     conversation: OnceLock<RunConversation>,
     /// The encoded conversation as captured at the most recent request-stream boundary and not
@@ -517,15 +575,20 @@ async fn local_pi_only_exempt(foreground: &ModelSpawner<AgentDriver>, harness: H
 }
 
 impl AcpHarnessRunner {
-    fn setup_failed(&self, reason: String) -> AgentDriverError {
+    fn setup_failed(&self, stage: HarnessSetupStage, reason: String) -> AgentDriverError {
         AgentDriverError::HarnessSetupFailed {
             harness: self.harness.to_string(),
+            stage: Some(stage),
             reason,
         }
     }
 
-    /// The run's error for a handshake that produced no session.
-    fn handshake_failed(&self, error: HandshakeError) -> AgentDriverError {
+    /// The run's error for a handshake that produced no session; `stage` is where it stopped.
+    fn handshake_failed(
+        &self,
+        error: HandshakeError,
+        stage: HarnessSetupStage,
+    ) -> AgentDriverError {
         match error {
             HandshakeError::Protocol(error) => {
                 // Code -32000 is the agent refusing the session for lack of credentials, which
@@ -542,9 +605,9 @@ impl AcpHarnessRunner {
                 let reason = format!("{error:#}");
                 report_error!(
                     error.context("ACP handshake failed"),
-                    extra: { "harness" => %self.harness }
+                    extra: { "harness" => %self.harness, "stage" => stage.as_str() }
                 );
-                self.setup_failed(reason)
+                self.setup_failed(stage, reason)
             }
             // The run fails with the rehydration error itself, as a terminal-transport resume
             // does, so the task status says what went wrong.
@@ -559,9 +622,10 @@ impl AcpHarnessRunner {
                 );
                 error
             }
-            HandshakeError::TimedOut(phase) => self.setup_failed(format!(
-                "the agent did not finish {phase} within {HANDSHAKE_TIMEOUT:?}"
-            )),
+            HandshakeError::TimedOut(phase) => self.setup_failed(
+                stage,
+                format!("the agent did not finish {phase} within {HANDSHAKE_TIMEOUT:?}"),
+            ),
         }
     }
 
@@ -708,7 +772,10 @@ impl AcpHarnessRunner {
                         .await
                         .map_err(|error| {
                             report_error!(&error);
-                            AgentDriverError::ConfigBuildFailed(error)
+                            self.setup_failed(
+                                HarnessSetupStage::ExternalConversation,
+                                format!("{error:#}"),
+                            )
                         })
                 })
                 .await?
@@ -737,7 +804,8 @@ impl AcpHarnessRunner {
 #[cfg_attr(target_family = "wasm", async_trait(?Send))]
 impl HarnessRunner for AcpHarnessRunner {
     fn harness_name(&self) -> &str {
-        &self.launch.program
+        // The harness, not the program: the same harness launches under several names.
+        self.harness.config_name()
     }
     #[cfg(test)]
     fn prompt_text_for_test(&self) -> Option<&str> {
@@ -757,6 +825,7 @@ impl HarnessRunner for AcpHarnessRunner {
         foreground: &ModelSpawner<AgentDriver>,
         setup_events: &SetupClientEventReporter,
     ) -> Result<CommandHandle, AgentDriverError> {
+        let setup_events = &setup_events.with_transport(HarnessTransport::Acp);
         let (background, shell_family, restored): (
             Arc<Background>,
             ShellFamily,
@@ -803,10 +872,17 @@ impl HarnessRunner for AcpHarnessRunner {
             })
         });
 
-        let listener = BridgeListener::bind(&self.launch.program, &self.launch.args)
-            .map_err(|error| self.setup_failed(format!("{error:#}")))?;
-        let command = bridge_command(listener.launch_file(), shell_family)
-            .map_err(|error| self.setup_failed(format!("{error:#}")))?;
+        let programs = self
+            .program_candidates
+            .iter()
+            .map(String::as_str)
+            .collect::<Vec<_>>();
+        let listener = BridgeListener::bind(&programs, &self.launch.args).map_err(|error| {
+            self.setup_failed(HarnessSetupStage::BridgeSpawn, format!("{error:#}"))
+        })?;
+        let command = bridge_command(listener.launch_file(), shell_family).map_err(|error| {
+            self.setup_failed(HarnessSetupStage::BridgeSpawn, format!("{error:#}"))
+        })?;
         let terminal_driver = self.terminal_driver.clone();
         let command_handle = foreground
             .spawn(move |_, ctx| {
@@ -815,12 +891,20 @@ impl HarnessRunner for AcpHarnessRunner {
             .await??
             .await?;
 
-        let clock = PhaseClock::start("connecting and initializing");
-        let (reader, writer) = match listener.accept(HANDSHAKE_TIMEOUT).await {
+        let clock = PhaseClock::start(HarnessSetupStage::BridgeAccept, "connecting");
+        let accepted = setup_events
+            .record_result(
+                SetupStep::AcpBridgeAccept,
+                listener.accept(HANDSHAKE_TIMEOUT),
+            )
+            .await;
+        let (reader, writer) = match accepted {
             Ok(halves) => halves,
             Err(error) => {
                 self.interrupt_terminal(foreground).await;
-                return Err(self.setup_failed(format!("{error:#}")));
+                return Err(
+                    self.setup_failed(HarnessSetupStage::BridgeAccept, format!("{error:#}"))
+                );
             }
         };
         drop(listener);
@@ -846,29 +930,34 @@ impl HarnessRunner for AcpHarnessRunner {
         let handshake = async move {
             let connection = handshake_connection;
             let clock = handshake_clock;
-            let initialize: InitializeResponse = connection
-                .request(
-                    protocol::METHOD_INITIALIZE,
-                    InitializeParams {
-                        protocol_version: PROTOCOL_VERSION,
-                        client_capabilities: ClientCapabilities {
-                            fs: FsCapabilities {
-                                read_text_file: true,
-                                write_text_file: true,
+            clock.restart(HarnessSetupStage::Initialize, "initializing");
+            let initialize: InitializeResponse = setup_events
+                .record_result(SetupStep::AcpInitialize, async {
+                    connection
+                        .request(
+                            protocol::METHOD_INITIALIZE,
+                            InitializeParams {
+                                protocol_version: PROTOCOL_VERSION,
+                                client_capabilities: ClientCapabilities {
+                                    fs: FsCapabilities {
+                                        read_text_file: true,
+                                        write_text_file: true,
+                                    },
+                                    terminal: false,
+                                },
+                                client_info: ClientInfo {
+                                    name: "warp".to_owned(),
+                                    title: "Warp".to_owned(),
+                                    version: ChannelState::app_version()
+                                        .unwrap_or(env!("CARGO_PKG_VERSION"))
+                                        .to_owned(),
+                                },
                             },
-                            terminal: false,
-                        },
-                        client_info: ClientInfo {
-                            name: "warp".to_owned(),
-                            title: "Warp".to_owned(),
-                            version: ChannelState::app_version()
-                                .unwrap_or(env!("CARGO_PKG_VERSION"))
-                                .to_owned(),
-                        },
-                    },
-                )
-                .await
-                .context("initialize failed")?;
+                        )
+                        .await
+                        .context("initialize failed")
+                })
+                .await?;
             let agent_description = initialize
                 .agent_info
                 .as_ref()
@@ -897,22 +986,37 @@ impl HarnessRunner for AcpHarnessRunner {
             );
             self.attachments
                 .set_prompt_capabilities(capabilities.prompt_capabilities);
-            clock.restart("opening its session");
-            let plan = plan_session(rehydration, &capabilities.session_capabilities).await?;
-            let (mut session, origin) = open_session(
-                &connection,
-                plan,
-                self.harness_working_dir.display().to_string(),
-                self.mcp_servers.clone(),
-                &clock,
-            )
-            .await?;
-            configure_model_and_thinking_through_acp(
-                &connection,
-                &mut session,
-                self.model_config.as_ref(),
-            )
-            .await?;
+            clock.restart(HarnessSetupStage::SessionOpen, "opening its session");
+            let (mut session, origin) = setup_events
+                .record_result_with_outcome(
+                    SetupStep::AcpSessionOpen,
+                    async {
+                        let plan =
+                            plan_session(rehydration, &capabilities.session_capabilities).await?;
+                        open_session(
+                            &connection,
+                            plan,
+                            self.harness_working_dir.display().to_string(),
+                            self.mcp_servers.clone(),
+                            &clock,
+                        )
+                        .await
+                        .map_err(HandshakeError::from)
+                    },
+                    |(_, origin)| Some(origin.metric_label()),
+                )
+                .await?;
+            clock.restart(HarnessSetupStage::ModelConfig, "configuring its model");
+            setup_events
+                .record_result(
+                    SetupStep::AcpModelConfig,
+                    configure_model_and_thinking_through_acp(
+                        &connection,
+                        &mut session,
+                        self.model_config.as_ref(),
+                    ),
+                )
+                .await?;
             let suppressed_startup_message = match self.harness {
                 Harness::Pi => pi::startup_message(&session.meta),
                 Harness::Claude
@@ -945,7 +1049,7 @@ impl HarnessRunner for AcpHarnessRunner {
             Err(error) => {
                 connection.close().await;
                 self.interrupt_terminal(foreground).await;
-                return Err(self.handshake_failed(error));
+                return Err(self.handshake_failed(error, clock.stage()));
             }
         };
         match &origin {
@@ -983,15 +1087,15 @@ impl HarnessRunner for AcpHarnessRunner {
             run_id,
             conversation_id: local_conversation_id,
         });
-        let turn = match host.begin_turn(None).await {
+        let turn = match setup_events
+            .record_result(SetupStep::AcpBeginTurn, host.begin_turn(None))
+            .await
+        {
             Ok(turn) => turn,
             Err(error) => {
                 connection.close().await;
                 self.interrupt_terminal(foreground).await;
-                return Err(AgentDriverError::HarnessSetupFailed {
-                    harness: "acp".to_owned(),
-                    reason: format!("{error:#}"),
-                });
+                return Err(self.setup_failed(HarnessSetupStage::BeginTurn, format!("{error:#}")));
             }
         };
         let (follow_up_tx, follow_up_rx) = async_channel::unbounded::<ExternalHarnessPrompt>();
@@ -1007,18 +1111,19 @@ impl HarnessRunner for AcpHarnessRunner {
                 let mapper = AcpTurnMapper::new(
                     root_task_id,
                     turn.request_id.clone(),
-                    self.mcp_server_identities.clone(),
+                    self.known_mcp_servers.clone(),
                 );
-                let actions = vec![mapper.user_query_action(&self.user_prompt, None)];
+                let actions =
+                    vec![mapper.user_query_action(&self.user_prompt, self.opening_base.as_ref())];
                 (mapper, actions)
             }
             None => {
                 let mapper = AcpTurnMapper::new(
                     Uuid::new_v4().to_string(),
                     turn.request_id.clone(),
-                    self.mcp_server_identities.clone(),
+                    self.known_mcp_servers.clone(),
                 );
-                let actions = mapper.initial_actions(&self.user_prompt);
+                let actions = mapper.initial_actions(&self.user_prompt, self.opening_base.as_ref());
                 (mapper, actions)
             }
         };
@@ -1036,6 +1141,7 @@ impl HarnessRunner for AcpHarnessRunner {
             follow_ups: Some(follow_up_rx),
             cancels: Some(cancel_rx),
             host,
+            telemetry: Arc::new(setup_events.clone()),
             state: self.turn_state.clone(),
             turn,
             session_id,
@@ -1558,15 +1664,6 @@ async fn write_text_file(context: &AgentRequestContext, params: Value) -> Result
         Ok(Value::Null)
     })
     .await
-}
-
-/// The identity of an MCP server as its tool calls carry it. No server request sees these calls,
-/// so the display name warp-server would otherwise fill in is set here.
-fn tool_call_server_identity(name: &str, warp_id: Option<&str>) -> McpServerIdentity {
-    McpServerIdentity {
-        display_name: name.to_owned(),
-        ..warp_id.and_then(mcp_server_identity).unwrap_or_default()
-    }
 }
 
 fn mcp_server_for_acp(name: &str, server: &JSONMCPServer) -> McpServer {
