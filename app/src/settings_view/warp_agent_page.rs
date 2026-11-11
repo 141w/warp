@@ -2406,7 +2406,7 @@ impl WarpAgentPageView {
             ));
         }
 
-        if FeatureFlag::CustomModelRouters.is_enabled() {
+        if FeatureFlag::CustomModelRouters.is_enabled() && !is_logged_out {
             #[allow(clippy::vec_init_then_push)]
             let custom_router_widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = {
                 let mut widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = Vec::new();
