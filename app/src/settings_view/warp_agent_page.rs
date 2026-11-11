@@ -2293,6 +2293,13 @@ impl WarpAgentPageView {
     fn build_page(ctx: &mut ViewContext<Self>) -> PageType<Self> {
         let mut categories: Vec<Category<Self>> = Vec::new();
 
+        // Sections whose content is backed by Warp account services. Without an
+        // account they render dead toggles and login prompts, so they are left out
+        // entirely; the local sections (input, voice, attribution, other) stay.
+        let is_logged_out = AuthStateProvider::as_ref(ctx)
+            .get()
+            .is_anonymous_or_logged_out();
+
         let has_active_ai_widgets = {
             let ai_settings = AISettings::as_ref(ctx);
             ai_settings
@@ -2314,7 +2321,7 @@ impl WarpAgentPageView {
                         .git_operations_autogen_enabled_internal
                         .is_supported_on_current_platform())
         };
-        if has_active_ai_widgets {
+        if has_active_ai_widgets && !is_logged_out {
             let active_ai_widgets: Vec<Box<dyn SettingsWidget<View = Self>>> = vec![
                 Box::new(NextCommandWidget::default()),
                 Box::new(PromptSuggestionsWidget::default()),
@@ -2357,42 +2364,47 @@ impl WarpAgentPageView {
             ));
         }
 
-        categories.push(Category::new(
-            t!("settings.section.cloud_handoff"),
-            vec![
-                Box::new(CloudHandoffWidget::default()),
-                Box::new(AutoHandoffOnSleepWidget::default()),
-                Box::new(AmpersandHandoffWidget::default()),
-            ],
-        ));
+        if !is_logged_out {
+            categories.push(Category::new(
+                t!("settings.section.cloud_handoff"),
+                vec![
+                    Box::new(CloudHandoffWidget::default()),
+                    Box::new(AutoHandoffOnSleepWidget::default()),
+                    Box::new(AmpersandHandoffWidget::default()),
+                ],
+            ));
+        }
 
-        let page_view_handle = ctx.handle();
-        categories.push(Category::with_header(
-            CategoryHeader::new("Custom Inference").with_trailing_element(
-                move |view: &Self, _appearance, app| {
-                    let workspaces = UserWorkspaces::as_ref(app);
-                    let team_scope = workspaces.team_context(&page_view_handle, app);
-                    let shows_custom_inference =
-                        CustomInferenceVisibility::compute(&team_scope, app).show_custom_inference;
-                    if shows_custom_inference {
-                        view.custom_inference_add_button.as_ref(app).render(app)
-                    } else {
-                        Empty::new().finish()
-                    }
-                },
-            ),
-            vec![Box::new(ApiKeysWidget::new(ctx))],
-        ));
+        if !is_logged_out {
+            let page_view_handle = ctx.handle();
+            categories.push(Category::with_header(
+                CategoryHeader::new("Custom Inference").with_trailing_element(
+                    move |view: &Self, _appearance, app| {
+                        let workspaces = UserWorkspaces::as_ref(app);
+                        let team_scope = workspaces.team_context(&page_view_handle, app);
+                        let shows_custom_inference =
+                            CustomInferenceVisibility::compute(&team_scope, app)
+                                .show_custom_inference;
+                        if shows_custom_inference {
+                            view.custom_inference_add_button.as_ref(app).render(app)
+                        } else {
+                            Empty::new().finish()
+                        }
+                    },
+                ),
+                vec![Box::new(ApiKeysWidget::new(ctx))],
+            ));
 
-        categories.push(Category::new(
-            t!("settings.section.aws_bedrock"),
-            vec![Box::new(AwsBedrockWidget::new(ctx))],
-        ));
+            categories.push(Category::new(
+                t!("settings.section.aws_bedrock"),
+                vec![Box::new(AwsBedrockWidget::new(ctx))],
+            ));
 
-        categories.push(Category::new(
-            t!("settings.section.gemini_enterprise"),
-            vec![Box::new(GeminiEnterpriseWidget::new(ctx))],
-        ));
+            categories.push(Category::new(
+                t!("settings.section.gemini_enterprise"),
+                vec![Box::new(GeminiEnterpriseWidget::new(ctx))],
+            ));
+        }
 
         if FeatureFlag::CustomModelRouters.is_enabled() {
             #[allow(clippy::vec_init_then_push)]
@@ -2427,7 +2439,7 @@ impl WarpAgentPageView {
         other_widgets.push(Box::new(ConversationLayoutPreferenceWidget));
         categories.push(Category::new(t!("settings.section.other"), other_widgets));
 
-        if FeatureFlag::AgentModeComputerUse.is_enabled() {
+        if FeatureFlag::AgentModeComputerUse.is_enabled() && !is_logged_out {
             categories.push(Category::new(
                 t!("settings.section.experimental"),
                 vec![Box::new(CloudAgentComputerUseWidget::default())],
@@ -3262,57 +3274,10 @@ fn render_global_ai_toggle(
         );
     }
 
-    // Show sign-up button for anonymous users, toggle for logged-in users
+    // Anonymous users get nothing here: the account-only sections are already
+    // hidden, and a sign-up prompt would be a dead end in the OSS channel.
     if is_anonymous {
-        row.add_child(
-            Flex::row()
-                .with_cross_axis_alignment(CrossAxisAlignment::Center)
-                .with_child(
-                    Container::new(
-                        Text::new_inline(
-                            "To use AI features, please create an account.",
-                            appearance.ui_font_family(),
-                            14.,
-                        )
-                        .with_color(
-                            appearance
-                                .theme()
-                                .sub_text_color(appearance.theme().surface_2())
-                                .into_solid(),
-                        )
-                        .finish(),
-                    )
-                    .with_margin_right(16.)
-                    .finish(),
-                )
-                .with_child(
-                    Container::new(
-                        ui_builder
-                            .button(ButtonVariant::Accent, sign_up_button.clone())
-                            .with_style(UiComponentStyles {
-                                font_size: Some(14.),
-                                font_weight: Some(Weight::Semibold),
-                                border_radius: Some(CornerRadius::with_all(Radius::Pixels(4.))),
-                                padding: Some(Coords {
-                                    top: 8.,
-                                    bottom: 8.,
-                                    left: 24.,
-                                    right: 24.,
-                                }),
-                                ..Default::default()
-                            })
-                            .with_text_label("Sign up".to_owned())
-                            .build()
-                            .on_click(move |ctx, _, _| {
-                                ctx.dispatch_typed_action(WarpAgentPageAction::SignupAnonymousUser);
-                            })
-                            .finish(),
-                    )
-                    .with_padding_right(TOGGLE_BUTTON_RIGHT_PADDING)
-                    .finish(),
-                )
-                .finish(),
-        );
+        return row.finish();
     } else {
         row.add_child(
             Container::new(
